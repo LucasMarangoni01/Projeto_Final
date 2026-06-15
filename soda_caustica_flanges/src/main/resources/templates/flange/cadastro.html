@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Escola</title>
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+<body>
+
+<div th:replace="~{/fragments/menu.html :: menu}"></div>
+
+<main>
+    <div class="card">
+        <h2>Cadastro de Flange</h2>
+        <form id="form-cadastro" th:action="@{/flange/salvar}" th:object="${flange}" method="post" enctype="multipart/form-data">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Nome Flange</label>
+                    <input type="text" id="nome_flange" required th:field="*{nome_flange}">
+                </div>
+
+                <div class="form-group">
+                    <label>Localização</label>
+                    <input type="text" id="localizacao" required th:field="*{localizacao}">
+                </div>
+
+                <div class="form-group">
+                    <label for="temp_ambiente">Temperatura Ambiente (°C)</label>
+                    <div style="display: flex; align-items: center;">
+                        <input type="number" step="0.1" id="temp_ambiente" required th:field="*{temp_ambiente}" placeholder="Ex: 25.0">
+                        <span style="margin-left: 5px;">°C</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Data de Entrada</label>
+                    <input type="date"
+                           id="data_entrada"
+                           th:field="*{data_entrada}"
+                           min="1900-01-01"
+                           max="2026-12-31"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto:</label>
+                    <input type="file" name="arquivoFoto" accept="image/*">
+                </div>
+
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-success">Salvar</button>
+                <a th:href="@{/flange/listagem}" class="btn btn-alter">Voltar para Lista</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // --- LÓGICA DA DATA (Ajuste Imediato) ---
+        const dataInput = document.getElementById('data_entrada');
+
+        dataInput.addEventListener('input', function() {
+            const dataDigitada = this.value;
+
+            if (!dataDigitada) return;
+
+            const partes = dataDigitada.split('-');
+            let ano = parseInt(partes[0], 10);
+            const mes = partes[1];
+            const dia = partes[2];
+
+            let precisaCorrigir = false;
+
+            // Limite Máximo
+            if (ano > 2026) {
+                ano = 2026;
+                precisaCorrigir = true;
+            }
+            // Limite Mínimo (só corrige após 4 dígitos digitados)
+            else if (ano >= 1000 && ano < 1900) {
+                ano = 1900;
+                precisaCorrigir = true;
+            }
+
+            if (precisaCorrigir) {
+                this.value = `${String(ano).padStart(4, '0')}-${mes}-${dia}`;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

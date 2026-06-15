@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Soda cáustica</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Design Tokens ───────────────────────────────────────────── */
+        :root {
+            --bg-base: #1d365e;
+            --bg-card: #0f2749;
+            --bg-card-2:      #1c2335;
+            --bg-hover: #1d2f4e;
+            --border:         rgba(255,255,255,0.07);
+            --border-strong:  rgba(255,255,255,0.13);
+
+            --text-primary:   rgb(0 81 255);
+            --text-secondary: #8892a4;
+            --text-dim:       rgb(0 81 255);
+
+            --ok-green:       #22c55e;
+            --ok-green-dim:   rgba(34,197,94,0.12);
+            --ok-green-ring:  rgba(34,197,94,0.25);
+            --alert-red:      #ef4444;
+            --alert-red-dim:  rgba(239,68,68,0.12);
+            --alert-red-ring: rgba(239,68,68,0.25);
+            --amber:          #f59e0b;
+            --blue-pipe:      #3b82f6;
+            --blue-pipe-dim: rgb(25 76 158 / 0.2);
+
+            --radius-sm:  6px;
+            --radius-md:  10px;
+            --radius-lg:  14px;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.25);
+            --shadow-lift: 0 2px 8px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3);
+
+            --font-ui:   'IBM Plex Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --gap-xs: clamp(4px,  0.4vw, 6px);
+            --gap-sm: clamp(8px,  0.75vw, 12px);
+            --gap-md: clamp(10px, 1vw,   16px);
+            --gap-lg: clamp(14px, 1.5vw, 22px);
+        }
+
+        /* ── Reset ───────────────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-ui);
+            background: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── Scanline texture ────────────────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.08) 2px,
+                    rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Dashboard root ──────────────────────────────────────────── */
+        .dash {
+            position: relative;
+            z-index: 1;
+            padding: clamp(12px, 2vw, 24px) clamp(12px, 2.5vw, 28px) clamp(20px, 3vw, 36px);
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-md);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ── Top bar ─────────────────────────────────────────────────── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--gap-sm);
+            flex-wrap: wrap;
+            padding-bottom: var(--gap-md);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-meta { display: flex; flex-direction: column; gap: 3px; }
+        .topbar-eyebrow {
+            font-family: var(--font-mono);
+            font-size: clamp(9px, 0.8vw, 10.5px);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--amber);
+        }
+        .topbar-title {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .topbar-sub {
+            font-size: clamp(10px, 0.85vw, 12px);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ── Status badge ────────────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: clamp(28px, 3vw, 34px);
+            padding: 0 clamp(10px, 1.2vw, 16px);
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: clamp(9px, 0.8vw, 11px);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border: 1px solid;
+            backdrop-filter: blur(8px);
+            flex-shrink: 0;
+        }
+        .badge::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .ok-b {
+            background: var(--ok-green-dim);
+            color: var(--ok-green);
+            border-color: rgba(34,197,94,0.3);
+        }
+        .ok-b::before { background: var(--ok-green); box-shadow: 0 0 6px var(--ok-green); }
+        .al-b {
+            background: var(--alert-red-dim);
+            color: var(--alert-red);
+            border-color: rgba(239,68,68,0.4);
+            animation: pbadge 1s infinite;
+        }
+        .al-b::before { background: var(--alert-red); animation: blink 0.65s infinite; box-shadow: 0 0 6px var(--alert-red); }
+
+        /* ── Body: map + flange panel ────────────────────────────────── */
+        .body-row {
+            display: flex;
+            gap: var(--gap-md);
+            align-items: flex-start;
+        }
+
+        /* ── Map card ────────────────────────────────────────────────── */
+        .map-card {
+            flex: 1 1 0;
+            min-width: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-lg);
+            padding: var(--gap-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+        .map-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* ── Flange panel ─────────────────────────────────────────────── */
+        .flange-panel {
+            width: clamp(200px, 20vw, 248px);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+        .flange-panel-header {
+            padding: clamp(10px, 1vw, 14px) clamp(12px, 1.2vw, 16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(255,255,255,0.02);
+        }
+        .flange-panel-title {
+            font-family: var(--font-mono);
+            font-size: clamp(9px, 0.75vw, 10.5px);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .flange-panel-count {
+            font-family: var(--font-mono);
+            font-size: clamp(9px, 0.75vw, 10.5px);
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+        .flange-list {
+            display: flex;
+            flex-direction: column;
+            padding: var(--gap-xs);
+            gap: var(--gap-xs);
+            overflow-y: auto;
+        }
+
+        /* ── Flange card ──────────────────────────────────────────────── */
+        .fc {
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 12px);
+            padding: clamp(9px, 0.9vw, 12px) clamp(10px, 1vw, 14px);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-card-2);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+            user-select: none;
+        }
+        .fc:hover { background: var(--bg-hover); border-color: var(--border-strong); box-shadow: var(--shadow-lift); }
+        .fc:active { transform: scale(0.97); }
+        .fc.fc-alert { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.06); }
+        .fc.fc-alert:hover { background: rgba(239,68,68,0.1); }
+
+        .fc-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--ok-green);
+            box-shadow: 0 0 0 3px var(--ok-green-ring), 0 0 8px var(--ok-green);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .fc-dot.alert {
+            background: var(--alert-red);
+            box-shadow: 0 0 0 3px var(--alert-red-ring), 0 0 8px var(--alert-red);
+            animation: blink 0.65s infinite;
+        }
+
+        .fc-info { flex: 1 1 0; min-width: 0; }
+        .fc-code {
+            font-family: var(--font-mono);
+            font-size: clamp(12px, 1.1vw, 14px);
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        .fc-loc {
+            font-size: clamp(10px, 0.85vw, 11.5px);
+            color: var(--text-secondary);
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fc-pill {
+            font-family: var(--font-mono);
+            font-size: clamp(9px, 0.75vw, 10.5px);
+            font-weight: 700;
+            padding: 3px clamp(6px, 0.7vw, 10px);
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: var(--ok-green-dim);
+            color: var(--ok-green);
+            border: 1px solid rgba(34,197,94,0.25);
+            letter-spacing: 0.05em;
+        }
+        .fc-pill.alert {
+            background: var(--alert-red-dim);
+            color: var(--alert-red);
+            border-color: rgba(239,68,68,0.3);
+        }
+
+        /* ── Stats row ───────────────────────────────────────────────── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+            gap: var(--gap-sm);
+        }
+        .sc {
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: clamp(12px, 1.2vw, 18px) clamp(14px, 1.4vw, 20px);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .sc::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--amber), transparent);
+            opacity: 0.4;
+        }
+        .sv {
+            font-family: var(--font-mono);
+            font-size: clamp(22px, 2.5vw, 30px);
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .sl {
+            font-size: clamp(10px, 0.85vw, 11.5px);
+            color: var(--text-secondary);
+        }
+
+        /* ── Log ─────────────────────────────────────────────────────── */
+        .log-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: clamp(6px, 0.7vw, 10px) clamp(10px, 1vw, 14px);
+            max-height: clamp(90px, 12vh, 120px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong) transparent;
+            box-shadow: var(--shadow-card);
+        }
+        .log-box::-webkit-scrollbar { width: 4px; }
+        .log-box::-webkit-scrollbar-track { background: transparent; }
+        .log-box::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+        .log-row {
+            display: flex;
+            gap: 12px;
+            align-items: baseline;
+            font-family: var(--font-mono);
+            font-size: clamp(10px, 0.85vw, 11.5px);
+            color: var(--text-secondary);
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .log-row:last-child { border-bottom: none; }
+        .lt { color: var(--text-dim); min-width: 54px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .la { color: var(--alert-red); font-weight: 600; }
+
+        /* ── Buttons ─────────────────────────────────────────────────── */
+        .btns { display: flex; gap: var(--gap-sm); flex-wrap: wrap; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: clamp(32px, 3.5vw, 38px);
+            padding: 0 clamp(14px, 1.5vw, 20px);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--bg-card-2);
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: clamp(11px, 0.9vw, 13px);
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+        }
+        .btn:hover { background: var(--bg-hover); border-color: rgba(255,255,255,0.2); box-shadow: var(--shadow-lift); }
+        .btn:active { transform: scale(0.97); }
+        .btn-danger {
+            border-color: rgba(239,68,68,0.35);
+            color: var(--alert-red);
+            background: rgba(239,68,68,0.06);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.5); }
+
+        /* ── Legend button ───────────────────────────────────────────── */
+        .btn-legend {
+            height: 22px;
+            padding: 0 9px;
+            font-size: clamp(8px, 0.7vw, 9.5px);
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-radius: 4px;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-base);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-legend:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        /* ── Legend modal ────────────────────────────────────────────── */
+        .legend-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+        .legend-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            padding: clamp(18px, 2.5vw, 28px);
+            border-radius: var(--radius-lg);
+            width: min(340px, 92vw);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .legend-header {
+            font-family: var(--font-mono);
+            font-size: clamp(11px, 1vw, 13px);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--amber);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 13px;
+            font-size: clamp(11px, 0.95vw, 13px);
+            color: var(--text-secondary);
+        }
+        .leg-box { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+        .leg-circle { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── Animations ──────────────────────────────────────────────── */
+        @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.1} }
+        @keyframes pbadge { 0%,100%{opacity:1} 50%{opacity:0.55} }
+        .blink { animation: blink 0.65s infinite; }
+
+        /* ── Responsive ──────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .body-row     { flex-direction: column; }
+            .flange-panel { width: 100%; }
+            .flange-list  { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .flange-list { grid-template-columns: 1fr; }
+            .btn { flex: 1 1 auto; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{/fragments/menu.html :: menu}"></div>
+
+<main style="padding:0; max-width:100%;">
+    <div class="dash">
+
+        <div class="topbar">
+            <div class="topbar-meta">
+                <div class="topbar-eyebrow">Sistema de Monitoramento · NaOH 32%</div>
+                <div class="topbar-title">Planta de Flanges — Soda Cáustica</div>
+                <div class="topbar-sub">Linha de processo industrial · 6 flanges · sensor de vazamento ativo</div>
+            </div>
+            <div class="badge ok-b" id="badge">Sistema normal</div>
+        </div>
+
+        <div class="body-row">
+
+            <div class="map-card">
+                <svg class="map-svg" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
+
+                    <rect x="0" y="0" width="860" height="340" rx="8" fill="#0f1624" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <rect x="0" y="0" width="860" height="26" rx="8" fill="#0b101a"/>
+                    <rect x="0" y="16" width="860" height="10" fill="#0b101a"/>
+                    <text x="430" y="17" text-anchor="middle" font-size="9.5" fill="#f59e0b" font-weight="700" letter-spacing="0.14em" font-family="monospace">PLANTA BAIXA — LINHA DE PROCESSO NaOH 32%</text>
+
+                    <!-- Main pipe -->
+                    <rect x="68" y="76" width="724" height="16" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <text x="430" y="70" text-anchor="middle" font-size="8.5" fill="#60a5fa" font-weight="600" letter-spacing="0.06em">FLUXO PRINCIPAL →</text>
+
+                    <!-- Pump P-01 -->
+                    <rect x="14" y="54" width="56" height="56" rx="7" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
+                    <text x="42" y="76"  text-anchor="middle" font-size="8.5" fill="#c9d1e0" font-weight="700" font-family="monospace">BOMBA</text>
+                    <text x="42" y="88"  text-anchor="middle" font-size="7.5" fill="#8892a4">NaOH 32%</text>
+                    <text x="42" y="99"  text-anchor="middle" font-size="7"   fill="#4e596b" font-family="monospace">P-01</text>
+
+                    <!-- Tank T-01 -->
+                    <rect x="790" y="54" width="56" height="56" rx="7" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
+                    <text x="818" y="76"  text-anchor="middle" font-size="8.5" fill="#c9d1e0" font-weight="700" font-family="monospace">TANK</text>
+                    <text x="818" y="88"  text-anchor="middle" font-size="7.5" fill="#8892a4">Rec. Final</text>
+                    <text x="818" y="99"  text-anchor="middle" font-size="7"   fill="#4e596b" font-family="monospace">T-01</text>
+
+                    <!-- F-01 -->
+                    <g id="fg1" style="cursor:pointer" onclick="toggleLeak(1)">
+                        <rect x="222" y="70" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="231" y="70" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="223" y1="84" x2="235" y2="84" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led1" cx="229" cy="52" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-1" x="229" y="28" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <!-- Subtítulo atualizado CSS -->
+                        <text id="svg-loc-1" x="229" y="40" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- F-02 -->
+                    <g id="fg2" style="cursor:pointer" onclick="toggleLeak(2)">
+                        <rect x="625" y="70" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="634" y="70" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="626" y1="84" x2="638" y2="84" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led2" cx="632" cy="52" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-2" x="632" y="28" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <!-- Subtítulo atualizado CSS -->
+                        <text id="svg-loc-2" x="632" y="40" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- Leak indicators 1 & 2 -->
+                    <g id="drop1" opacity="0">
+                        <ellipse cx="229" cy="112" rx="6" ry="8" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="221" cy="126" rx="4" ry="5" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="237" cy="123" rx="3" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <text x="229" y="142" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+                    <g id="drop2" opacity="0">
+                        <ellipse cx="632" cy="112" rx="6" ry="8" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="624" cy="126" rx="4" ry="5" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="640" cy="123" rx="3" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <text x="632" y="142" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+
+                    <!-- Vertical pipe + Ramal A/B -->
+                    <rect x="424" y="92" width="12" height="86" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <circle cx="430" cy="84"  r="5" fill="#60a5fa"/>
+                    <circle cx="430" cy="178" r="5" fill="#60a5fa"/>
+
+                    <rect x="60" y="178" width="364" height="16" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <text x="220" y="173" text-anchor="middle" font-size="8" fill="#60a5fa" font-weight="600" letter-spacing="0.05em">→ RAMAL A</text>
+                    <rect x="436" y="178" width="364" height="16" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <text x="618" y="173" text-anchor="middle" font-size="8" fill="#60a5fa" font-weight="600" letter-spacing="0.05em">→ RAMAL B</text>
+
+                    <rect x="34" y="174" width="26" height="24" rx="4" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                    <text x="47" y="189" text-anchor="middle" font-size="6.5" fill="#8892a4" font-weight="600" font-family="monospace">BY-A</text>
+                    <rect x="800" y="174" width="26" height="24" rx="4" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                    <text x="813" y="189" text-anchor="middle" font-size="6.5" fill="#8892a4" font-weight="600" font-family="monospace">BY-B</text>
+
+                    <!-- F-03 -->
+                    <g id="fg3" style="cursor:pointer" onclick="toggleLeak(3)">
+                        <rect x="162" y="172" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="171" y="172" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="163" y1="186" x2="175" y2="186" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led3" cx="169" cy="156" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-3" x="169" y="132" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <text id="svg-loc-3" x="169" y="144" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- F-04 -->
+                    <g id="fg4" style="cursor:pointer" onclick="toggleLeak(4)">
+                        <rect x="685" y="172" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="694" y="172" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="686" y1="186" x2="698" y2="186" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led4" cx="691" cy="156" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-4" x="691" y="132" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <text id="svg-loc-4" x="691" y="144" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- Leak 3 & 4 -->
+                    <g id="drop3" opacity="0">
+                        <ellipse cx="169" cy="214" rx="6" ry="8" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="161" cy="228" rx="4" ry="5" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="177" cy="225" rx="3" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <text x="169" y="244" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+                    <g id="drop4" opacity="0">
+                        <ellipse cx="691" cy="214" rx="6" ry="8" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="683" cy="228" rx="4" ry="5" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="699" cy="225" rx="3" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <text x="691" y="244" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+
+                    <!-- Ramal C/D -->
+                    <rect x="424" y="194" width="12" height="86" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <circle cx="430" cy="280" r="5" fill="#60a5fa"/>
+
+                    <rect x="60" y="280" width="364" height="16" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <text x="220" y="275" text-anchor="middle" font-size="8" fill="#60a5fa" font-weight="600" letter-spacing="0.05em">→ RAMAL C</text>
+                    <rect x="436" y="280" width="364" height="16" rx="3" fill="rgba(59,130,246,0.18)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+                    <text x="618" y="275" text-anchor="middle" font-size="8" fill="#60a5fa" font-weight="600" letter-spacing="0.05em">→ RAMAL D</text>
+
+                    <rect x="34" y="276" width="26" height="24" rx="4" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                    <text x="47" y="291" text-anchor="middle" font-size="6.5" fill="#8892a4" font-weight="600" font-family="monospace">BY-C</text>
+                    <rect x="800" y="276" width="26" height="24" rx="4" fill="#1c2335" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                    <text x="813" y="291" text-anchor="middle" font-size="6.5" fill="#8892a4" font-weight="600" font-family="monospace">BY-D</text>
+
+                    <!-- F-05 -->
+                    <g id="fg5" style="cursor:pointer" onclick="toggleLeak(5)">
+                        <rect x="162" y="274" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="171" y="274" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="163" y1="288" x2="175" y2="288" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led5" cx="169" cy="258" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-5" x="169" y="234" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <text id="svg-loc-5" x="169" y="246" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- F-06 -->
+                    <g id="fg6" style="cursor:pointer" onclick="toggleLeak(6)">
+                        <rect x="685" y="274" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <rect x="694" y="274" width="5" height="28" rx="1.5" fill="#4e596b" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+                        <line x1="686" y1="288" x2="698" y2="288" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                        <circle id="led6" cx="691" cy="258" r="9" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
+                        <text id="svg-title-6" x="691" y="234" text-anchor="middle" font-size="10" fill="#22c55e" font-weight="700" font-family="monospace"></text>
+                        <text id="svg-loc-6" x="691" y="246" text-anchor="middle" font-size="12" fill="#FFFFFF" font-weight="600"></text>
+                    </g>
+
+                    <!-- Leak 5 & 6 -->
+                    <g id="drop5" opacity="0">
+                        <ellipse cx="169" cy="316" rx="6" ry="7" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="161" cy="327" rx="4" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="177" cy="325" rx="3" ry="3.5" fill="#ef4444" opacity="0.5"/>
+                        <text x="169" y="340" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+                    <g id="drop6" opacity="0">
+                        <ellipse cx="691" cy="316" rx="6" ry="7" fill="#ef4444" opacity="0.9"/>
+                        <ellipse cx="683" cy="327" rx="4" ry="4" fill="#ef4444" opacity="0.5"/>
+                        <ellipse cx="699" cy="325" rx="3" ry="3.5" fill="#ef4444" opacity="0.5"/>
+                        <text x="691" y="340" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
+                    </g>
+
+                    <text x="430" y="333" text-anchor="middle" font-size="7.5" fill="#4e596b" font-family="monospace">clique em uma flange para simular acionamento do sensor</text>
+
+                </svg>
+            </div>
+
+            <div class="flange-panel">
+                <div class="flange-panel-header">
+                    <span class="flange-panel-title">Flanges</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
+                        <span class="flange-panel-count">6 ativos</span>
+                    </div>
+                </div>
+                <!-- O painel lateral gerado dinamicamente via JS e Thymeleaf -->
+                <div class="flange-list" id="dynamic-flange-list">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="sc"><div class="sv" id="ok-c">6</div><div class="sl">Flanges normais</div></div>
+            <div class="sc"><div class="sv" style="color:var(--alert-red)" id="lk-c">0</div><div class="sl">Vazamentos ativos</div></div>
+            <div class="sc"><div class="sv" id="ev-c">0</div><div class="sl">Eventos totais</div></div>
+            <div class="sc"><div class="sv" id="ts-v" style="font-size:clamp(16px,2vw,22px)">--:--</div><div class="sl">Último alerta</div></div>
+        </div>
+
+        <div class="log-box" id="log">
+            <div class="log-row">
+                <span class="lt" id="t0"></span>
+                <span>Sistema iniciado. Monitoramento ativo — 6 flanges.</span>
+            </div>
+        </div>
+
+        <div class="btns">
+            <button class="btn" onclick="simLeak()">Simular vazamento aleatório</button>
+            <button class="btn btn-danger" onclick="resetAll()">Resetar todos os alertas</button>
+        </div>
+
+    </div>
+</main>
+
+<!-- Legend modal -->
+<div id="legendModal" class="legend-overlay" onclick="toggleLegend(false)">
+    <div class="legend-content" onclick="event.stopPropagation()">
+        <div class="legend-header">Legenda do Sistema</div>
+
+        <div class="legend-item">
+            <div class="leg-circle" style="background:#22c55e;box-shadow:0 0 6px #22c55e;"></div>
+            <span><strong style="color:var(--text-primary)">Verde:</strong> Status Normal — sensor estável.</span>
+        </div>
+        <div class="legend-item">
+            <div class="leg-circle" style="background:#ef4444;box-shadow:0 0 6px #ef4444;"></div>
+            <span><strong style="color:var(--text-primary)">Vermelho:</strong> Vazamento detectado (Alerta).</span>
+        </div>
+        <div class="legend-item">
+            <div class="leg-box" style="background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.5);"></div>
+            <span><strong style="color:var(--text-primary)">Tubulações:</strong> Linhas de transporte NaOH.</span>
+        </div>
+        <div class="legend-item">
+            <div class="leg-box" style="background:#1c2335;border:1px solid rgba(255,255,255,0.1);"></div>
+            <span><strong style="color:var(--text-primary)">Flanges:</strong> Pontos de conexão e vedação.</span>
+        </div>
+
+        <div class="legend-item" style="margin-top:14px;">
+            <button class="btn" style="width:100%;height:34px;" onclick="toggleLegend(false)">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+<script th:inline="javascript">
+    /* ── Arquitetura de Dados: Integração com Backend (Spring Boot/Thymeleaf) ─────────────── */
+    // O Thymeleaf irá injetar a lista de flanges que você cadastrou no BD diretamente aqui.
+    /*<![CDATA[*/
+    const flangesDB = /*[[${flanges}]]*/ [];
+
+    // Função para puxar o dado do BD (caso exista) ou usar um valor padrão (caso aquele slot não tenha sido cadastrado ainda)
+    function getFlangeData(index, defaultName, defaultLoc) {
+        if (flangesDB && flangesDB.length > index && flangesDB[index] !== null) {
+            return {
+                id: index + 1, // IDs vão de 1 a 6 para bater com o SVG
+                name: flangesDB[index].nome_flange || defaultName,
+                location: flangesDB[index].localizacao || defaultLoc
+            };
+        }
+        return { id: index + 1, name: defaultName, location: defaultLoc };
+    }
+
+    // Array dinâmico e reflete exatamente o que foi cadastrado no sistema
+    const FLANGE_CONFIG = [
+        getFlangeData(0, 'F-01', 'Setor A1'),
+        getFlangeData(1, 'F-02', 'Setor A2'),
+        getFlangeData(2, 'F-03', 'Ramal B1'),
+        getFlangeData(3, 'F-04', 'Ramal B2'),
+        getFlangeData(4, 'F-05', 'Ramal C1'),
+        getFlangeData(5, 'F-06', 'Ramal C2')
+    ];
+    /*]]>*/
+
+    /* ── Renderização Dinâmica Inicial ──────────────────────────────── */
+    function initializeFlangeData() {
+        const listContainer = document.getElementById('dynamic-flange-list');
+        listContainer.innerHTML = '';
+
+        FLANGE_CONFIG.forEach(flange => {
+            // 1. Atualiza os textos do mapa SVG com os dados do banco
+            const svgTitle = document.getElementById('svg-title-' + flange.id);
+            const svgLoc = document.getElementById('svg-loc-' + flange.id);
+            if (svgTitle) svgTitle.textContent = flange.name;
+            if (svgLoc) svgLoc.textContent = flange.location;
+
+            // 2. Constrói os cards da barra lateral dinamicamente
+            const card = document.createElement('div');
+            card.className = 'fc';
+            card.id = 'fc' + flange.id;
+            card.setAttribute('onclick', `toggleLeak(${flange.id})`);
+
+            card.innerHTML = `
+                <div class="fc-dot" id="fcdot${flange.id}"></div>
+                <div class="fc-info">
+                    <div class="fc-code">${flange.name}</div>
+                    <div class="fc-loc" title="${flange.location}">${flange.location}</div>
+                </div>
+                <div class="fc-pill" id="fcpill${flange.id}">Normal</div>
+            `;
+
+            listContainer.appendChild(card);
+        });
+    }
+
+    /* ── Legend ─────────────────────────────────────────────────────── */
+    function toggleLegend(show) {
+        document.getElementById('legendModal').style.display = show ? 'flex' : 'none';
+    }
+
+    /* ── Monitoring logic ───────────────────────────────────────────── */
+    let eventCount = 0;
+
+    function toggleLeak(n) {
+        const led  = document.getElementById('led'  + n);
+        const drop = document.getElementById('drop' + n);
+        const isCurrentlyNormal = led.getAttribute('fill') === '#22c55e';
+
+        // Busca o nome do flange na configuração central para os Logs
+        const flangeData = FLANGE_CONFIG.find(f => f.id === n);
+        const flangeName = flangeData ? flangeData.name : `F-0${n}`;
+
+        if (isCurrentlyNormal) {
+            led.setAttribute('fill', '#ef4444');
+            led.setAttribute('stroke', '#b91c1c');
+            if (drop) drop.setAttribute('opacity', '1');
+            addLog(`ALERTA: Vazamento detectado na Flange ${flangeName}`, true);
+            eventCount++;
+            syncCard(n, true);
+        } else {
+            led.setAttribute('fill', '#22c55e');
+            led.setAttribute('stroke', '#16a34a');
+            if (drop) drop.setAttribute('opacity', '0');
+            addLog(`INFO: Flange ${flangeName} normalizada.`);
+            syncCard(n, false);
+        }
+        updateStats();
+    }
+
+    function syncCard(n, isAlert) {
+        const card = document.getElementById('fc'     + n);
+        const dot  = document.getElementById('fcdot'  + n);
+        const pill = document.getElementById('fcpill' + n);
+        if (!card) return;
+        if (isAlert) {
+            card.classList.add('fc-alert');
+            dot.classList.add('alert');
+            pill.classList.add('alert');
+            pill.textContent = 'Vazamento';
+        } else {
+            card.classList.remove('fc-alert');
+            dot.classList.remove('alert');
+            pill.classList.remove('alert');
+            pill.textContent = 'Normal';
+        }
+    }
+
+    function updateStats() {
+        let leaks = 0;
+        for (let i = 1; i <= 6; i++) {
+            const led = document.getElementById('led' + i);
+            if (led && led.getAttribute('fill') === '#ef4444') leaks++;
+        }
+        document.getElementById('ok-c').textContent = 6 - leaks;
+        document.getElementById('lk-c').textContent = leaks;
+        document.getElementById('ev-c').textContent = eventCount;
+        const badge = document.getElementById('badge');
+        if (leaks > 0) {
+            badge.className = 'badge al-b';
+            badge.textContent = 'Atenção: Vazamento';
+            document.getElementById('ts-v').textContent =
+                new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+        } else {
+            badge.className = 'badge ok-b';
+            badge.textContent = 'Sistema normal';
+        }
+    }
+
+    function addLog(msg, isAlert = false) {
+        const logBox = document.getElementById('log');
+        const now = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        const row = document.createElement('div');
+        row.className = 'log-row';
+        row.innerHTML = `<span class="lt">${now}</span><span class="${isAlert ? 'la' : ''}">${msg}</span>`;
+        logBox.prepend(row);
+    }
+
+    function simLeak() {
+        const r = Math.floor(Math.random() * 6) + 1;
+        toggleLeak(r);
+    }
+
+    function resetAll() {
+        for (let i = 1; i <= 6; i++) {
+            const led = document.getElementById('led' + i);
+            if (led && led.getAttribute('fill') === '#ef4444') toggleLeak(i);
+        }
+        addLog('Comando: Todos os alertas foram resetados manualmente.');
+    }
+
+    window.addEventListener('load', function () {
+        // Agora inicializa a UI lendo direto da lista preenchida pelo backend
+        initializeFlangeData();
+
+        const t = document.getElementById('t0');
+        if (t) t.textContent = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+        updateStats();
+    });
+</script>
+</body>
+</html>

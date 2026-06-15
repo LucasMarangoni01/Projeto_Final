@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listagem de Manutenções</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- Menu -->
+<div th:replace="~{/fragments/menu.html :: menu}"></div>
+
+<main>
+
+    <header>
+        <h1>Listagem de Manutenções</h1>
+    </header>
+
+    <section class="card">
+
+        <div class="topo-card">
+            <h2>Manutenções Cadastradas</h2>
+
+            <a th:href="@{/manutencao/cadastro}" class="btn btn-primary">
+                Nova Manutenção
+            </a>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ocorrência</th>
+                <th>Número de Série</th>
+                <th>Data</th>
+                <th>Flange</th>
+                <th>Funcionário</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="manutencao : ${manutencoes}">
+
+                <td th:text="${manutencao.id}"></td>
+
+                <td th:text="${manutencao.ocorrencia}"></td>
+
+                <td th:text="${manutencao.num_serie}"></td>
+
+                <!-- DATA FORMATADA -->
+                <td th:text="${#dates.format(manutencao.data, 'dd/MM/yyyy')}"></td>
+
+                <!-- FLANGE -->
+                <td th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}"></td>
+
+                <!-- FUNCIONÁRIO -->
+                <td th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}"></td>
+
+                <td class="acoes">
+                    <a th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}" class="btn btn-edit">
+                        Editar
+                    </a>
+
+                    <a th:href="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
+                       class="btn btn-delete"
+                       onclick="return confirm('Tem certeza que deseja excluir esta manutenção?')">
+                        Excluir
+                    </a>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${#lists.isEmpty(manutencoes)}">
+            <p>Nenhuma manutenção cadastrada.</p>
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

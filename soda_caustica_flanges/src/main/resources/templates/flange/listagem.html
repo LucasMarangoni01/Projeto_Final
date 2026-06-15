@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem - Escola</title>
+    <link rel="stylesheet" href="/style.css">
+
+
+
+</head>
+<body>
+
+<!-- Menu -->
+<div th:replace="~{/fragments/menu.html :: menu}"></div>
+
+<main>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2>Listagem de Flanges</h2>
+        <a th:href="@{/flange/cadastro}" class="btn btn-success">Cadastrar Novo</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Nome da flange</th>
+                <th>Localização</th>
+                <th>Temperatura Ambiente</th>
+                <th>Data de entrada</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- Caso não tenha registros -->
+            <tr th:if="${flanges.empty}">
+                <td colspan="5" style="text-align: center;">
+                    Nenhum registro encontrado.
+                </td>
+            </tr>
+
+            <!-- Lista de flanges -->
+            <tr th:each="p : ${flanges}">
+
+                <!-- FOTO -->
+                <td>
+                    <img th:if="${p.foto != null}"
+                         th:src="@{'/foto_flange/' + ${p.foto}}"
+                         class="foto-tabela">
+
+                    <img th:if="${p.foto == null}"
+                         src="/foto_flange/default.png"
+                         class="foto-tabela">
+                </td>
+
+                <td th:text="${p.nome_flange}"></td>
+                <td th:text="${p.localizacao}"></td>
+                <td th:text="${p.temp_ambiente}"></td>
+                <td th:text="${#temporals.format(p.data_entrada, 'dd/MM/yyyy')}"></td>
+
+                <td style="white-space: nowrap;">
+                    <a th:href="@{'/flange/excluir/' + ${p.id}}"
+                       class="btn btn-cancel"
+                       onclick="return confirm('Deseja realmente excluir este registro?');"
+                       style="margin-right: 8px;">
+                        Excluir
+                    </a>
+
+                    <a th:href="@{'/flange/alterar/' + ${p.id}}"
+                       class="btn btn-alter">
+                        Alterar
+                    </a>
+                </td>
+
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+</body>
+</html>

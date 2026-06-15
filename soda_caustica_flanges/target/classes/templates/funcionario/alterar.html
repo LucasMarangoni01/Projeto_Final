@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alterar - Funcionarios</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main style="display: flex; justify-content: center; align-items: flex-start; min-height: calc(100vh - 120px); padding: 40px 10px;">
+
+    <div class="card" style="width: 100%; max-width: 700px;">
+        <div class="topbar-eyebrow">Alteração de Dados</div>
+        <h2 style="margin-bottom: 20px;">Alterar Cadastro do Operador</h2>
+
+        <form id="form-cadastro" th:action="@{/funcionario/salvar}" th:object="${funcionario}" method="post">
+
+            <input type="hidden" th:field="*{id}">
+
+            <h3 style="font-size: 1.1rem; color: #9ca3af; margin-bottom: 15px; border-bottom: 1px solid #374151; padding-bottom: 5px;">
+                Informações Pessoais
+            </h3>
+
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Nome Completo</label>
+                    <input type="text" th:field="*{nome_funcionario}" required placeholder="Ex: João Silva">
+                </div>
+
+                <div class="form-group">
+                    <label>Data de Nascimento</label>
+                    <input type="date"
+                           id="data_nascimento"
+                           th:field="*{data_nascimento}"
+                           min="1900-01-01"
+                           max="2026-12-31"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Idade Atual</label>
+                    <input type="number" th:field="*{idade}">
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; background-color: rgba(255, 255, 255, 0.02); border: 1px solid #374151; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px;">
+                <h3 style="font-size: 1.1rem; color: #f59e0b; margin-bottom: 15px; margin-top: 0;">
+                    Designação Operacional
+                </h3>
+
+                <div class="form-group" style="position: relative; margin-bottom: 0;">
+                    <label>Código da Flange (Único)</label>
+                    <input type="text" id="funcionario_flange" th:field="*{funcionario_flange}" autocomplete="off" placeholder="Digite o ID ou Nome...">
+                    <div id="dropdown-flange" class="autocomplete-dropdown" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-alter">Alterar Registro</button>
+                <a th:href="@{/funcionario/listagem}" class="btn">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // --- 1. LÓGICA DA DATA (Ajuste Imediato) ---
+        const dataInput = document.getElementById('data_nascimento');
+
+        dataInput.addEventListener('input', function() {
+            const dataDigitada = this.value;
+
+            if (!dataDigitada) return;
+
+            const partes = dataDigitada.split('-');
+            let ano = parseInt(partes[0], 10);
+            const mes = partes[1];
+            const dia = partes[2];
+
+            let precisaCorrigir = false;
+
+            if (ano > 2026) {
+                ano = 2026;
+                precisaCorrigir = true;
+            } else if (ano >= 1000 && ano < 1900) {
+                ano = 1900;
+                precisaCorrigir = true;
+            }
+
+            if (precisaCorrigir) {
+                this.value = `${String(ano).padStart(4, '0')}-${mes}-${dia}`;
+            }
+        });
+
+        // --- 2. LÓGICA DO AUTOCOMPLETE DA FLANGE ---
+        const inputFlange = document.getElementById('funcionario_flange');
+        const dropdown = document.getElementById('dropdown-flange');
+        let timeoutId;
+        let flangeValidaSelecionada = inputFlange.value.trim() !== '';
+
+        inputFlange.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            const termo = this.value.trim();
+            flangeValidaSelecionada = false;
+
+            if (termo.length < 1) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            timeoutId = setTimeout(() => {
+                buscarFlanges(termo);
+            }, 300);
+        });
+
+        function buscarFlanges(termo) {
+            fetch(`/api/flanges/buscar?q=${encodeURIComponent(termo)}`)
+                .then(response => response.json())
+                .then(data => {
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'block';
+
+                    if (data.length === 0) {
+                        dropdown.innerHTML = '<div class="autocomplete-empty">⚠️ Nenhuma flange encontrada</div>';
+                        return;
+                    }
+
+                    data.forEach(flange => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.innerHTML = `<span>${flange.nome_flange}</span> <span class="badge-id">ID: ${flange.id}</span>`;
+
+                        item.addEventListener('click', function() {
+                            inputFlange.value = flange.nome_flange;
+                            flangeValidaSelecionada = true;
+                            dropdown.style.display = 'none';
+                        });
+                        dropdown.appendChild(item);
+                    });
+                })
+                .catch(error => console.error('Erro na busca:', error));
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target !== inputFlange && e.target !== dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // --- 3. INTERCEPTAÇÃO DO SUBMIT (Salvar) ---
+        const formCadastro = document.getElementById('form-cadastro');
+        formCadastro.addEventListener('submit', function(e) {
+            let formValido = true;
+
+            if (!flangeValidaSelecionada && inputFlange.value.trim() !== '') {
+                inputFlange.classList.add('input-invalido');
+                alert("Por favor, selecione uma flange válida da lista.");
+                formValido = false;
+            }
+
+            if (!formValido) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listagem - Monitoramento de Pessoal</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        /* Ajuste específico para a Topbar da Listagem */
+        .listagem-topbar {
+            display: flex;
+            justify-content: space-between; /* Joga o botão pro lado direito */
+            align-items: center; /* Centraliza verticalmente */
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-strong);
+            flex-wrap: wrap; /* Ajuda no responsivo */
+            gap: 16px;
+        }
+
+        .listagem-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Ajuste para os botões de ação na tabela não quebrarem linha */
+        .acoes-celula {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main>
+    <div class="listagem-topbar">
+        <div class="listagem-meta">
+            <div class="topbar-eyebrow">Recursos Humanos · Planta Industrial</div>
+            <div class="topbar-title">Listagem de Funcionários</div>
+        </div>
+        <a th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
+    </div>
+
+    <div th:if="${mensagem}" class="badge ok-b" style="margin-bottom: 24px;" th:text="${mensagem}"></div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Flange Designada</th>
+                <th>Idade</th>
+                <th>Nascimento</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${funcionarios}">
+                <td th:text="${f.id}" style="font-family: var(--font-mono); color: var(--amber);"></td>
+                <td th:text="${f.nome_funcionario}" style="font-weight: 700;"></td>
+                <td><span class="fc-pill" th:text="${f.funcionario_flange}"></span></td>
+                <td th:text="${f.idade}"></td>
+                <td th:text="${#temporals.format(f.data_nascimento, 'dd/MM/yyyy')}"></td>
+                <td class="acoes-celula">
+                    <a th:href="@{/funcionario/alterar/{id}(id=${f.id})}" class="btn btn-alter" style="padding: 6px 12px; font-size: 0.8rem;">Alterar</a>
+                    <a th:href="@{/funcionario/excluir/{id}(id=${f.id})}" class="btn btn-cancel" style="padding: 6px 12px; font-size: 0.8rem;" onclick="return confirm('Confirmar remoção do registro?')">Excluir</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+</body>
+</html>
