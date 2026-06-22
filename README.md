@@ -79,5 +79,3 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 - Indicação de status normal ou alerta;
 - Organização dos dados para auxiliar na prevenção de falhas;
 - Possibilidade de integração com sensores físicos, como Arduino e sensor térmico.
-
----
