@@ -81,5 +81,3 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 - Possibilidade de integração com sensores físicos, como Arduino e sensor térmico.
 
 ---
-
-## Estrutura do Projeto
