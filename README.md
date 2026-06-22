@@ -1,75 +1,84 @@
-# Sistema de Monitoramento de Flanges — Soda Cáustica
+# Sistema de Prevenção e Monitoramento de Soda Cáustica
 
-Projeto desenvolvido para monitoramento industrial de flanges em tubulações que transportam soda cáustica, com foco em segurança, controle de manutenção, prevenção de vazamentos e acompanhamento de incidentes.
+Projeto desenvolvido com foco na **prevenção de acidentes envolvendo soda cáustica**, especialmente em ambientes industriais que utilizam linhas, tubulações e flanges para transporte de NaOH.
 
-O sistema utiliza uma aplicação web desenvolvida em **Spring Boot**, com interface em **Thymeleaf**, banco de dados **MySQL** e estrutura MVC. A proposta do projeto também considera integração com sensores físicos, como Arduino e sensores térmicos, para alertas visuais em caso de possíveis vazamentos ou aumento anormal de temperatura.
-
----
-
-## Objetivo do Projeto
-
-O objetivo principal é auxiliar empresas e ambientes industriais no controle de flanges utilizadas em tubulações de soda cáustica, reduzindo riscos de acidentes, falhas de manutenção e vazamentos.
-
-A soda cáustica é uma substância corrosiva e pode causar danos sérios em caso de contato. Por isso, o sistema busca melhorar o acompanhamento das flanges, registrar manutenções, monitorar temperaturas e facilitar a visualização de pontos críticos.
+O sistema tem como objetivo auxiliar no **monitoramento de flanges**, identificação de possíveis falhas, controle de manutenções e organização das informações relacionadas à segurança industrial.
 
 ---
 
-## Funcionalidades
+## Sobre o Projeto
 
-- Cadastro de flanges
-- Listagem de flanges cadastradas
-- Alteração de dados das flanges
-- Exclusão de flanges
-- Upload de imagem da flange
-- Cadastro de funcionários
-- Listagem de funcionários
-- Alteração e exclusão de funcionários
-- Cálculo automático de idade pela data de nascimento
-- Cadastro de manutenções
-- Associação de manutenção com flange e funcionário
-- Registro de ocorrências
-- Mapa visual das flanges
-- Painel com status das flanges
-- Simulação de alerta de vazamento
-- Dashboard com informações do sistema
-- Gráficos de incidentes
-- Controle de usuários com login e senha
-- Separação de permissões por usuário
+A soda cáustica é uma substância altamente corrosiva e perigosa. Em ambientes industriais, vazamentos em flanges, tubulações ou conexões podem causar acidentes graves, prejuízos materiais e riscos à saúde dos funcionários.
+
+Pensando nisso, este projeto foi criado para funcionar como um sistema de apoio à **prevenção, controle e monitoramento de vazamentos**, permitindo o cadastro e acompanhamento de flanges, funcionários, manutenções e possíveis incidentes.
+
+---
+
+## Objetivo
+
+O principal objetivo do sistema é oferecer uma plataforma simples e funcional para:
+
+- Cadastrar flanges utilizadas na linha de soda cáustica;
+- Monitorar informações importantes das flanges;
+- Registrar funcionários responsáveis;
+- Controlar manutenções realizadas;
+- Auxiliar na prevenção de vazamentos;
+- Melhorar a segurança no ambiente industrial;
+- Facilitar a visualização de dados por meio de uma interface web.
 
 ---
 
 ## Tecnologias Utilizadas
 
-### Back-End
+O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
-- Java 21
+- Java
 - Spring Boot
-- Spring MVC
-- Spring Data JPA
-- Spring Security
-- Maven
-- Validation
-
-### Front-End
-
-- HTML5
-- CSS3
-- Thymeleaf
-- JavaScript
-- Chart.js
-- SVG para o mapa das flanges
-
-### Banco de Dados
-
 - MySQL
+- HTML
+- CSS
+- JavaScript
+- Thymeleaf
+- Maven
 
-### Hardware previsto no projeto
+---
 
-- Arduino
-- Sensor térmico
-- LED verde para situação normal
-- LED vermelho para situação de alerta
-- Sistema de alerta para possível vazamento
+## Funcionalidades
+
+### Flanges
+
+- Cadastro de flanges;
+- Listagem de flanges;
+- Alteração de dados;
+- Exclusão de registros;
+- Registro de localização;
+- Registro de temperatura ambiente;
+- Data de entrada em operação;
+- Upload de foto da flange.
+
+### Funcionários
+
+- Cadastro de funcionários;
+- Listagem de funcionários;
+- Alteração de dados;
+- Exclusão de funcionários;
+- Associação do funcionário com uma flange;
+- Controle de idade e data de nascimento.
+
+### Manutenções
+
+- Cadastro de manutenções;
+- Registro de ocorrências;
+- Número de série;
+- Data da manutenção;
+- Associação da manutenção com flange e funcionário.
+
+### Monitoramento
+
+- Painel visual para acompanhamento das flanges;
+- Indicação de status normal ou alerta;
+- Organização dos dados para auxiliar na prevenção de falhas;
+- Possibilidade de integração com sensores físicos, como Arduino e sensor térmico.
 
 ---
 
