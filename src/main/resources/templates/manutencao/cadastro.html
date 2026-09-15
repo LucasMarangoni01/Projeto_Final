@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Manutenção</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div th:replace="~{/fragments/menu.html :: menu}"></div>
+
+<main>
+
+    <header>
+        <h1>Cadastro de Manutenção</h1>
+    </header>
+
+    <section class="card">
+
+        <h2>Dados da Manutenção</h2>
+
+        <div th:if="${erro}" class="alerta-erro">
+            <p th:text="${erro}"></p>
+        </div>
+
+        <form th:action="@{/manutencao/salvar}" th:object="${manutencao}" method="post">
+
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="ocorrencia">Ocorrência</label>
+                    <input
+                            type="text"
+                            id="ocorrencia"
+                            th:field="*{ocorrencia}"
+                            placeholder="Digite a ocorrência"
+                            required>
+                </div>
+
+                <div class="form-group">
+                    <label for="num_serie">Número de Série</label>
+                    <input
+                            type="text"
+                            id="num_serie"
+                            th:field="*{num_serie}"
+                            placeholder="Digite o número de série"
+                            required>
+                </div>
+
+                <div class="form-group">
+                    <label for="data">Data</label>
+                    <input
+                            type="date"
+                            id="data"
+                            th:field="*{data}"
+                            required>
+                </div>
+
+                <div class="form-group">
+                    <label for="flangeId">ID da Flange</label>
+                    <input
+                            type="number"
+                            id="flangeId"
+                            name="flangeId"
+                            th:value="${manutencao.flange != null ? manutencao.flange.id : ''}"
+                            placeholder="Digite o ID da flange"
+                            required>
+                </div>
+
+                <div class="form-group">
+                    <label for="funcionarioId">ID do Funcionário</label>
+                    <input
+                            type="number"
+                            id="funcionarioId"
+                            name="funcionarioId"
+                            th:value="${manutencao.funcionario != null ? manutencao.funcionario.id : ''}"
+                            placeholder="Digite o ID do funcionário"
+                            required>
+                </div>
+
+            </div>
+
+            <div class="botoes">
+                <button type="submit" class="btn btn-primary">
+                    Salvar
+                </button>
+
+                <a th:href="@{/manutencao/listagem}" class="btn btn-cancel">
+                    Voltar
+                </a>
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+</body>
+</html>

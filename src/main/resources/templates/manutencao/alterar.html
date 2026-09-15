@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Alterar - Manutenção</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main style="display: flex; justify-content: center; align-items: flex-start; min-height: calc(100vh - 120px); padding: 40px 10px;">
+
+    <div class="card" style="width: 100%; max-width: 700px;">
+        <div class="topbar-eyebrow">Alteração de Dados</div>
+        <h2 style="margin-bottom: 20px;">Alterar Cadastro de Manutenção</h2>
+
+        <div th:if="${erro}" class="alerta-erro">
+            <p th:text="${erro}"></p>
+        </div>
+
+        <form id="form-cadastro" th:action="@{/manutencao/salvar}" th:object="${manutencao}" method="post">
+
+            <input type="hidden" th:field="*{id}">
+
+            <h3 style="font-size: 1.1rem; color: #9ca3af; margin-bottom: 15px; border-bottom: 1px solid #374151; padding-bottom: 5px;">
+                Informações da Manutenção
+            </h3>
+
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Ocorrência</label>
+                    <input type="text" th:field="*{ocorrencia}" required placeholder="Ex: Problema na flange">
+                </div>
+
+                <div class="form-group">
+                    <label>Número de Série</label>
+                    <input type="text" th:field="*{num_serie}" required placeholder="Digite o número de série">
+                </div>
+
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date"
+                           id="data"
+                           th:field="*{data}"
+                           min="1900-01-01"
+                           max="2026-12-31"
+                           required>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; background-color: rgba(255, 255, 255, 0.02); border: 1px solid #374151; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px;">
+                <h3 style="font-size: 1.1rem; color: #f59e0b; margin-bottom: 15px; margin-top: 0;">
+                    Designação Operacional
+                </h3>
+
+                <div class="form-grid">
+                    <div class="form-group" style="position: relative; margin-bottom: 0;">
+                        <label>Flange (Único)</label>
+                        <input type="text" id="busca_flange" autocomplete="off"
+                               th:value="${manutencao.flange != null ? manutencao.flange.nomeFlange : ''}"
+                               placeholder="Digite o ID ou Nome...">
+                        <input type="hidden" id="flangeId" name="flangeId"
+                               th:value="${manutencao.flange != null ? manutencao.flange.id : ''}">
+                        <div id="dropdown-flange" class="autocomplete-dropdown" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group" style="position: relative; margin-bottom: 0;">
+                        <label>Funcionário (Único)</label>
+                        <input type="text" id="busca_funcionario" autocomplete="off"
+                               th:value="${manutencao.funcionario != null ? manutencao.funcionario.nomeFuncionario : ''}"
+                               placeholder="Digite o ID ou Nome...">
+                        <input type="hidden" id="funcionarioId" name="funcionarioId"
+                               th:value="${manutencao.funcionario != null ? manutencao.funcionario.id : ''}">
+                        <div id="dropdown-funcionario" class="autocomplete-dropdown" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-alter">Alterar Registro</button>
+                <a th:href="@{/manutencao/listagem}" class="btn">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{/fragments/footer.html :: footer}"></div>
+
+
+</body>
+</html>
