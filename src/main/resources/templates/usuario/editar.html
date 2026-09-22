@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editar Usuário | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+</head>
+
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+
+<main>
+
+    <header>
+
+        <h1>
+            Editar Usuário
+        </h1>
+
+        <p>
+            Altere a permissão de acesso do usuário.
+        </p>
+
+    </header>
+
+
+    <div class="card">
+
+        <div class="form-group">
+
+            <label>
+                Nome
+            </label>
+
+            <input
+                    type="text"
+                    th:value="${usuario.nome}"
+                    disabled>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                E-mail
+            </label>
+
+            <input
+                    type="email"
+                    th:value="${usuario.email}"
+                    disabled>
+
+        </div>
+
+
+        <hr>
+
+
+        <form
+                th:action="@{/usuarios/alterar-role}"
+                method="post">
+
+            <input
+                    type="hidden"
+                    name="id"
+                    th:value="${usuario.id}">
+
+
+            <div class="form-group">
+
+                <label for="role">
+                    Nível de acesso
+                </label>
+
+                <select
+                        id="role"
+                        name="role"
+                        required>
+
+                    <option
+                            th:each="role : ${roles}"
+                            th:value="${role}"
+                            th:text="${role}"
+                            th:selected="${role == usuario.role}">
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="botoes">
+
+                <a
+                        class="btn-voltar"
+                        th:href="@{/usuarios}">
+
+                    Voltar
+
+                </a>
+
+
+                <button
+                        type="submit"
+                        class="btn-primary">
+
+                    Salvar Permissão
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <p>
+        © 2026 Sistema de Monitoramento de Flanges.
+        Todos os direitos reservados.
+    </p>
+
+</footer>
+
+</body>
+
+</html>

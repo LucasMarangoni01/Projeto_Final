@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <div th:fragment="menu">
@@ -61,6 +61,12 @@
                     Sair
 
                 </button>
+
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/usuarios}">
+                    Usuários
+                </a>
+            </li>
 
             </li>
 

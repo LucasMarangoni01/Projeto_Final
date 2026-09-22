@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Usuários | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+</head>
+
+<body>
+
+<!-- MENU -->
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+
+<!-- CONTEÚDO -->
+
+<main>
+
+    <div class="topo-listagem">
+
+        <div>
+
+                <span class="section-label">
+                    ADMINISTRAÇÃO
+                </span>
+
+            <h2>
+                Gerenciamento de Usuários
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <p style="margin-bottom: 22px; color: #d7deea;">
+            Gerencie os usuários cadastrados no sistema,
+            suas permissões e o status de acesso.
+        </p>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Nome
+                    </th>
+
+                    <th>
+                        E-mail
+                    </th>
+
+                    <th>
+                        Permissão
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Ações
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                <tr th:each="usuario : ${usuarios}">
+
+                    <td>
+                                <span
+                                        class="badge-id"
+                                        th:text="${usuario.id}">
+                                </span>
+                    </td>
+
+
+                    <td>
+
+                        <strong
+                                th:text="${usuario.nome}">
+                        </strong>
+
+                    </td>
+
+
+                    <td
+                            th:text="${usuario.email}">
+                    </td>
+
+
+                    <td>
+
+                                <span
+                                        class="usuario-role"
+                                        th:classappend="${usuario.role.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
+                                        th:text="${usuario.role}">
+                                </span>
+
+                    </td>
+
+
+                    <td>
+
+                                <span
+                                        class="usuario-status"
+                                        th:classappend="${usuario.ativo} ? ' status-ativo' : ' status-inativo'">
+
+                                    <span class="status-dot-table"></span>
+
+                                    <span
+                                            th:text="${usuario.ativo ? 'ATIVO' : 'INATIVO'}">
+                                    </span>
+
+                                </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="acoes">
+
+                            <a
+                                    class="btn-editar"
+                                    th:href="@{/usuarios/editar/{id}(id=${usuario.id})}">
+
+                                Editar
+
+                            </a>
+
+
+                            <form
+                                    th:action="@{/usuarios/alterar-status}"
+                                    method="post"
+                                    style="display: inline;">
+
+                                <input
+                                        type="hidden"
+                                        name="id"
+                                        th:value="${usuario.id}">
+
+                                <button
+                                        type="submit"
+                                        class="btn-status">
+
+                                            <span
+                                                    th:text="${usuario.ativo ? 'Desativar' : 'Ativar'}">
+                                            </span>
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <tr th:if="${#lists.isEmpty(usuarios)}">
+
+                    <td
+                            colspan="6"
+                            style="text-align: center; padding: 35px;">
+
+                        Nenhum usuário cadastrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    <p>
+        © 2026 Sistema de Monitoramento de Flanges.
+        Todos os direitos reservados.
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

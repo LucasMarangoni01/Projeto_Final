@@ -7,54 +7,68 @@ import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(
-            UsuarioRepository repository,
-            PasswordEncoder passwordEncoder
-    ) {
+    public UsuarioService(UsuarioRepository repository,
+                          PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ==============================
-    // VERIFICAR E-MAIL
-    // ==============================
     public boolean emailExiste(String email) {
-
         return repository.findByEmail(email).isPresent();
     }
 
-    // ==============================
-    // CADASTRAR USUÁRIO
-    // ==============================
     public Usuario cadastrar(CadastroDTO cadastroDTO) {
 
         Usuario usuario = new Usuario();
 
-        usuario.setNome(
-                cadastroDTO.getNome().trim()
-        );
-
-        usuario.setEmail(
-                cadastroDTO.getEmail().trim().toLowerCase()
-        );
-
+        usuario.setNome(cadastroDTO.getNome().trim());
+        usuario.setEmail(cadastroDTO.getEmail().trim().toLowerCase());
         usuario.setSenha(
-                passwordEncoder.encode(
-                        cadastroDTO.getSenha()
-                )
+                passwordEncoder.encode(cadastroDTO.getSenha())
         );
-
-        // Cadastro público sempre cria USER
         usuario.setRole(Role.USER);
-
         usuario.setAtivo(true);
 
         return repository.save(usuario);
+    }
+
+    public List<Usuario> listarTodos() {
+        return repository.findAll();
+    }
+
+    public Usuario buscarPorId(Long id) {
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Usuário não encontrado."
+                        )
+                );
+    }
+
+    public void alterarRole(Long id, Role role) {
+
+        Usuario usuario = buscarPorId(id);
+
+        usuario.setRole(role);
+
+        repository.save(usuario);
+    }
+
+    public void alterarStatus(Long id) {
+
+        Usuario usuario = buscarPorId(id);
+
+        usuario.setAtivo(!usuario.isAtivo());
+
+        repository.save(usuario);
     }
 }

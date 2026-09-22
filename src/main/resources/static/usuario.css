@@ -1,0 +1,119 @@
+/* =========================================================
+   USUÁRIOS
+========================================================= */
+
+.usuario-role,
+.usuario-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-family: var(--font-mono);
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* ROLE ADMIN */
+
+.role-admin {
+    color: var(--blue-pipe);
+
+    background:
+        var(--blue-pipe-dim);
+
+    border:
+        1px solid rgba(59,130,246,0.25);
+}
+
+
+/* ROLE USER */
+
+.role-user {
+    color: #d7deea;
+
+    background:
+        rgba(255,255,255,0.06);
+
+    border:
+        1px solid var(--border-strong);
+}
+
+
+/* STATUS */
+
+.status-ativo {
+    color: var(--ok-green);
+
+    background:
+        var(--ok-green-dim);
+
+    border:
+        1px solid var(--ok-green-ring);
+}
+
+
+.status-inativo {
+    color: var(--alert-red);
+
+    background:
+        var(--alert-red-dim);
+
+    border:
+        1px solid var(--alert-red-ring);
+}
+
+
+.status-dot-table {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+
+/* BOTÃO STATUS */
+
+.btn-status {
+    min-height: 40px;
+
+    padding: 10px 14px;
+
+    border:
+        1px solid var(--border-strong);
+
+    border-radius: var(--radius-md);
+
+    background:
+        var(--bg-card-2);
+
+    color: var(--text-secondary);
+
+    cursor: pointer;
+
+    font-family: var(--font-ui);
+
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    transition:
+        all 0.2s ease;
+}
+
+
+.btn-status:hover {
+    background:
+        var(--bg-hover);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        var(--shadow-lift);
+}
