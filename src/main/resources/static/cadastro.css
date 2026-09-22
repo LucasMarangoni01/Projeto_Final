@@ -1,0 +1,1160 @@
+/* =========================================================
+   CADASTRO
+   Tema oficial: Soda Cáustica Flanges
+   Baseado na identidade visual do INDEX
+========================================================= */
+
+
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
+
+:root {
+    --bg-base: #002456;
+    --bg-base-dark: #011a3d;
+
+    --bg-card: #10288c;
+    --bg-card-2: #1c2335;
+    --bg-hover: #003082;
+
+    --blue-pipe: #3b82f6;
+    --blue-pipe-dim: rgb(25 76 158 / 0.20);
+
+    --text-primary: #ffffff;
+    --text-secondary: #ffffff;
+    --text-dim: #a9b9d4;
+
+    --title: #93bbff;
+
+    --border: rgba(255,255,255,0.07);
+    --border-strong: rgba(255,255,255,0.14);
+
+    --ok-green: #22c55e;
+    --ok-green-dim: rgba(34,197,94,0.12);
+    --ok-green-ring: rgba(34,197,94,0.25);
+
+    --alert-red: #ef4444;
+    --alert-red-dim: rgba(239,68,68,0.12);
+
+    --amber: #f59e0b;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    --shadow-card:
+        0 1px 3px rgba(0,0,0,0.45),
+        0 4px 16px rgba(0,0,0,0.28);
+
+    --shadow-lift:
+        0 2px 8px rgba(0,0,0,0.55),
+        0 10px 28px rgba(0,0,0,0.32);
+
+    --font-ui:
+        'IBM Plex Sans',
+        'Segoe UI',
+        Arial,
+        sans-serif;
+
+    --font-mono:
+        'JetBrains Mono',
+        Consolas,
+        monospace;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html {
+    min-height: 100%;
+}
+
+
+body {
+    min-height: 100vh;
+
+    font-family: var(--font-ui);
+
+    color: var(--text-secondary);
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,0.018),
+            rgba(255,255,255,0.018) 1px,
+            transparent 1px,
+            transparent 4px
+        ),
+        linear-gradient(
+            180deg,
+            var(--bg-base) 0%,
+            #142947 100%
+        );
+
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   ESTRUTURA PRINCIPAL
+========================================================= */
+
+.register-page {
+    width: 100%;
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 48% 52%;
+}
+
+
+/* =========================================================
+   PAINEL ESQUERDO
+========================================================= */
+
+.register-info {
+    position: relative;
+
+    min-height: 100vh;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 50px 60px;
+
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(59,130,246,0.12),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 85%,
+            rgba(25,76,158,0.22),
+            transparent 32%
+        ),
+        linear-gradient(
+            145deg,
+            #001b3f 0%,
+            #002456 52%,
+            #071c3d 100%
+        );
+
+    border-right: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   GRID TECNOLÓGICA
+========================================================= */
+
+.register-info::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(147,187,255,0.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(147,187,255,0.035) 1px,
+            transparent 1px
+        );
+
+    background-size: 42px 42px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   GLOW
+========================================================= */
+
+.register-info::after {
+    content: "";
+
+    position: absolute;
+
+    width: 420px;
+    height: 420px;
+
+    right: -200px;
+    bottom: -180px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(59,130,246,0.14) 0%,
+            rgba(59,130,246,0.04) 45%,
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTEÚDO ESQUERDO
+========================================================= */
+
+.info-content {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 600px;
+}
+
+
+/* =========================================================
+   LABEL DO SISTEMA
+========================================================= */
+
+.system-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 8px 13px;
+
+    border:
+        1px solid rgba(147,187,255,0.15);
+
+    border-radius: 999px;
+
+    background:
+        rgba(59,130,246,0.07);
+
+    color: #b8cdf1;
+
+    font-family: var(--font-mono);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--ok-green);
+
+    box-shadow:
+        0 0 0 4px var(--ok-green-ring),
+        0 0 12px rgba(34,197,94,0.45);
+}
+
+
+/* =========================================================
+   MARCA
+========================================================= */
+
+.brand-mark {
+    width: 62px;
+    height: 62px;
+
+    margin-top: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid rgba(147,187,255,0.18);
+
+    border-radius: var(--radius-md);
+
+    background:
+        linear-gradient(
+            145deg,
+            #12367d,
+            #0b275c
+        );
+
+    color: var(--title);
+
+    font-family: var(--font-mono);
+
+    font-size: 25px;
+    font-weight: 900;
+
+    box-shadow:
+        var(--shadow-card);
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.info-content h1 {
+    max-width: 580px;
+
+    margin-top: 27px;
+
+    color: #ffffff;
+
+    font-size: clamp(38px, 4vw, 58px);
+
+    line-height: 1.03;
+
+    letter-spacing: -2px;
+
+    font-weight: 800;
+}
+
+
+.info-content h1 span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--title);
+}
+
+
+/* =========================================================
+   DESCRIÇÃO
+========================================================= */
+
+.info-text {
+    max-width: 520px;
+
+    margin-top: 25px;
+
+    color: #c3d1e7;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   DIVISÓRIA
+========================================================= */
+
+.info-divider {
+    width: 100%;
+    max-width: 520px;
+
+    height: 1px;
+
+    margin-top: 38px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(59,130,246,0.65),
+            rgba(147,187,255,0.15),
+            transparent
+        );
+}
+
+
+/* =========================================================
+   INFORMAÇÕES DO SISTEMA
+========================================================= */
+
+.system-information {
+    width: 100%;
+    max-width: 520px;
+
+    margin-top: 28px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+.information-item {
+    min-height: 82px;
+
+    padding: 15px;
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: var(--radius-md);
+
+    background:
+        rgba(16,40,140,0.28);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025);
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.information-item:hover {
+    border-color:
+        rgba(147,187,255,0.18);
+
+    transform: translateY(-2px);
+}
+
+
+.information-title {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #788eaf;
+
+    font-family: var(--font-mono);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+.information-item strong {
+    color: #e4ecf9;
+
+    font-family: var(--font-mono);
+
+    font-size: 11px;
+}
+
+
+/* STATUS ONLINE */
+
+.information-item strong.online {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: var(--ok-green);
+}
+
+
+.mini-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--ok-green);
+
+    box-shadow:
+        0 0 8px rgba(34,197,94,0.5);
+}
+
+
+/* =========================================================
+   BLOCO DE SEGURANÇA
+========================================================= */
+
+.security-message {
+    width: 100%;
+    max-width: 520px;
+
+    margin-top: 22px;
+
+    padding: 14px 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border:
+        1px solid rgba(59,130,246,0.14);
+
+    border-radius: var(--radius-md);
+
+    background:
+        rgba(59,130,246,0.06);
+}
+
+
+.security-icon {
+    width: 31px;
+    height: 31px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background:
+        var(--blue-pipe-dim);
+
+    color: #7db2ff;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+.security-message strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #dbe7f8;
+
+    font-size: 12px;
+}
+
+
+.security-message span {
+    color: #8da4c5;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   FOOTER ESQUERDO
+========================================================= */
+
+.info-footer {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #6f83a1;
+
+    font-family: var(--font-mono);
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   LADO DIREITO
+========================================================= */
+
+.register-section {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 50px 70px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #061a37 0%,
+            #0a203f 100%
+        );
+}
+
+
+.register-container {
+    width: 100%;
+    max-width: 570px;
+}
+
+
+/* =========================================================
+   CABEÇALHO DO CADASTRO
+========================================================= */
+
+.register-header {
+    margin-bottom: 30px;
+}
+
+
+.register-label {
+    color: var(--blue-pipe);
+
+    font-family: var(--font-mono);
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 1.5px;
+}
+
+
+.register-header h2 {
+    margin-top: 9px;
+
+    color: #ffffff;
+
+    font-size: 36px;
+
+    line-height: 1.1;
+
+    letter-spacing: -1px;
+
+    font-weight: 800;
+}
+
+
+.register-header p {
+    max-width: 470px;
+
+    margin-top: 10px;
+
+    color: #9eb0c9;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOGO MOBILE
+========================================================= */
+
+.mobile-logo {
+    display: none;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.register-form {
+    width: 100%;
+
+    padding: 28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #10288c,
+            #082461
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow:
+        var(--shadow-card);
+}
+
+
+/* =========================================================
+   GRUPO
+========================================================= */
+
+.form-group {
+    width: 100%;
+
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
+
+.input-wrapper {
+    position: relative;
+}
+
+
+.input-icon {
+    position: absolute;
+
+    top: 50%;
+    left: 15px;
+
+    transform: translateY(-50%);
+
+    width: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #7ea9e9;
+
+    font-family: var(--font-mono);
+
+    font-size: 13px;
+    font-weight: 800;
+
+    pointer-events: none;
+}
+
+
+.password-icon {
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.input-wrapper input {
+    width: 100%;
+    height: 48px;
+
+    padding:
+        0
+        14px
+        0
+        43px;
+
+    border:
+        1px solid rgba(255,255,255,0.10);
+
+    border-radius: var(--radius-md);
+
+    outline: none;
+
+    background:
+        var(--bg-card-2);
+
+    color: #ffffff;
+
+    font-family: var(--font-ui);
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.input-wrapper input::placeholder {
+    color: #74849d;
+}
+
+
+.input-wrapper input:hover {
+    border-color:
+        rgba(147,187,255,0.20);
+}
+
+
+.input-wrapper input:focus {
+    border-color:
+        var(--blue-pipe);
+
+    background:
+        #202a43;
+
+    box-shadow:
+        0 0 0 3px var(--blue-pipe-dim);
+}
+
+
+/* =========================================================
+   DICA
+========================================================= */
+
+.field-hint {
+    margin-top: 6px;
+
+    color: #8295b1;
+
+    font-size: 10px;
+}
+
+
+.field-hint strong {
+    color: #a9c8f6;
+}
+
+
+/* =========================================================
+   GRID SENHAS
+========================================================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+/* =========================================================
+   ERROS
+========================================================= */
+
+.error-message {
+    margin-top: 6px;
+
+    color: var(--alert-red);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.alert-error {
+    margin-bottom: 20px;
+
+    padding: 12px 14px;
+
+    border:
+        1px solid rgba(239,68,68,0.25);
+
+    border-radius: var(--radius-md);
+
+    background:
+        var(--alert-red-dim);
+
+    color: #ff8585;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   BOTÃO
+========================================================= */
+
+.register-button {
+    width: 100%;
+    height: 50px;
+
+    margin-top: 3px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 13px;
+
+    border:
+        1px solid rgba(59,130,246,0.55);
+
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #3b82f6
+        );
+
+    color: #ffffff;
+
+    font-family: var(--font-ui);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 5px 18px rgba(37,99,235,0.23);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.register-button:hover {
+    transform: translateY(-1px);
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #2563eb
+        );
+
+    box-shadow:
+        0 8px 22px rgba(37,99,235,0.3);
+}
+
+
+.register-button:active {
+    transform: translateY(0);
+}
+
+
+.button-arrow {
+    font-size: 18px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.register-button:hover .button-arrow {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+.login-area {
+    margin-top: 20px;
+
+    text-align: center;
+
+    color: #8194af;
+
+    font-size: 11px;
+}
+
+
+.login-area a {
+    margin-left: 4px;
+
+    color: #70a9ff;
+
+    text-decoration: none;
+
+    font-weight: 800;
+}
+
+
+.login-area a:hover {
+    color: #a1c7ff;
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   FOOTER MOBILE
+========================================================= */
+
+.mobile-footer {
+    display: none;
+}
+
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .register-page {
+        grid-template-columns: 44% 56%;
+    }
+
+    .register-info {
+        padding: 42px;
+    }
+
+    .register-section {
+        padding: 40px;
+    }
+
+    .info-content h1 {
+        font-size: 44px;
+    }
+
+    .system-information {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .register-page {
+        display: block;
+    }
+
+    .register-info {
+        min-height: auto;
+
+        padding: 40px 30px;
+    }
+
+    .register-section {
+        min-height: auto;
+
+        padding: 45px 25px;
+    }
+
+    .info-footer {
+        display: none;
+    }
+
+    .system-information {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .register-info {
+        padding: 30px 20px;
+    }
+
+    .system-label {
+        font-size: 9px;
+    }
+
+    .brand-mark {
+        width: 54px;
+        height: 54px;
+
+        margin-top: 28px;
+    }
+
+    .info-content h1 {
+        font-size: 36px;
+
+        letter-spacing: -1.2px;
+    }
+
+    .info-text {
+        font-size: 13px;
+    }
+
+    .system-information {
+        grid-template-columns: 1fr;
+    }
+
+    .security-message {
+        margin-top: 18px;
+    }
+
+    .register-section {
+        padding: 35px 17px;
+    }
+
+    .mobile-logo {
+        width: 43px;
+        height: 43px;
+
+        margin-bottom: 18px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: var(--radius-sm);
+
+        background:
+            var(--bg-card);
+
+        border:
+            1px solid var(--border-strong);
+
+        color: var(--title);
+
+        font-family: var(--font-mono);
+
+        font-weight: 900;
+    }
+
+    .register-header h2 {
+        font-size: 30px;
+    }
+
+    .register-form {
+        padding: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .register-button {
+        height: 50px;
+    }
+
+    .mobile-footer {
+        margin-top: 25px;
+
+        padding-top: 18px;
+
+        display: flex;
+        justify-content: space-between;
+
+        border-top:
+            1px solid var(--border);
+
+        color: #6f83a1;
+
+        font-family: var(--font-mono);
+
+        font-size: 9px;
+    }
+}

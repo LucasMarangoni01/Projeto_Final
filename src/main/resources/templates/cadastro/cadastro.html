@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Criar Conta | Prevenção da Soda Cáustica</title>
+
+    <link rel="stylesheet" th:href="@{/cadastro.css}">
+</head>
+
+<body>
+
+<div class="register-page">
+
+    <!-- ==========================================
+         PAINEL ESQUERDO
+    =========================================== -->
+
+    <section class="register-info">
+
+        <div class="info-content">
+
+            <div class="system-label">
+                <span class="status-dot"></span>
+                SISTEMA DE MONITORAMENTO
+            </div>
+
+            <div class="brand-mark">
+                Flange
+            </div>
+
+            <h1>
+                Prevenção da
+                <span>Soda Cáustica</span>
+            </h1>
+
+            <p class="info-text">
+                Plataforma desenvolvida para monitoramento,
+                controle e acompanhamento de flanges em
+                processos industriais.
+            </p>
+
+
+            <div class="info-divider"></div>
+
+
+            <!-- DADOS DO SISTEMA -->
+
+            <div class="system-information">
+
+                <div class="information-item">
+                    <span class="information-title">
+                        PROCESSO
+                    </span>
+
+                    <strong>
+                        NaOH 32%
+                    </strong>
+                </div>
+
+
+                <div class="information-item">
+                    <span class="information-title">
+                        MONITORAMENTO
+                    </span>
+
+                    <strong>
+                        TEMPO REAL
+                    </strong>
+                </div>
+
+
+                <div class="information-item">
+                    <span class="information-title">
+                        SISTEMA
+                    </span>
+
+                    <strong class="online">
+                        <span class="mini-dot"></span>
+                        OPERACIONAL
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="security-message">
+
+                <div class="security-icon">
+                    ✓
+                </div>
+
+                <div>
+                    <strong>
+                        Acesso controlado
+                    </strong>
+
+                    <span>
+                        Crie sua conta para acessar
+                        o sistema com segurança.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="info-footer">
+
+            <span>
+                Sistema de Monitoramento de Flanges
+            </span>
+
+            <span>
+                © 2026
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         ÁREA DO CADASTRO
+    =========================================== -->
+
+    <section class="register-section">
+
+        <div class="register-container">
+
+
+            <!-- CABEÇALHO -->
+
+            <div class="register-header">
+
+                <div class="mobile-logo">
+                    F
+                </div>
+
+                <span class="register-label">
+                    NOVO ACESSO
+                </span>
+
+                <h2>
+                    Criar sua conta
+                </h2>
+
+                <p>
+                    Preencha os dados abaixo para
+                    criar seu acesso ao sistema.
+                </p>
+
+            </div>
+
+
+            <!-- ALERTA DE ERRO -->
+
+            <div
+                    class="alert-error"
+                    th:if="${erro}"
+                    th:text="${erro}">
+            </div>
+
+
+            <!-- FORMULÁRIO -->
+
+            <form
+                    th:action="@{/cadastro}"
+                    th:object="${cadastroDTO}"
+                    method="post"
+                    class="register-form">
+
+
+                <!-- NOME -->
+
+                <div class="form-group">
+
+                    <label for="nome">
+                        Nome completo
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ◉
+                        </span>
+
+                        <input
+                                type="text"
+                                id="nome"
+                                th:field="*{nome}"
+                                placeholder="Digite seu nome completo"
+                                autocomplete="name"
+                                required>
+
+                    </div>
+
+                    <div
+                            class="error-message"
+                            th:if="${#fields.hasErrors('nome')}"
+                            th:errors="*{nome}">
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            @
+                        </span>
+
+                        <input
+                                type="email"
+                                id="email"
+                                th:field="*{email}"
+                                placeholder="exemplo@gmail.com"
+                                autocomplete="email"
+                                required>
+
+                    </div>
+
+                    <div class="field-hint">
+                        Utilize um endereço <strong>@gmail.com</strong>
+                    </div>
+
+                    <div
+                            class="error-message"
+                            th:if="${#fields.hasErrors('email')}"
+                            th:errors="*{email}">
+                    </div>
+
+                </div>
+
+
+                <!-- SENHAS -->
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="senha">
+                            Senha
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon password-icon">
+                                ●
+                            </span>
+
+                            <input
+                                    type="password"
+                                    id="senha"
+                                    th:field="*{senha}"
+                                    placeholder="Mínimo 6 caracteres"
+                                    autocomplete="new-password"
+                                    required>
+
+                        </div>
+
+                        <div
+                                class="error-message"
+                                th:if="${#fields.hasErrors('senha')}"
+                                th:errors="*{senha}">
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="confirmaSenha">
+                            Confirmar senha
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon password-icon">
+                                ●
+                            </span>
+
+                            <input
+                                    type="password"
+                                    id="confirmaSenha"
+                                    th:field="*{confirmaSenha}"
+                                    placeholder="Repita sua senha"
+                                    autocomplete="new-password"
+                                    required>
+
+                        </div>
+
+                        <div
+                                class="error-message"
+                                th:if="${#fields.hasErrors('confirmaSenha')}"
+                                th:errors="*{confirmaSenha}">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                        type="submit"
+                        class="register-button">
+
+                    <span>
+                        Criar minha conta
+                    </span>
+
+                    <span class="button-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </form>
+
+
+            <!-- LOGIN -->
+
+            <div class="login-area">
+
+                <span>
+                    Já possui uma conta?
+                </span>
+
+                <a th:href="@{/login}">
+                    Entrar no sistema
+                </a>
+
+            </div>
+
+
+            <!-- RODAPÉ -->
+
+            <div class="mobile-footer">
+
+                <span>
+                    Sistema de Monitoramento de Flanges
+                </span>
+
+                <span>
+                    © 2026
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

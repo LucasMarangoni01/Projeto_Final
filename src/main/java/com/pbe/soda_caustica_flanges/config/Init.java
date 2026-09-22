@@ -30,6 +30,8 @@ public class Init implements CommandLineRunner {
 
             Usuario admin = new Usuario();
 
+            admin.setNome("Administrador");
+
             admin.setEmail("admin@admin.com");
 
             admin.setSenha(
@@ -44,6 +46,7 @@ public class Init implements CommandLineRunner {
 
             System.out.println("=================================");
             System.out.println("USUÁRIO ADMIN CRIADO");
+            System.out.println("Nome: Administrador");
             System.out.println("E-mail: admin@admin.com");
             System.out.println("Senha: 123");
             System.out.println("Função: ADMIN");
@@ -54,7 +57,6 @@ public class Init implements CommandLineRunner {
             System.out.println("=================================");
             System.out.println("USUÁRIO ADMIN JÁ EXISTE");
             System.out.println("=================================");
-
         }
     }
 }

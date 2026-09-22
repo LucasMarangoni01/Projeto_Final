@@ -10,6 +10,9 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 100)
+    private String nome;
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
@@ -26,7 +29,14 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String email, String senha, Role role, boolean ativo) {
+    public Usuario(
+            String nome,
+            String email,
+            String senha,
+            Role role,
+            boolean ativo
+    ) {
+        this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.role = role;
@@ -39,6 +49,14 @@ public class Usuario {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEmail() {

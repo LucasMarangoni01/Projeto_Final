@@ -22,7 +22,7 @@ public class SecurityConfig {
     }
 
     // ==============================
-    // BUSCAR USUÁRIO NO MYSQL
+    // BUSCA O USUÁRIO NO MYSQL
     // ==============================
     @Bean
     public UserDetailsService userDetailsService() {
@@ -50,7 +50,6 @@ public class SecurityConfig {
     // ==============================
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -70,27 +69,31 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // ==============================
-                // PERMISSÕES
+                // AUTORIZAÇÃO
                 // ==============================
                 .authorizeHttpRequests(auth -> auth
 
                         // ==============================
-                        // LOGIN E ARQUIVOS PÚBLICOS
+                        // PÚBLICO
                         // ==============================
                         .requestMatchers(
                                 "/login",
+                                "/cadastro",
                                 "/error",
+                                "/login.css",
+                                "/cadastro.css",
                                 "/style.css",
-                                "/style2.css",
+                                "/menu.css",
+                                "/menu.js",
                                 "/js/**",
+                                "/css/**",
                                 "/img/**",
                                 "/foto_ocorrencia/**",
                                 "/foto_pessoa/**",
                                 "/foto_flange/**"
                         ).permitAll()
-
                         // ==============================
-                        // ADMIN E USER
+                        // ADMIN + USER
                         // ==============================
                         .requestMatchers(
                                 "/",
@@ -107,12 +110,12 @@ public class SecurityConfig {
                         // SOMENTE ADMIN
                         // ==============================
                         .requestMatchers(
-                                "/usuario/**"
+                                "/usuario/**",
+                                "/usuarios/**"
                         ).hasRole("ADMIN")
 
                         // ==============================
-                        // QUALQUER OUTRA ROTA
-                        // PRECISA DE LOGIN
+                        // RESTANTE
                         // ==============================
                         .anyRequest().authenticated()
                 )

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Monitoramento</title>
+    <link rel="stylesheet" href="/login.css">
+</head>
+
+<body>
+
+<div class="login-page">
+
+
+    <!-- ==========================================
+         PAINEL ESQUERDO
+         ========================================== -->
+
+    <section class="login-info">
+
+        <div class="info-content">
+
+            <div class="system-badge">
+
+                <span class="status-dot"></span>
+
+                SISTEMA DE MONITORAMENTO
+
+            </div>
+
+
+            <h1>
+
+                Prevenção da
+                <span>Soda Cáustica</span>
+
+            </h1>
+
+
+            <p class="info-description">
+
+                Sistema de monitoramento e controle
+                de flanges para prevenção e detecção
+                de vazamentos em processos industriais.
+
+            </p>
+
+
+            <div class="info-line"></div>
+
+
+            <div class="system-data">
+
+                <div class="data-item">
+
+                    <span class="data-label">
+                        PROCESSO
+                    </span>
+
+                    <span class="data-value">
+                        NaOH 32%
+                    </span>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <span class="data-label">
+                        MONITORAMENTO
+                    </span>
+
+                    <span class="data-value">
+                        TEMPO REAL
+                    </span>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <span class="data-label">
+                        STATUS
+                    </span>
+
+                    <span class="data-value status-online">
+
+                        <span class="status-dot"></span>
+
+                        OPERACIONAL
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         PAINEL DE LOGIN
+         ========================================== -->
+
+    <section class="login-section">
+
+
+        <div class="login-card">
+
+
+            <!-- LOGO -->
+
+            <div class="login-header">
+
+                <div class="logo">
+
+                    <span>
+                        F
+                    </span>
+
+                </div>
+
+
+                <h2>
+                    Acesso ao Sistema
+                </h2>
+
+
+                <p>
+                    Entre com suas credenciais
+                </p>
+
+            </div>
+
+
+            <!-- ==================================
+                 MENSAGEM DE ERRO
+                 ================================== -->
+
+            <div
+                    class="alert alert-error"
+                    th:if="${param.error}">
+
+                <div class="alert-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <strong>
+                        Falha no acesso
+                    </strong>
+
+                    <span>
+                        E-mail ou senha inválidos.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 MENSAGEM DE LOGOUT
+                 ================================== -->
+
+            <div
+                    class="alert alert-success"
+                    th:if="${param.logout}">
+
+                <div class="alert-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <strong>
+                        Sessão encerrada
+                    </strong>
+
+                    <span>
+                        Você saiu do sistema com sucesso.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 MENSAGEM DE CADASTRO
+                 ================================== -->
+
+            <div
+                    class="alert alert-success"
+                    th:if="${param.cadastro}">
+
+                <div class="alert-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <strong>
+                        Cadastro realizado
+                    </strong>
+
+                    <span>
+                        Sua conta foi criada. Faça login para continuar.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 FORMULÁRIO
+                 ================================== -->
+
+            <form
+                    th:action="@{/login}"
+                    method="post"
+                    class="login-form">
+
+
+                <!-- E-MAIL -->
+
+                <div class="form-group">
+
+                    <label for="email">
+
+                        E-mail
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+
+                            @
+
+                        </span>
+
+                        <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="seuemail@gmail.com"
+                                autocomplete="username"
+                                required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SENHA -->
+
+                <div class="form-group">
+
+                    <label for="senha">
+
+                        Senha
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon password-icon">
+
+                            ●
+
+                        </span>
+
+                        <input
+                                type="password"
+                                id="senha"
+                                name="senha"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                        type="submit"
+                        class="login-button">
+
+                    Entrar no Sistema
+
+                </button>
+
+            </form>
+
+
+            <!-- ==================================
+                 CADASTRO
+                 ================================== -->
+
+            <div class="register-area">
+
+                <span>
+                    Ainda não possui uma conta?
+                </span>
+
+                <a th:href="@{/cadastro}">
+                    Criar uma conta
+                </a>
+
+            </div>
+
+
+            <!-- ==================================
+                 RODAPÉ
+                 ================================== -->
+
+            <div class="login-footer">
+
+                <span>
+                    Sistema de Monitoramento de Flanges
+                </span>
+
+                <span>
+                    © 2026
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

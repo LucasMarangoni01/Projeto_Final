@@ -1,25 +1,125 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Escola</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
 <body>
-<div  th:fragment="menu">
+
+<div th:fragment="menu">
+
     <nav>
+
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/flange/listagem">Listagem de Flanges</a></li>
-            <li><a href="/flange/cadastro">Cadastrar Flanges</a></li>
-            <li><a href="/funcionario/cadastro">Listagem Funcionario</a></li>
-            <li><a href="/funcionario/listagem">Cadastrar Funcionario</a></li>
-            <li><a href="/manutencao/listagem">Listagem Manutenção</a></li>
-            <li><a href="/manutencao/cadastro">Cadastro Manutenção</a></li>
-            <li style="margin-left: auto;"><a href="/">Sair</a></li>
+
+            <li>
+                <a href="/">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="/flange/listagem">
+                    Listagem de Flanges
+                </a>
+            </li>
+
+            <li>
+                <a href="/flange/cadastro">
+                    Cadastrar Flanges
+                </a>
+            </li>
+
+            <li>
+                <a href="/funcionario/listagem">
+                    Listagem Funcionário
+                </a>
+            </li>
+
+            <li>
+                <a href="/funcionario/cadastro">
+                    Cadastrar Funcionário
+                </a>
+            </li>
+
+            <li>
+                <a href="/manutencao/listagem">
+                    Listagem Manutenção
+                </a>
+            </li>
+
+            <li>
+                <a href="/manutencao/cadastro">
+                    Cadastro Manutenção
+                </a>
+            </li>
+
+            <li style="margin-left: auto;">
+
+                <button
+                        type="button"
+                        class="btn-sair"
+                        onclick="abrirModalLogout()">
+
+                    Sair
+
+                </button>
+
+            </li>
+
         </ul>
+
     </nav>
+
+
+    <!-- ==============================
+         MODAL DE LOGOUT
+         ============================== -->
+
+    <div
+            id="logoutModal"
+            class="logout-overlay"
+            hidden
+            onclick="fecharModalLogout(event)">
+
+        <div
+                class="logout-modal"
+                onclick="event.stopPropagation()">
+
+            <div class="logout-icon">
+                ⏻
+            </div>
+
+            <h2>
+                Deseja sair?
+            </h2>
+
+            <p>
+                Você será desconectado do sistema.
+            </p>
+
+            <div class="logout-botoes">
+                <button
+                        type="button"
+                        class="btn-cancelar"
+                        onclick="fecharModalLogout()">
+                    Cancelar
+                </button>
+                <button
+                        type="button"
+                        class="btn-desconectar"
+                        onclick="confirmarLogout()">
+                    Desconectar
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- ==============================
+         FORMULÁRIO DE LOGOUT
+         ============================== -->
+    <form
+            id="logoutForm"
+            th:action="@{/logout}"
+            method="post"
+            style="display: none;">
+    </form>
 </div>
 </body>
 </html>
