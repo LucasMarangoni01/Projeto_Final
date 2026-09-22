@@ -1,0 +1,67 @@
+/* =========================================================
+   FLANGES - UNIDADES
+========================================================= */
+
+.flange-form-header {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 22px;
+}
+
+.flange-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--blue-pipe);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+}
+
+.flange-form-header h1 {
+    margin-bottom: 6px;
+    color: var(--bg-text-h1);
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.flange-form-header p {
+    color: #c7d3e5;
+    font-size: 13px;
+}
+
+.flange-form-card {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #023e7d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.flange-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--alert-red-ring);
+    border-radius: var(--radius-md);
+    background: var(--alert-red-dim);
+    color: #ff8585;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.flange-admin-field {
+    grid-column: span 1;
+}
+
+@media (max-width: 900px) {
+    .flange-form-card {
+        padding: 20px;
+    }
+
+    .flange-admin-field {
+        grid-column: auto;
+    }
+}

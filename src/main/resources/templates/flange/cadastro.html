@@ -1,104 +1,218 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Escola</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" th:href="@{/menu.css}">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Cadastrar Flange | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/menu.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/flange.css}">
 </head>
+
 <body>
 
-<div th:replace="~{/fragments/menu.html :: menu}"></div>
+<div th:replace="~{fragments/menu :: menu}"></div>
 
 <main>
-    <div class="card">
-        <h2>Cadastro de Flange</h2>
-        <form id="form-cadastro" th:action="@{/flange/salvar}" th:object="${flange}" method="post" enctype="multipart/form-data">
+
+    <div class="flange-form-header">
+
+        <span class="flange-label">
+            MONITORAMENTO
+        </span>
+
+        <h1>
+            Cadastrar Flange
+        </h1>
+
+        <p>
+            Cadastre um flange e associe-o à unidade
+            responsável pelo monitoramento.
+        </p>
+
+    </div>
+
+    <section class="flange-form-card">
+
+        <div class="flange-error"
+             th:if="${erro}"
+             th:text="${erro}">
+        </div>
+
+        <form
+                th:action="@{/flange/salvar}"
+                th:object="${flange}"
+                method="post"
+                enctype="multipart/form-data">
 
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label>Nome Flange</label>
-                    <input type="text" id="nome_flange" required th:field="*{nome_flange}">
-                </div>
 
-                <div class="form-group">
-                    <label>Localização</label>
-                    <input type="text" id="localizacao" required th:field="*{localizacao}">
-                </div>
+                    <label for="nome_flange">
+                        Nome do flange
+                    </label>
 
-                <div class="form-group">
-                    <label for="temp_ambiente">Temperatura Ambiente (°C)</label>
-                    <div style="display: flex; align-items: center;">
-                        <input type="number" step="0.1" id="temp_ambiente" required th:field="*{temp_ambiente}" placeholder="Ex: 25.0">
-                        <span style="margin-left: 5px;">°C</span>
+                    <input
+                            type="text"
+                            id="nome_flange"
+                            th:field="*{nome_flange}"
+                            placeholder="Ex.: FL-01"
+                            required>
+
+                    <div
+                            class="msg-erro"
+                            th:if="${#fields.hasErrors('nome_flange')}"
+                            th:errors="*{nome_flange}">
                     </div>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Data de Entrada</label>
-                    <input type="date"
-                           id="data_entrada"
-                           th:field="*{data_entrada}"
-                           min="1900-01-01"
-                           max="2026-12-31"
-                           required>
+
+                    <label for="localizacao">
+                        Localização
+                    </label>
+
+                    <input
+                            type="text"
+                            id="localizacao"
+                            th:field="*{localizacao}"
+                            placeholder="Ex.: Linha de produção"
+                            required>
+
+                    <div
+                            class="msg-erro"
+                            th:if="${#fields.hasErrors('localizacao')}"
+                            th:errors="*{localizacao}">
+                    </div>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Foto:</label>
-                    <input type="file" name="arquivoFoto" accept="image/*">
+
+                    <label for="temp_ambiente">
+                        Temperatura ambiente
+                    </label>
+
+                    <input
+                            type="number"
+                            id="temp_ambiente"
+                            th:field="*{temp_ambiente}"
+                            step="0.1"
+                            placeholder="Ex.: 27.5"
+                            required>
+
+                    <div
+                            class="msg-erro"
+                            th:if="${#fields.hasErrors('temp_ambiente')}"
+                            th:errors="*{temp_ambiente}">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="data_entrada">
+                        Data de entrada
+                    </label>
+
+                    <input
+                            type="date"
+                            id="data_entrada"
+                            th:field="*{data_entrada}"
+                            required>
+
+                    <div
+                            class="msg-erro"
+                            th:if="${#fields.hasErrors('data_entrada')}"
+                            th:errors="*{data_entrada}">
+                    </div>
+
+                </div>
+
+                <div class="form-group flange-admin-field"
+                     th:if="${ehAdmin}">
+
+                    <label for="unidadeId">
+                        Unidade
+                    </label>
+
+                    <select
+                            id="unidadeId"
+                            name="unidadeId"
+                            required>
+
+                        <option value="">
+                            Selecione uma unidade
+                        </option>
+
+                        <option
+                                th:each="unidade : ${unidades}"
+                                th:value="${unidade.id}"
+                                th:text="${unidade.nome}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="arquivoFoto">
+                        Foto do flange
+                    </label>
+
+                    <input
+                            type="file"
+                            id="arquivoFoto"
+                            name="arquivoFoto"
+                            accept="image/*">
+
                 </div>
 
             </div>
 
-            <div style="margin-top: 20px;">
-                <button type="submit" class="btn btn-success">Salvar</button>
-                <a th:href="@{/flange/listagem}" class="btn btn-alter">Voltar para Lista</a>
+            <div class="botoes">
+
+                <a
+                        th:href="@{/flange/listagem}"
+                        class="btn-voltar">
+                    Voltar
+                </a>
+
+                <button
+                        type="submit"
+                        class="btn-primary">
+                    Cadastrar Flange
+                </button>
+
             </div>
+
         </form>
-    </div>
+
+    </section>
+
 </main>
 
-<div th:replace="~{/fragments/footer.html :: footer}"></div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-        // --- LÓGICA DA DATA (Ajuste Imediato) ---
-        const dataInput = document.getElementById('data_entrada');
-
-        dataInput.addEventListener('input', function() {
-            const dataDigitada = this.value;
-
-            if (!dataDigitada) return;
-
-            const partes = dataDigitada.split('-');
-            let ano = parseInt(partes[0], 10);
-            const mes = partes[1];
-            const dia = partes[2];
-
-            let precisaCorrigir = false;
-
-            // Limite Máximo
-            if (ano > 2026) {
-                ano = 2026;
-                precisaCorrigir = true;
-            }
-            // Limite Mínimo (só corrige após 4 dígitos digitados)
-            else if (ano >= 1000 && ano < 1900) {
-                ano = 1900;
-                precisaCorrigir = true;
-            }
-
-            if (precisaCorrigir) {
-                this.value = `${String(ano).padStart(4, '0')}-${mes}-${dia}`;
-            }
-        });
-    });
-</script>
+<footer>
+    <p>
+        © 2026 Sistema de Monitoramento de Flanges.
+        Todos os direitos reservados.
+    </p>
+</footer>
 
 <script th:src="@{/menu.js}"></script>
+
 </body>
 </html>

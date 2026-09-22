@@ -1,107 +1,191 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alterar Flange - Sistema Industrial</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
-    <link rel="stylesheet" th:href="@{/menu.css}">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
+    <title>Alterar Flange | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/menu.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/flange.css}">
 </head>
+
 <body>
 
-<div th:replace="~{/fragments/menu.html :: menu}"></div>
+<div th:replace="~{fragments/menu :: menu}"></div>
 
 <main>
-    <div class="card">
-        <h2>Alterar Flange</h2>
 
-        <form id="form-cadastro" th:action="@{/flange/salvar}" th:object="${flange}" method="post" enctype="multipart/form-data">
+    <div class="flange-form-header">
 
-            <input type="hidden" th:field="${flange.id}">
+        <span class="flange-label">
+            MONITORAMENTO
+        </span>
+
+        <h1>
+            Alterar Flange
+        </h1>
+
+        <p>
+            Atualize os dados e a unidade responsável.
+        </p>
+
+    </div>
+
+    <section class="flange-form-card">
+
+        <div class="flange-error"
+             th:if="${erro}"
+             th:text="${erro}">
+        </div>
+
+        <form
+                th:action="@{/flange/salvar}"
+                th:object="${flange}"
+                method="post"
+                enctype="multipart/form-data">
+
+            <input
+                    type="hidden"
+                    th:field="*{id}">
 
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label>Nome Flange</label>
-                    <input type="text" id="nome_flange" th:field="*{nome_flange}">
+
+                    <label for="nome_flange">
+                        Nome do flange
+                    </label>
+
+                    <input
+                            type="text"
+                            id="nome_flange"
+                            th:field="*{nome_flange}"
+                            required>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Localização</label>
-                    <input type="text" id="localizacao" th:field="*{localizacao}">
+
+                    <label for="localizacao">
+                        Localização
+                    </label>
+
+                    <input
+                            type="text"
+                            id="localizacao"
+                            th:field="*{localizacao}"
+                            required>
+
                 </div>
 
                 <div class="form-group">
-                    <label for="temp_ambiente">Temperatura Ambiente (°C)</label>
-                    <div style="display: flex; align-items: center;">
-                        <input type="number" step="0.1" id="temp_ambiente" th:field="*{temp_ambiente}" placeholder="Ex: 25.0">
-                        <span style="margin-left: 5px;">°C</span>
-                    </div>
+
+                    <label for="temp_ambiente">
+                        Temperatura ambiente
+                    </label>
+
+                    <input
+                            type="number"
+                            id="temp_ambiente"
+                            th:field="*{temp_ambiente}"
+                            step="0.1"
+                            required>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Data de Entrada</label>
-                    <input type="date"
-                           id="data_entrada"
-                           th:field="*{data_entrada}"
-                           min="1900-01-01"
-                           max="2026-12-31">
+
+                    <label for="data_entrada">
+                        Data de entrada
+                    </label>
+
+                    <input
+                            type="date"
+                            id="data_entrada"
+                            th:field="*{data_entrada}"
+                            required>
+
+                </div>
+
+                <div class="form-group"
+                     th:if="${ehAdmin}">
+
+                    <label for="unidadeId">
+                        Unidade
+                    </label>
+
+                    <select
+                            id="unidadeId"
+                            name="unidadeId"
+                            required>
+
+                        <option
+                                th:each="unidade : ${unidades}"
+                                th:value="${unidade.id}"
+                                th:text="${unidade.nome}"
+                                th:selected="${flange.unidade != null and flange.unidade.id == unidade.id}">
+                        </option>
+
+                    </select>
+
                 </div>
 
                 <div class="form-group">
-                    <label>Foto</label>
-                    <input type="file" id="foto_flange" name="arquivoFoto" accept="image/*">
+
+                    <label for="arquivoFoto">
+                        Alterar foto
+                    </label>
+
+                    <input
+                            type="file"
+                            id="arquivoFoto"
+                            name="arquivoFoto"
+                            accept="image/*">
+
                 </div>
 
             </div>
 
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button type="submit" class="btn btn-alter">Alterar</button>
-                <a th:href="@{/flange/listagem}" class="btn btn-cancel">Voltar para Lista</a>
+            <div class="botoes">
+
+                <a
+                        th:href="@{/flange/listagem}"
+                        class="btn-voltar">
+                    Voltar
+                </a>
+
+                <button
+                        type="submit"
+                        class="btn-primary">
+                    Salvar Alterações
+                </button>
+
             </div>
 
         </form>
-    </div>
+
+    </section>
+
 </main>
 
-<div th:replace="~{/fragments/footer.html :: footer}"></div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-        // --- LÓGICA DA DATA (Ajuste Imediato) ---
-        const dataInput = document.getElementById('data_entrada');
-
-        if(dataInput) {
-            dataInput.addEventListener('input', function() {
-                const dataDigitada = this.value;
-
-                if (!dataDigitada) return;
-
-                const partes = dataDigitada.split('-');
-                let ano = parseInt(partes[0], 10);
-                const mes = partes[1];
-                const dia = partes[2];
-
-                let precisaCorrigir = false;
-
-                if (ano > 2026) {
-                    ano = 2026;
-                    precisaCorrigir = true;
-                } else if (ano >= 1000 && ano < 1900) {
-                    ano = 1900;
-                    precisaCorrigir = true;
-                }
-
-                if (precisaCorrigir) {
-                    this.value = `${String(ano).padStart(4, '0')}-${mes}-${dia}`;
-                }
-            });
-        }
-    });
-</script>
+<footer>
+    <p>
+        © 2026 Sistema de Monitoramento de Flanges.
+        Todos os direitos reservados.
+    </p>
+</footer>
 
 <script th:src="@{/menu.js}"></script>
+
 </body>
 </html>

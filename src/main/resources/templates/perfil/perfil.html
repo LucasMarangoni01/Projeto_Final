@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/perfil.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main class="perfil-main">
+
+    <div class="perfil-header">
+        <span class="perfil-label">CONTA DO SISTEMA</span>
+        <h1>Meu Perfil</h1>
+        <p>Visualize as informações da sua conta de acesso.</p>
+    </div>
+
+    <section class="perfil-card">
+
+        <div class="perfil-topo">
+
+            <div class="perfil-avatar">
+                👤
+            </div>
+
+            <div class="perfil-identidade">
+                <h2 th:text="${usuarioLogado.nome}">
+                    Usuário
+                </h2>
+
+                <p th:text="${usuarioLogado.email}">
+                    email@gmail.com
+                </p>
+            </div>
+
+            <span class="perfil-role"
+                  th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' perfil-admin' : ' perfil-user'"
+                  th:text="${usuarioLogado.role}">
+                USER
+            </span>
+
+        </div>
+
+        <div class="perfil-divider"></div>
+
+        <div class="perfil-grid">
+
+            <div class="perfil-item">
+                <span class="perfil-item-label">NOME COMPLETO</span>
+                <strong th:text="${usuarioLogado.nome}">
+                    Usuário
+                </strong>
+            </div>
+
+            <div class="perfil-item">
+                <span class="perfil-item-label">E-MAIL</span>
+                <strong th:text="${usuarioLogado.email}">
+                    email@gmail.com
+                </strong>
+            </div>
+
+            <div class="perfil-item">
+                <span class="perfil-item-label">NÍVEL DE ACESSO</span>
+                <strong th:text="${usuarioLogado.role}">
+                    USER
+                </strong>
+            </div>
+
+            <div class="perfil-item">
+                <span class="perfil-item-label">STATUS DA CONTA</span>
+                <strong class="perfil-status">
+                    <span></span>
+                    <span th:text="${usuarioLogado.ativo ? 'ATIVA' : 'INATIVA'}">
+                        ATIVA
+                    </span>
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="perfil-acoes">
+
+            <a th:href="@{/}"
+               class="perfil-btn perfil-voltar">
+                Voltar ao Sistema
+            </a>
+
+            <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+               th:href="@{/usuarios}"
+               class="perfil-btn perfil-admin-btn">
+                Gerenciar Usuários
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p>
+</footer>
+
+<script th:src="@{/menu.js}"></script>
+
+</body>
+</html>

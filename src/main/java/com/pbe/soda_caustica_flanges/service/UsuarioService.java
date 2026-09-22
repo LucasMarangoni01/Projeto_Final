@@ -2,6 +2,7 @@ package com.pbe.soda_caustica_flanges.service;
 
 import com.pbe.soda_caustica_flanges.model.CadastroDTO;
 import com.pbe.soda_caustica_flanges.model.Role;
+import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +16,10 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository,
-                          PasswordEncoder passwordEncoder) {
+    public UsuarioService(
+            UsuarioRepository repository,
+            PasswordEncoder passwordEncoder) {
+
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -26,7 +29,6 @@ public class UsuarioService {
     }
 
     public Usuario cadastrar(CadastroDTO cadastroDTO) {
-
         Usuario usuario = new Usuario();
 
         usuario.setNome(
@@ -44,7 +46,6 @@ public class UsuarioService {
         );
 
         usuario.setRole(Role.USER);
-
         usuario.setAtivo(true);
 
         return repository.save(usuario);
@@ -55,7 +56,6 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorId(Long id) {
-
         return repository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
@@ -65,7 +65,6 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorEmail(String email) {
-
         return repository.findByEmail(email)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
@@ -74,23 +73,51 @@ public class UsuarioService {
                 );
     }
 
-    public void alterarRole(Long id, Role role) {
+    public void alterarRole(
+            Long id,
+            Role role,
+            String emailLogado) {
 
         Usuario usuario = buscarPorId(id);
+
+        if (usuario.getEmail().equalsIgnoreCase(emailLogado)
+                && usuario.getRole() == Role.ADMIN
+                && role != Role.ADMIN) {
+
+            throw new IllegalArgumentException(
+                    "Você não pode remover sua própria permissão de ADMIN."
+            );
+        }
 
         usuario.setRole(role);
 
         repository.save(usuario);
     }
 
-    public void alterarStatus(Long id) {
+    public void alterarStatus(
+            Long id,
+            String emailLogado) {
 
         Usuario usuario = buscarPorId(id);
 
-        usuario.setAtivo(
-                !usuario.isAtivo()
-        );
+        if (usuario.getEmail().equalsIgnoreCase(emailLogado)) {
+            throw new IllegalArgumentException(
+                    "Você não pode desativar sua própria conta."
+            );
+        }
 
+        usuario.setAtivo(!usuario.isAtivo());
+
+        repository.save(usuario);
+    }
+
+    public void alterarUnidade(
+            Long id,
+            Unidade unidade) {
+
+        Usuario usuario = buscarPorId(id);
+
+        usuario.setUnidade(unidade);
         repository.save(usuario);
     }
 }

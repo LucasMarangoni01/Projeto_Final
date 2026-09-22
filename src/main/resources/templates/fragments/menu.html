@@ -4,71 +4,253 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <div th:fragment="menu">
+
     <nav class="main-nav">
-        <ul>
-            <li><a th:href="@{/}">Home</a></li>
-            <li><a th:href="@{/flange/listagem}">Listagem de Flanges</a></li>
-            <li><a th:href="@{/flange/cadastro}">Cadastrar Flanges</a></li>
-            <li><a th:href="@{/funcionario/listagem}">Listagem Funcionário</a></li>
-            <li><a th:href="@{/funcionario/cadastro}">Cadastrar Funcionário</a></li>
-            <li><a th:href="@{/manutencao/listagem}">Listagem Manutenção</a></li>
-            <li><a th:href="@{/manutencao/cadastro}">Cadastro Manutenção</a></li>
-            <li sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/usuarios}">Usuários</a>
-            </li>
 
-            <li class="nav-user" sec:authorize="isAuthenticated()">
-                <div class="user-info">
-                    <div class="user-avatar">👤</div>
-                    <div class="user-data">
-                        <strong th:text="${usuarioLogado.nome}">Usuário</strong>
-                        <span th:text="${usuarioLogado.email}">email@gmail.com</span>
+        <div class="nav-desktop">
+
+            <ul>
+                <li>
+                    <a th:href="@{/}">Home</a>
+                </li>
+
+                <li>
+                    <a th:href="@{/flange/listagem}">Flanges</a>
+                </li>
+
+                <li>
+                    <a th:href="@{/flange/cadastro}">Cadastrar Flange</a>
+                </li>
+
+                <li>
+                    <a th:href="@{/funcionario/listagem}">Funcionários</a>
+                </li>
+
+                <li>
+                    <a th:href="@{/funcionario/cadastro}">
+                        Cadastrar Funcionário
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/manutencao/listagem}">
+                        Manutenção
+                    </a>
+                </li>
+
+                <li>
+                    <a th:href="@{/manutencao/cadastro}">
+                        Cadastrar Manutenção
+                    </a>
+                </li>
+
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/usuarios}">
+                        Usuários
+                    </a>
+                </li>
+
+                <li class="nav-user">
+
+                    <a th:href="@{/perfil}"
+                       class="user-profile"
+                       th:title="${usuarioLogado.nome}">
+
+                        <div class="user-avatar">
+
+                            <svg viewBox="0 0 24 24"
+                                 aria-hidden="true">
+                                <circle cx="12"
+                                        cy="8"
+                                        r="3.2"></circle>
+
+                                <path d="M5.5 20c.6-4 3-6 6.5-6s5.9 2 6.5 6"></path>
+                            </svg>
+
+                        </div>
+
+                        <div class="user-info-text">
+
+                            <strong th:text="${usuarioLogado.nome}">
+                                Usuário
+                            </strong>
+
+                            <span th:text="${usuarioLogado.role}">
+                                USER
+                            </span>
+
+                        </div>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-exit">
+
+                    <button type="button"
+                            class="btn-sair"
+                            onclick="abrirModalLogout()">
+                        Sair
+                    </button>
+
+                </li>
+
+                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                    <a th:href="@{/unidades}">
+                        Unidades
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <div class="nav-mobile">
+
+            <div class="mobile-top">
+
+                <a th:href="@{/perfil}"
+                   class="mobile-user">
+
+                    <div class="user-avatar">
+
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true">
+                            <circle cx="12"
+                                    cy="8"
+                                    r="3.2"></circle>
+
+                            <path d="M5.5 20c.6-4 3-6 6.5-6s5.9 2 6.5 6"></path>
+                        </svg>
+
                     </div>
-                    <span class="user-role"
-                          th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
-                          th:text="${usuarioLogado.role}">
-                        USER
-                    </span>
-                </div>
-            </li>
 
-            <li class="nav-exit">
-                <button type="button"
-                        class="btn-sair"
-                        onclick="abrirModalLogout()">
-                    Sair
-                </button>
-            </li>
-        </ul>
+                    <div class="user-info-text">
+
+                        <strong th:text="${usuarioLogado.nome}">
+                            Usuário
+                        </strong>
+
+                        <span th:text="${usuarioLogado.role}">
+                            USER
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                <details class="mobile-menu">
+
+                    <summary>
+                        <span class="menu-icon">☰</span>
+                        MENU
+                    </summary>
+
+                    <div class="mobile-menu-content">
+
+                        <a th:href="@{/}">
+                            Home
+                        </a>
+
+                        <a th:href="@{/flange/listagem}">
+                            Listagem de Flanges
+                        </a>
+
+                        <a th:href="@{/flange/cadastro}">
+                            Cadastrar Flange
+                        </a>
+
+                        <a th:href="@{/funcionario/listagem}">
+                            Listagem Funcionários
+                        </a>
+
+                        <a th:href="@{/funcionario/cadastro}">
+                            Cadastrar Funcionário
+                        </a>
+
+                        <a th:href="@{/manutencao/listagem}">
+                            Listagem Manutenção
+                        </a>
+
+                        <a th:href="@{/manutencao/cadastro}">
+                            Cadastrar Manutenção
+                        </a>
+
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/usuarios}">
+                            Usuários
+                        </a>
+
+                        <a th:href="@{/perfil}">
+                            Meu Perfil
+                        </a>
+
+                        <button type="button"
+                                class="mobile-logout"
+                                onclick="abrirModalLogout()">
+                            Sair do Sistema
+                        </button>
+
+                    </div>
+
+                </details>
+
+            </div>
+
+        </div>
+
     </nav>
+
 
     <div id="logoutModal"
          class="logout-overlay"
          hidden
          onclick="fecharModalLogout(event)">
-        <div class="logout-modal" onclick="event.stopPropagation()">
-            <div class="logout-icon">⏻</div>
-            <h2>Deseja sair?</h2>
-            <p>Você será desconectado do sistema.</p>
+
+        <div class="logout-modal"
+             onclick="event.stopPropagation()">
+
+            <div class="logout-icon">
+                ⏻
+            </div>
+
+            <h2>
+                Deseja sair?
+            </h2>
+
+            <p>
+                Você será desconectado do sistema.
+            </p>
+
             <div class="logout-botoes">
+
                 <button type="button"
                         class="btn-cancelar"
                         onclick="fecharModalLogout()">
                     Cancelar
                 </button>
+
                 <button type="button"
                         class="btn-desconectar"
                         onclick="confirmarLogout()">
                     Desconectar
                 </button>
+
             </div>
+
         </div>
+
     </div>
+
 
     <form id="logoutForm"
           th:action="@{/logout}"
           method="post"
           style="display:none;">
     </form>
+
 </div>
+
 </html>

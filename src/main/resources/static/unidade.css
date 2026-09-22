@@ -1,0 +1,259 @@
+/* =========================================================
+   UNIDADES - SODA CÁUSTICA FLANGES
+========================================================= */
+
+.unidade-topo,
+.unidade-form-header {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 24px;
+}
+
+.unidade-topo {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.unidade-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--blue-pipe);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+}
+
+.unidade-topo h1,
+.unidade-form-header h1 {
+    margin-bottom: 6px;
+    color: var(--bg-text-h1);
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.unidade-topo p,
+.unidade-form-header p {
+    color: #c7d3e5;
+    font-size: 13px;
+}
+
+.unidade-grid {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.unidade-card {
+    padding: 20px;
+    background: #023e7d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.unidade-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+}
+
+.unidade-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.unidade-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--blue-pipe-dim);
+    border: 1px solid rgba(59,130,246,0.20);
+}
+
+.unidade-icon span {
+    color: var(--bg-text-h1);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.unidade-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.status-ativo {
+    color: var(--ok-green);
+    background: var(--ok-green-dim);
+    border: 1px solid var(--ok-green-ring);
+}
+
+.status-inativo {
+    color: var(--alert-red);
+    background: var(--alert-red-dim);
+    border: 1px solid var(--alert-red-ring);
+}
+
+.unidade-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.unidade-info {
+    margin-top: 18px;
+}
+
+.unidade-id {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--amber);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.unidade-info h2 {
+    margin: 0 0 6px;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+.unidade-info p {
+    color: #b9c9df;
+    font-size: 12px;
+}
+
+.unidade-acoes {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.unidade-acoes form {
+    width: auto;
+}
+
+.unidade-btn {
+    min-height: 40px;
+    padding: 10px 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.unidade-btn-primary {
+    border: 1px solid rgba(59,130,246,0.35);
+    background: var(--blue-pipe-dim);
+    color: var(--blue-pipe);
+}
+
+.unidade-btn-primary:hover {
+    background: rgba(59,130,246,0.20);
+    transform: translateY(-1px);
+}
+
+.unidade-btn-secondary {
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card-2);
+    color: #ffffff;
+}
+
+.unidade-btn-secondary:hover {
+    background: var(--bg-hover);
+    transform: translateY(-1px);
+}
+
+.unidade-btn-status {
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card-2);
+    color: #d7deea;
+}
+
+.unidade-btn-status:hover {
+    background: var(--bg-hover);
+    transform: translateY(-1px);
+}
+
+.unidade-form-header {
+    margin-bottom: 20px;
+}
+
+.unidade-form-card {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #023e7d;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.unidade-form-acoes {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.unidade-error {
+    margin-top: 6px;
+    color: var(--alert-red);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.unidade-vazia {
+    grid-column: 1 / -1;
+    padding: 30px;
+    text-align: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: #aebed6;
+}
+
+@media (max-width: 700px) {
+    .unidade-topo {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .unidade-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .unidade-form-acoes {
+        flex-direction: column;
+    }
+
+    .unidade-form-acoes .unidade-btn {
+        width: 100%;
+    }
+}

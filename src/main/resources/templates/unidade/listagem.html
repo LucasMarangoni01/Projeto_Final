@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Unidades | Soda Cáustica Flanges</title>
+
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/menu.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/unidade.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main>
+
+    <div class="unidade-topo">
+
+        <div>
+            <span class="unidade-label">
+                ADMINISTRAÇÃO
+            </span>
+
+            <h1>
+                Unidades
+            </h1>
+
+            <p>
+                Gerencie as unidades industriais
+                cadastradas no sistema.
+            </p>
+        </div>
+
+        <a th:href="@{/unidades/cadastro}"
+           class="unidade-btn unidade-btn-primary">
+            Nova Unidade
+        </a>
+
+    </div>
+
+    <div class="unidade-grid">
+
+        <article
+                class="unidade-card"
+                th:each="unidade : ${unidades}">
+
+            <div class="unidade-card-top">
+
+                <div class="unidade-icon">
+                    <span>U</span>
+                </div>
+
+                <span
+                        class="unidade-status"
+                        th:classappend="${unidade.ativo}
+                            ? ' status-ativo'
+                            : ' status-inativo'">
+
+                    <span class="unidade-status-dot"></span>
+
+                    <span
+                            th:text="${unidade.ativo
+                            ? 'ATIVA'
+                            : 'INATIVA'}">
+                        ATIVA
+                    </span>
+
+                </span>
+
+            </div>
+
+            <div class="unidade-info">
+
+                <span class="unidade-id"
+                      th:text="'UNIDADE #' + ${unidade.id}">
+                    UNIDADE #1
+                </span>
+
+                <h2 th:text="${unidade.nome}">
+                    Unidade Industrial
+                </h2>
+
+                <p th:text="${unidade.localizacao}">
+                    Localização
+                </p>
+
+            </div>
+
+            <div class="unidade-acoes">
+
+                <form
+                        th:action="@{/unidades/alterar-status}"
+                        method="post">
+
+                    <input
+                            type="hidden"
+                            name="id"
+                            th:value="${unidade.id}">
+
+                    <button
+                            type="submit"
+                            class="unidade-btn unidade-btn-status"
+                            th:text="${unidade.ativo
+                            ? 'Desativar'
+                            : 'Ativar'}">
+                        Desativar
+                    </button>
+
+                </form>
+
+            </div>
+
+        </article>
+
+        <div
+                class="unidade-vazia"
+                th:if="${#lists.isEmpty(unidades)}">
+
+            Nenhuma unidade cadastrada.
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer>
+    <p>
+        © 2026 Sistema de Monitoramento de Flanges.
+        Todos os direitos reservados.
+    </p>
+</footer>
+
+<script th:src="@{/menu.js}"></script>
+
+</body>
+</html>

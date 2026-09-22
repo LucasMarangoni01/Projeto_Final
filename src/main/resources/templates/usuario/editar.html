@@ -3,42 +3,43 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
     <title>Editar Usuário | Soda Cáustica Flanges</title>
 
-    <link rel="stylesheet" th:href="@{/style.css}">
-    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet"
+          th:href="@{/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/menu.css}">
 </head>
 
 <body>
 
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-
 <main>
 
     <header>
+        <span class="section-label">
+            ADMINISTRAÇÃO
+        </span>
 
         <h1>
             Editar Usuário
         </h1>
 
         <p>
-            Altere a permissão de acesso do usuário.
+            Configure a permissão e a unidade
+            associada ao usuário.
         </p>
-
     </header>
-
 
     <div class="card">
 
         <div class="form-group">
-
             <label>
                 Nome
             </label>
@@ -47,12 +48,9 @@
                     type="text"
                     th:value="${usuario.nome}"
                     disabled>
-
         </div>
 
-
         <div class="form-group">
-
             <label>
                 E-mail
             </label>
@@ -61,12 +59,92 @@
                     type="email"
                     th:value="${usuario.email}"
                     disabled>
-
         </div>
-
 
         <hr>
 
+        <div class="form-group">
+            <label>
+                Unidade atual
+            </label>
+
+            <div class="usuario-unidade-atual"
+                 th:if="${usuario.unidade != null}">
+
+                <strong
+                        th:text="${usuario.unidade.nome}">
+                    Unidade
+                </strong>
+
+                <span
+                        th:text="${usuario.unidade.localizacao}">
+                    Localização
+                </span>
+
+            </div>
+
+            <div class="usuario-unidade-pendente"
+                 th:if="${usuario.unidade == null}">
+
+                Este usuário ainda não possui uma unidade.
+
+            </div>
+        </div>
+
+        <form
+                th:action="@{/usuarios/alterar-unidade}"
+                method="post">
+
+            <input
+                    type="hidden"
+                    name="id"
+                    th:value="${usuario.id}">
+
+            <div class="form-group">
+
+                <label for="unidadeId">
+                    Alterar unidade
+                </label>
+
+                <select
+                        id="unidadeId"
+                        name="unidadeId"
+                        required>
+
+                    <option value="">
+                        Selecione uma unidade
+                    </option>
+
+                    <option
+                            th:each="unidade : ${unidades}"
+                            th:value="${unidade.id}"
+                            th:text="${unidade.nome}"
+                            th:selected="${usuario.unidade != null and usuario.unidade.id == unidade.id}">
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="botoes">
+
+                <a
+                        th:href="@{/usuarios}"
+                        class="btn-voltar">
+                    Voltar
+                </a>
+
+                <button
+                        type="submit"
+                        class="btn-primary">
+                    Salvar Unidade
+                </button>
+
+            </div>
+
+        </form>
+
+        <hr>
 
         <form
                 th:action="@{/usuarios/alterar-role}"
@@ -76,7 +154,6 @@
                     type="hidden"
                     name="id"
                     th:value="${usuario.id}">
-
 
             <div class="form-group">
 
@@ -100,24 +177,12 @@
 
             </div>
 
-
             <div class="botoes">
-
-                <a
-                        class="btn-voltar"
-                        th:href="@{/usuarios}">
-
-                    Voltar
-
-                </a>
-
 
                 <button
                         type="submit"
                         class="btn-primary">
-
                     Salvar Permissão
-
                 </button>
 
             </div>
@@ -128,16 +193,14 @@
 
 </main>
 
-
 <footer>
-
     <p>
         © 2026 Sistema de Monitoramento de Flanges.
         Todos os direitos reservados.
     </p>
-
 </footer>
 
 <script th:src="@{/menu.js}"></script>
+
 </body>
 </html>

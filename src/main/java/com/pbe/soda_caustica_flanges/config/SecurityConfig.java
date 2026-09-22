@@ -1,5 +1,6 @@
 package com.pbe.soda_caustica_flanges.config;
 
+import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +22,8 @@ public class SecurityConfig {
         this.repository = repository;
     }
 
-    // ==============================
-    // BUSCA O USUÁRIO NO MYSQL
-    // ==============================
     @Bean
     public UserDetailsService userDetailsService() {
-
         return email -> {
 
             Usuario usuario = repository.findByEmail(email)
@@ -36,93 +33,81 @@ public class SecurityConfig {
                             )
                     );
 
+            boolean usuarioSemUnidade =
+                    usuario.getRole() == Role.USER
+                            && usuario.getUnidade() == null;
+
+            boolean usuarioDesabilitado =
+                    !usuario.isAtivo()
+                            || usuarioSemUnidade;
+
             return User.builder()
                     .username(usuario.getEmail())
                     .password(usuario.getSenha())
                     .roles(usuario.getRole().name())
-                    .disabled(!usuario.isAtivo())
+                    .disabled(usuarioDesabilitado)
                     .build();
         };
     }
 
-    // ==============================
-    // CRIPTOGRAFIA DA SENHA
-    // ==============================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ==============================
-    // CONFIGURAÇÃO DE SEGURANÇA
-    // ==============================
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+            HttpSecurity http) throws Exception {
 
         http
-
-                // ==============================
-                // CSRF
-                // ==============================
                 .csrf(csrf -> csrf.disable())
 
-                // ==============================
-                // AUTORIZAÇÃO
-                // ==============================
                 .authorizeHttpRequests(auth -> auth
 
-                        // ==============================
-                        // PÚBLICO
-                        // ==============================
                         .requestMatchers(
                                 "/login",
                                 "/cadastro",
                                 "/error",
+
                                 "/login.css",
                                 "/cadastro.css",
                                 "/style.css",
                                 "/menu.css",
                                 "/menu.js",
+                                "/perfil.css",
+                                "/unidade.css",
+                                "/flange.css",
+
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
+
                                 "/foto_ocorrencia/**",
                                 "/foto_pessoa/**",
                                 "/foto_flange/**"
                         ).permitAll()
-                        // ==============================
-                        // ADMIN + USER
-                        // ==============================
+
                         .requestMatchers(
                                 "/",
                                 "/flange/**",
                                 "/funcionario/**",
                                 "/manutencao/**",
-                                "/incidente/**"
+                                "/incidente/**",
+                                "/perfil"
                         ).hasAnyRole(
                                 "ADMIN",
                                 "USER"
                         )
 
-                        // ==============================
-                        // SOMENTE ADMIN
-                        // ==============================
                         .requestMatchers(
+                                "/usuarios/**",
                                 "/usuario/**",
-                                "/usuarios/**"
+                                "/unidades/**"
                         ).hasRole("ADMIN")
 
-                        // ==============================
-                        // RESTANTE
-                        // ==============================
                         .anyRequest().authenticated()
                 )
 
-                // ==============================
-                // LOGIN
-                // ==============================
                 .formLogin(form -> form
 
                         .loginPage("/login")
@@ -131,21 +116,25 @@ public class SecurityConfig {
 
                         .passwordParameter("senha")
 
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl(
+                                "/",
+                                true
+                        )
 
-                        .failureUrl("/login?error=true")
+                        .failureUrl(
+                                "/login?error=true"
+                        )
 
                         .permitAll()
                 )
 
-                // ==============================
-                // LOGOUT
-                // ==============================
                 .logout(logout -> logout
 
                         .logoutUrl("/logout")
 
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutSuccessUrl(
+                                "/login?logout=true"
+                        )
 
                         .permitAll()
                 );

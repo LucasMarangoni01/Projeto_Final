@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 @Entity
@@ -23,18 +24,22 @@ public class Flange {
     @NotNull
     private Double temp_ambiente;
 
-    // ==========================================
-    // CORREÇÃO: Conversão de data para não falhar a validação
-    // ==========================================
     @NotNull(message = "A data de entrada é obrigatória.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate data_entrada;
 
     private String foto;
 
-    // ==========================================
-    // GETTERS E SETTERS
-    // ==========================================
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusFlange status = StatusFlange.NORMAL;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidade_id")
+    private Unidade unidade;
+
+    public Flange() {
+    }
 
     public Long getId() {
         return id;
@@ -82,5 +87,25 @@ public class Flange {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public StatusFlange getStatus() {
+        if (status == null) {
+            return StatusFlange.NORMAL;
+        }
+
+        return status;
+    }
+
+    public void setStatus(StatusFlange status) {
+        this.status = status;
+    }
+
+    public Unidade getUnidade() {
+        return unidade;
+    }
+
+    public void setUnidade(Unidade unidade) {
+        this.unidade = unidade;
     }
 }

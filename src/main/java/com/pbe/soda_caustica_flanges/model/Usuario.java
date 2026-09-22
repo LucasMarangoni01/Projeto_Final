@@ -26,6 +26,10 @@ public class Usuario {
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidade_id")
+    private Unidade unidade;
+
     public Usuario() {
     }
 
@@ -34,13 +38,15 @@ public class Usuario {
             String email,
             String senha,
             Role role,
-            boolean ativo
-    ) {
+            boolean ativo,
+            Unidade unidade) {
+
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.role = role;
         this.ativo = ativo;
+        this.unidade = unidade;
     }
 
     public Long getId() {
@@ -89,5 +95,13 @@ public class Usuario {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public Unidade getUnidade() {
+        return unidade;
+    }
+
+    public void setUnidade(Unidade unidade) {
+        this.unidade = unidade;
     }
 }
