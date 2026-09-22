@@ -252,7 +252,114 @@
     }
 
 }
+/* =========================================================
+   USUÁRIO LOGADO
+========================================================= */
 
+.main-nav ul {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-user {
+    margin-left: auto;
+}
+
+.user-info {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-card-2);
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--blue-pipe-dim);
+    border: 1px solid rgba(59,130,246,0.2);
+    font-size: 14px;
+}
+
+.user-data {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.user-data strong {
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.user-data span {
+    margin-top: 2px;
+    color: #8ea4c4;
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+.user-role {
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.user-role.role-admin {
+    color: var(--blue-pipe);
+    background: var(--blue-pipe-dim);
+    border: 1px solid rgba(59,130,246,0.25);
+}
+
+.user-role.role-user {
+    color: #d7deea;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-strong);
+}
+
+.nav-exit {
+    margin-left: 0;
+}
+
+@media (max-width: 900px) {
+    .main-nav ul {
+        gap: 8px;
+    }
+
+    .nav-user {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .user-info {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .user-data {
+        min-width: 0;
+    }
+
+    .user-data span {
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
 
 /* ==============================
    RESPONSIVO

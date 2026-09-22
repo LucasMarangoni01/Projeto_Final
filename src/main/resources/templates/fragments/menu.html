@@ -1,115 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<body>
 
 <div th:fragment="menu">
-
-    <nav>
-
+    <nav class="main-nav">
         <ul>
-
-            <li>
-                <a href="/">
-                    Home
-                </a>
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/flange/listagem}">Listagem de Flanges</a></li>
+            <li><a th:href="@{/flange/cadastro}">Cadastrar Flanges</a></li>
+            <li><a th:href="@{/funcionario/listagem}">Listagem Funcionário</a></li>
+            <li><a th:href="@{/funcionario/cadastro}">Cadastrar Funcionário</a></li>
+            <li><a th:href="@{/manutencao/listagem}">Listagem Manutenção</a></li>
+            <li><a th:href="@{/manutencao/cadastro}">Cadastro Manutenção</a></li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/usuarios}">Usuários</a>
             </li>
 
-            <li>
-                <a href="/flange/listagem">
-                    Listagem de Flanges
-                </a>
+            <li class="nav-user" sec:authorize="isAuthenticated()">
+                <div class="user-info">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-data">
+                        <strong th:text="${usuarioLogado.nome}">Usuário</strong>
+                        <span th:text="${usuarioLogado.email}">email@gmail.com</span>
+                    </div>
+                    <span class="user-role"
+                          th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
+                          th:text="${usuarioLogado.role}">
+                        USER
+                    </span>
+                </div>
             </li>
 
-            <li>
-                <a href="/flange/cadastro">
-                    Cadastrar Flanges
-                </a>
-            </li>
-
-            <li>
-                <a href="/funcionario/listagem">
-                    Listagem Funcionário
-                </a>
-            </li>
-
-            <li>
-                <a href="/funcionario/cadastro">
-                    Cadastrar Funcionário
-                </a>
-            </li>
-
-            <li>
-                <a href="/manutencao/listagem">
-                    Listagem Manutenção
-                </a>
-            </li>
-
-            <li>
-                <a href="/manutencao/cadastro">
-                    Cadastro Manutenção
-                </a>
-            </li>
-
-            <li style="margin-left: auto;">
-
-                <button
-                        type="button"
+            <li class="nav-exit">
+                <button type="button"
                         class="btn-sair"
                         onclick="abrirModalLogout()">
-
                     Sair
-
                 </button>
-
-            <li sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/usuarios}">
-                    Usuários
-                </a>
             </li>
-
-            </li>
-
         </ul>
-
     </nav>
 
-
-    <!-- ==============================
-         MODAL DE LOGOUT
-         ============================== -->
-
-    <div
-            id="logoutModal"
-            class="logout-overlay"
-            hidden
-            onclick="fecharModalLogout(event)">
-
-        <div
-                class="logout-modal"
-                onclick="event.stopPropagation()">
-
-            <div class="logout-icon">
-                ⏻
-            </div>
-
-            <h2>
-                Deseja sair?
-            </h2>
-
-            <p>
-                Você será desconectado do sistema.
-            </p>
-
+    <div id="logoutModal"
+         class="logout-overlay"
+         hidden
+         onclick="fecharModalLogout(event)">
+        <div class="logout-modal" onclick="event.stopPropagation()">
+            <div class="logout-icon">⏻</div>
+            <h2>Deseja sair?</h2>
+            <p>Você será desconectado do sistema.</p>
             <div class="logout-botoes">
-                <button
-                        type="button"
+                <button type="button"
                         class="btn-cancelar"
                         onclick="fecharModalLogout()">
                     Cancelar
                 </button>
-                <button
-                        type="button"
+                <button type="button"
                         class="btn-desconectar"
                         onclick="confirmarLogout()">
                     Desconectar
@@ -117,15 +64,11 @@
             </div>
         </div>
     </div>
-    <!-- ==============================
-         FORMULÁRIO DE LOGOUT
-         ============================== -->
-    <form
-            id="logoutForm"
-            th:action="@{/logout}"
-            method="post"
-            style="display: none;">
+
+    <form id="logoutForm"
+          th:action="@{/logout}"
+          method="post"
+          style="display:none;">
     </form>
 </div>
-</body>
 </html>

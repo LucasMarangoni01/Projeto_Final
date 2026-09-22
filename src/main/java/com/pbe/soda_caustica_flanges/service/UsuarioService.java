@@ -29,12 +29,22 @@ public class UsuarioService {
 
         Usuario usuario = new Usuario();
 
-        usuario.setNome(cadastroDTO.getNome().trim());
-        usuario.setEmail(cadastroDTO.getEmail().trim().toLowerCase());
-        usuario.setSenha(
-                passwordEncoder.encode(cadastroDTO.getSenha())
+        usuario.setNome(
+                cadastroDTO.getNome().trim()
         );
+
+        usuario.setEmail(
+                cadastroDTO.getEmail().trim().toLowerCase()
+        );
+
+        usuario.setSenha(
+                passwordEncoder.encode(
+                        cadastroDTO.getSenha()
+                )
+        );
+
         usuario.setRole(Role.USER);
+
         usuario.setAtivo(true);
 
         return repository.save(usuario);
@@ -47,6 +57,16 @@ public class UsuarioService {
     public Usuario buscarPorId(Long id) {
 
         return repository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Usuário não encontrado."
+                        )
+                );
+    }
+
+    public Usuario buscarPorEmail(String email) {
+
+        return repository.findByEmail(email)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Usuário não encontrado."
@@ -67,7 +87,9 @@ public class UsuarioService {
 
         Usuario usuario = buscarPorId(id);
 
-        usuario.setAtivo(!usuario.isAtivo());
+        usuario.setAtivo(
+                !usuario.isAtivo()
+        );
 
         repository.save(usuario);
     }
