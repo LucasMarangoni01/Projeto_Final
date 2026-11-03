@@ -110,7 +110,7 @@ $env:DB_PASSWORD = "SUA_NOVA_SENHA_DO_MYSQL"
 $env:ADMIN_EMAIL = "admin-projeto@example.com"
 $env:ADMIN_PASSWORD = "Use-Uma-Senha-Forte-Com-12+Caracteres"
 
-.`mvnw.cmd` spring-boot:run
+.\mvnw.cmd spring-boot:run
 ```
 
 As variáveis definidas dessa forma permanecem disponíveis apenas na janela atual do PowerShell. Na IDE, elas também podem ser cadastradas na seção **Environment variables** da configuração de execução da aplicação.
