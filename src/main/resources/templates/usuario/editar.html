@@ -4,191 +4,195 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Editar Usuário | Soda Cáustica Flanges</title>
+    <title>Editar usuário | Soda Cáustica Flanges</title>
 
-    <link rel="stylesheet"
-          th:href="@{/style.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/usuario.css}">
 </head>
 
 <body>
 
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main>
+<main class="usuarios-edit-main">
 
-    <header>
-        <span class="section-label">
-            ADMINISTRAÇÃO
-        </span>
+    <header class="usuarios-edit-heading">
+        <div>
+            <span class="usuarios-eyebrow">ADMINISTRAÇÃO DO SISTEMA</span>
+            <h1>Configurações do usuário</h1>
+            <p>Gerencie o vínculo industrial e o nível de acesso desta conta.</p>
+        </div>
 
-        <h1>
-            Editar Usuário
-        </h1>
-
-        <p>
-            Configure a permissão e a unidade
-            associada ao usuário.
-        </p>
+        <a th:href="@{/usuarios}" class="usuarios-back-link">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+                <path d="M9 12h11"></path>
+            </svg>
+            Voltar aos usuários
+        </a>
     </header>
 
-    <div class="card">
+    <section class="usuarios-identity-card">
+        <div class="usuarios-identity-avatar"
+             th:text="${#strings.substring(usuario.nome, 0, 1).toUpperCase()}">U</div>
 
-        <div class="form-group">
-            <label>
-                Nome
-            </label>
-
-            <input
-                    type="text"
-                    th:value="${usuario.nome}"
-                    disabled>
+        <div class="usuarios-identity-copy">
+            <span class="usuarios-identity-label">CONTA SELECIONADA</span>
+            <h2 th:text="${usuario.nome}">Nome do usuário</h2>
+            <p th:text="${usuario.email}">email@gmail.com</p>
         </div>
 
-        <div class="form-group">
-            <label>
-                E-mail
-            </label>
-
-            <input
-                    type="email"
-                    th:value="${usuario.email}"
-                    disabled>
+        <div class="usuarios-identity-meta">
+            <span class="usuarios-role-caption">PERMISSÃO ATUAL</span>
+            <span
+                    class="usuario-role"
+                    th:classappend="${usuario.role.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
+                    th:text="${usuario.role}">
+                USER
+            </span>
         </div>
+    </section>
 
-        <hr>
+    <section class="usuarios-edit-grid">
 
-        <div class="form-group">
-            <label>
-                Unidade atual
-            </label>
-
-            <div class="usuario-unidade-atual"
-                 th:if="${usuario.unidade != null}">
-
-                <strong
-                        th:text="${usuario.unidade.nome}">
-                    Unidade
-                </strong>
-
-                <span
-                        th:text="${usuario.unidade.localizacao}">
-                    Localização
+        <article class="usuarios-edit-card">
+            <div class="usuarios-edit-card-heading">
+                <span class="usuarios-edit-card-icon usuarios-edit-unit-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 21h18"></path>
+                        <path d="M5 21V7l7-4 7 4v14"></path>
+                        <path d="M9 21v-5h6v5"></path>
+                        <path d="M9 9h.01M15 9h.01M9 12h.01M15 12h.01"></path>
+                    </svg>
                 </span>
-
+                <div>
+                    <span class="usuarios-edit-card-kicker">VÍNCULO INDUSTRIAL</span>
+                    <h2>Unidade do usuário</h2>
+                    <p>Defina a unidade à qual esta conta terá acesso.</p>
+                </div>
             </div>
 
-            <div class="usuario-unidade-pendente"
+            <div class="usuarios-current-unit"
+                 th:if="${usuario.unidade != null}">
+                <span class="usuarios-current-unit-label">UNIDADE ATUAL</span>
+                <strong th:text="${usuario.unidade.nome}">Unidade</strong>
+                <small th:text="${usuario.unidade.localizacao}">Localização</small>
+            </div>
+
+            <div class="usuarios-no-unit"
                  th:if="${usuario.unidade == null}">
-
-                Este usuário ainda não possui uma unidade.
-
-            </div>
-        </div>
-
-        <form
-                th:action="@{/usuarios/alterar-unidade}"
-                method="post">
-
-            <input
-                    type="hidden"
-                    name="id"
-                    th:value="${usuario.id}">
-
-            <div class="form-group">
-
-                <label for="unidadeId">
-                    Alterar unidade
-                </label>
-
-                <select
-                        id="unidadeId"
-                        name="unidadeId"
-                        required>
-
-                    <option value="">
-                        Selecione uma unidade
-                    </option>
-
-                    <option
-                            th:each="unidade : ${unidades}"
-                            th:value="${unidade.id}"
-                            th:text="${unidade.nome}"
-                            th:selected="${usuario.unidade != null and usuario.unidade.id == unidade.id}">
-                    </option>
-
-                </select>
-
+                <span class="usuarios-no-unit-dot"></span>
+                <span>Esta conta ainda não possui uma unidade vinculada.</span>
             </div>
 
-            <div class="botoes">
+            <form
+                    th:action="@{/usuarios/alterar-unidade}"
+                    method="post"
+                    class="usuarios-edit-form">
 
-                <a
-                        th:href="@{/usuarios}"
-                        class="btn-voltar">
-                    Voltar
-                </a>
+                <input
+                        type="hidden"
+                        name="id"
+                        th:value="${usuario.id}">
 
-                <button
-                        type="submit"
-                        class="btn-primary">
-                    Salvar Unidade
+                <div class="form-group">
+                    <label for="unidadeId">Selecionar unidade</label>
+                    <select
+                            id="unidadeId"
+                            name="unidadeId"
+                            required>
+                        <option value="">Escolha uma unidade</option>
+                        <option
+                                th:each="unidade : ${unidades}"
+                                th:value="${unidade.id}"
+                                th:text="${unidade.nome}"
+                                th:selected="${usuario.unidade != null and usuario.unidade.id == unidade.id}">
+                        </option>
+                    </select>
+                    <small class="usuarios-field-help">O usuário terá acesso aos dados associados à unidade selecionada.</small>
+                </div>
+
+                <button type="submit" class="usuarios-submit-button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 12 4 4L19 6"></path>
+                    </svg>
+                    Salvar unidade
                 </button>
+            </form>
+        </article>
 
+        <article class="usuarios-edit-card">
+            <div class="usuarios-edit-card-heading">
+                <span class="usuarios-edit-card-icon usuarios-edit-role-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6z"></path>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </span>
+                <div>
+                    <span class="usuarios-edit-card-kicker">CONTROLE DE ACESSO</span>
+                    <h2>Nível de permissão</h2>
+                    <p>Escolha o papel que define as funções disponíveis.</p>
+                </div>
             </div>
 
-        </form>
-
-        <hr>
-
-        <form
-                th:action="@{/usuarios/alterar-role}"
-                method="post">
-
-            <input
-                    type="hidden"
-                    name="id"
-                    th:value="${usuario.id}">
-
-            <div class="form-group">
-
-                <label for="role">
-                    Nível de acesso
-                </label>
-
-                <select
-                        id="role"
-                        name="role"
-                        required>
-
-                    <option
-                            th:each="role : ${roles}"
-                            th:value="${role}"
-                            th:text="${role}"
-                            th:selected="${role == usuario.role}">
-                    </option>
-
-                </select>
-
+            <div class="usuarios-permission-info">
+                <div class="usuarios-permission-row">
+                    <span class="usuarios-permission-symbol">A</span>
+                    <div>
+                        <strong>ADMIN</strong>
+                        <small>Gerencia usuários, unidades e configurações administrativas.</small>
+                    </div>
+                </div>
+                <div class="usuarios-permission-row">
+                    <span class="usuarios-permission-symbol usuarios-permission-user">U</span>
+                    <div>
+                        <strong>USER</strong>
+                        <small>Acessa as funcionalidades operacionais conforme sua unidade.</small>
+                    </div>
+                </div>
             </div>
 
-            <div class="botoes">
+            <form
+                    th:action="@{/usuarios/alterar-role}"
+                    method="post"
+                    class="usuarios-edit-form">
 
-                <button
-                        type="submit"
-                        class="btn-primary">
-                    Salvar Permissão
+                <input
+                        type="hidden"
+                        name="id"
+                        th:value="${usuario.id}">
+
+                <div class="form-group">
+                    <label for="role">Nova permissão</label>
+                    <select id="role" name="role" required>
+                        <option
+                                th:each="role : ${roles}"
+                                th:value="${role}"
+                                th:text="${role}"
+                                th:selected="${role == usuario.role}">
+                        </option>
+                    </select>
+                    <small class="usuarios-field-help">A alteração será aplicada imediatamente após salvar.</small>
+                </div>
+
+                <button type="submit" class="usuarios-submit-button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 12 4 4L19 6"></path>
+                    </svg>
+                    Salvar permissão
                 </button>
+            </form>
+        </article>
 
-            </div>
+    </section>
 
-        </form>
-
+    <div class="usuarios-security-note">
+        <span class="usuarios-security-icon">i</span>
+        <p><strong>Importante:</strong> alterar a unidade ou a permissão muda o alcance de acesso desta conta. Confira os dados antes de salvar.</p>
     </div>
 
 </main>
