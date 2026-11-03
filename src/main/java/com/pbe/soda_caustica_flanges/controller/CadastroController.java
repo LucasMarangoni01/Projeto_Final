@@ -150,6 +150,6 @@ public class CadastroController {
         // VOLTAR PARA LOGIN
         // ==============================
 
-        return "redirect:/login?cadastro=sucesso";
+        return "redirect:/login?cadastro=pendente";
     }
 }
