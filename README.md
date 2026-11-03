@@ -85,7 +85,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ## Configuração do ambiente local
 
-As credenciais não devem ser armazenadas no repositório. Antes de executar a aplicação, configure as variáveis de ambiente abaixo na configuração de execução da IDE ou no terminal.
+As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Copie `.env.example` para `.env` e preencha a senha real do seu MySQL. Também é possível configurar as variáveis diretamente na IDE ou no terminal.
 
 ### Variáveis necessárias
 
@@ -96,6 +96,16 @@ As credenciais não devem ser armazenadas no repositório. Antes de executar a a
 | `DB_PASSWORD` | Senha do usuário do MySQL. Obrigatória. |
 | `ADMIN_EMAIL` | E-mail da conta ADMIN inicial. Opcional quando já existe uma conta administrativa. |
 | `ADMIN_PASSWORD` | Senha da conta ADMIN inicial, com pelo menos 12 caracteres. Deve ser definida junto com `ADMIN_EMAIL`. |
+
+### Configuração recomendada no IntelliJ IDEA (Windows)
+
+1. Na raiz do projeto, copie o arquivo `.env.example` e renomeie a cópia para `.env`.
+2. Abra o arquivo `.env` e informe a senha que realmente funciona no seu MySQL em `DB_PASSWORD`.
+3. No IntelliJ, abra **Run > Edit Configurations...** e selecione a configuração da aplicação.
+4. Em **Environment variables**, remova valores antigos de `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, caso existam. Variáveis cadastradas no IntelliJ têm prioridade sobre o arquivo `.env` e podem continuar sobrescrevendo a senha correta.
+5. Confirme que o **Working directory** aponta para a pasta raiz do projeto e execute novamente.
+
+O arquivo `.env` deve usar o formato `NOME=valor`, sem `export` e sem aspas. Não compartilhe esse arquivo nem envie sua senha pelo chat.
 
 ### Exemplo no PowerShell (Windows)
 
