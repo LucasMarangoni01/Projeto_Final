@@ -85,27 +85,29 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ## Configuração do ambiente local
 
-As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Copie `.env.example` para `.env` e preencha a senha real do seu MySQL. Também é possível configurar as variáveis diretamente na IDE ou no terminal.
+As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Para evitar usar a conta administrativa `root` na aplicação, crie uma conta exclusiva chamada `soda_app` usando o script `database/setup.sql`. Depois copie `.env.example` para `.env` e configure a mesma senha nos dois locais.
 
 ### Variáveis necessárias
 
 | Variável | Finalidade |
 |---|---|
 | `DB_URL` | URL JDBC do MySQL. Caso omitida, é utilizado o endereço local padrão do projeto. |
-| `DB_USERNAME` | Usuário do MySQL. Caso omitida, o padrão é `root`. |
+| `DB_USERNAME` | Usuário da aplicação no MySQL. O modelo utiliza `soda_app`; não use `root` na execução normal. |
 | `DB_PASSWORD` | Senha do usuário do MySQL. Obrigatória. |
 | `ADMIN_EMAIL` | E-mail da conta ADMIN inicial. Opcional quando já existe uma conta administrativa. |
 | `ADMIN_PASSWORD` | Senha da conta ADMIN inicial, com pelo menos 12 caracteres. Deve ser definida junto com `ADMIN_EMAIL`. |
 
 ### Configuração recomendada no IntelliJ IDEA (Windows)
 
-1. Na raiz do projeto, copie o arquivo `.env.example` e renomeie a cópia para `.env`.
-2. Abra o arquivo `.env` e informe a senha que realmente funciona no seu MySQL em `DB_PASSWORD`.
-3. No IntelliJ, abra **Run > Edit Configurations...** e selecione a configuração da aplicação.
-4. Em **Environment variables**, remova valores antigos de `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, caso existam. Variáveis cadastradas no IntelliJ têm prioridade sobre o arquivo `.env` e podem continuar sobrescrevendo a senha correta.
-5. Confirme que o **Working directory** aponta para a pasta raiz do projeto e execute novamente.
+1. Abra o MySQL Workbench com uma conta que tenha permissão para criar usuários e bancos.
+2. Abra e execute `database/setup.sql`. Antes, substitua o texto `TROQUE_POR_UMA_SENHA_FORTE_2026` pela senha forte que você escolheu.
+3. Na raiz do projeto, copie `.env.example` e renomeie a cópia para `.env`.
+4. No `.env`, substitua o valor de `DB_PASSWORD` pela mesma senha colocada no script SQL. Mantenha `DB_USERNAME=soda_app`.
+5. No IntelliJ, abra **Run > Edit Configurations...** e selecione a configuração da aplicação.
+6. Em **Environment variables**, remova valores antigos de `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`. O IntelliJ pode sobrescrever os valores do arquivo `.env`.
+7. Confirme que o **Working directory** aponta para a pasta raiz do projeto e execute novamente.
 
-O arquivo `.env` deve usar o formato `NOME=valor`, sem `export` e sem aspas. Não compartilhe esse arquivo nem envie sua senha pelo chat.
+O arquivo `.env` deve usar o formato `NOME=valor`, sem `export` e sem aspas. Não compartilhe esse arquivo nem envie sua senha pelo chat. Se você não conseguir entrar no Workbench com uma conta administrativa, será necessário recuperar esse acesso antes de executar o script; não existe uma alteração segura no Spring Boot que possa corrigir uma senha recusada pelo próprio MySQL.
 
 ### Exemplo no PowerShell (Windows)
 
