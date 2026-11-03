@@ -79,3 +79,46 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 - Indicação de status normal ou alerta;
 - Organização dos dados para auxiliar na prevenção de falhas;
 - Possibilidade de integração com sensores físicos, como Arduino e sensor térmico.
+
+
+---
+
+## Configuração do ambiente local
+
+As credenciais não devem ser armazenadas no repositório. Antes de executar a aplicação, configure as variáveis de ambiente abaixo na configuração de execução da IDE ou no terminal.
+
+### Variáveis necessárias
+
+| Variável | Finalidade |
+|---|---|
+| `DB_URL` | URL JDBC do MySQL. Caso omitida, é utilizado o endereço local padrão do projeto. |
+| `DB_USERNAME` | Usuário do MySQL. Caso omitida, o padrão é `root`. |
+| `DB_PASSWORD` | Senha do usuário do MySQL. Obrigatória. |
+| `ADMIN_EMAIL` | E-mail da conta ADMIN inicial. Opcional quando já existe uma conta administrativa. |
+| `ADMIN_PASSWORD` | Senha da conta ADMIN inicial, com pelo menos 12 caracteres. Deve ser definida junto com `ADMIN_EMAIL`. |
+
+### Exemplo no PowerShell (Windows)
+
+Substitua os valores de exemplo pelas credenciais locais configuradas no seu MySQL:
+
+```powershell
+$env:DB_URL = "jdbc:mysql://localhost:3306/soda_caustica_flanges?createDatabaseIfNotExist=true"
+$env:DB_USERNAME = "root"
+$env:DB_PASSWORD = "SUA_NOVA_SENHA_DO_MYSQL"
+
+# Para criar uma nova conta ADMIN inicial, use um e-mail ainda não cadastrado.
+$env:ADMIN_EMAIL = "admin-projeto@example.com"
+$env:ADMIN_PASSWORD = "Use-Uma-Senha-Forte-Com-12+Caracteres"
+
+.`mvnw.cmd` spring-boot:run
+```
+
+As variáveis definidas dessa forma permanecem disponíveis apenas na janela atual do PowerShell. Na IDE, elas também podem ser cadastradas na seção **Environment variables** da configuração de execução da aplicação.
+
+### Atenção ao administrador já existente
+
+O bootstrap cria uma conta ADMIN somente quando o e-mail configurado ainda não existe. Ele não redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
+
+### Rotação de credenciais
+
+Se uma senha já foi publicada no histórico de um repositório público, alterá-la apenas no arquivo atual não é suficiente. Troque a senha correspondente no próprio MySQL e atualize a variável `DB_PASSWORD`. Senhas administrativas antigas também devem ser substituídas ou as respectivas contas desativadas.
