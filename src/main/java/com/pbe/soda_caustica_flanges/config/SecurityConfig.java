@@ -60,8 +60,7 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
-
+                // CSRF permanece habilitado pelo padrão do Spring Security.
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
