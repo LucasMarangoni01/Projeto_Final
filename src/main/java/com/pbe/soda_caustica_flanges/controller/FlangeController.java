@@ -361,7 +361,7 @@ public class FlangeController {
         return "redirect:/flange/listagem";
     }
 
-    @GetMapping("/flange/excluir/{id}")
+    @PostMapping("/flange/excluir/{id}")
     public String excluir(
             @PathVariable Long id,
             Authentication authentication) {
