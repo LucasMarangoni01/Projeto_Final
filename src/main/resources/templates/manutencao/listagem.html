@@ -63,11 +63,15 @@
                         Editar
                     </a>
 
-                    <a th:href="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
-                       class="btn btn-delete"
-                       onclick="return confirm('Tem certeza que deseja excluir esta manutenção?')">
-                        Excluir
-                    </a>
+                    <form th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
+                          method="post"
+                          style="display: inline; margin: 0;">
+                        <button type="submit"
+                                class="btn btn-delete"
+                                onclick="return confirm('Tem certeza que deseja excluir esta manutenção?')">
+                            Excluir
+                        </button>
+                    </form>
                 </td>
 
             </tr>

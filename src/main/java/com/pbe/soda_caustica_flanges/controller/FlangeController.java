@@ -216,6 +216,25 @@ public class FlangeController {
             return "flange/cadastro";
         }
 
+        Flange flangeExistente = null;
+
+        if (flange.getId() != null) {
+            flangeExistente = flangeRepository.findById(flange.getId()).orElse(null);
+
+            if (flangeExistente == null) {
+                return "redirect:/flange/listagem";
+            }
+
+            if (usuario.getRole() != Role.ADMIN) {
+                if (usuario.getUnidade() == null
+                        || flangeExistente.getUnidade() == null
+                        || !flangeExistente.getUnidade().getId()
+                                .equals(usuario.getUnidade().getId())) {
+                    return "redirect:/flange/listagem";
+                }
+            }
+        }
+
         if (usuario.getRole() == Role.ADMIN) {
 
             if (unidadeId == null) {
@@ -299,55 +318,65 @@ public class FlangeController {
 
         try {
 
-            if (arquivoFoto != null &&
-                    !arquivoFoto.isEmpty()) {
+            if (arquivoFoto != null && !arquivoFoto.isEmpty()) {
 
-                String nomeArquivo =
-                        UUID.randomUUID()
-                                + "_"
-                                + arquivoFoto.getOriginalFilename();
+                String nomeOriginal = arquivoFoto.getOriginalFilename();
+                String extensao = "";
+
+                if (nomeOriginal != null) {
+                    String nomeLimpo = Paths.get(nomeOriginal).getFileName().toString();
+                    int ponto = nomeLimpo.lastIndexOf('.');
+
+                    if (ponto >= 0) {
+                        String extensaoInformada = nomeLimpo.substring(ponto).toLowerCase();
+
+                        if (extensaoInformada.matches("\\.(jpg|jpeg|png|webp)")) {
+                            extensao = extensaoInformada;
+                        }
+                    }
+                }
+
+                String nomeArquivo = UUID.randomUUID() + extensao;
 
                 Path diretorio =
-                        Paths.get(uploadDir)
-                                .toAbsolutePath();
+                        Paths.get(uploadDir).toAbsolutePath();
 
                 if (!Files.exists(diretorio)) {
                     Files.createDirectories(diretorio);
                 }
 
-                Path arquivo =
-                        diretorio.resolve(nomeArquivo);
+                Path arquivo = diretorio.resolve(nomeArquivo).normalize();
 
-                arquivoFoto.transferTo(
-                        arquivo.toFile()
-                );
-
-                flange.setFoto(nomeArquivo);
-
-            } else if (flange.getId() != null) {
-
-                Flange flangeBanco =
-                        flangeRepository
-                                .findById(flange.getId())
-                                .orElse(null);
-
-                if (flangeBanco != null) {
-
-                    flange.setFoto(
-                            flangeBanco.getFoto()
-                    );
-
-                    if (flangeBanco.getStatus() != null) {
-
-                        flange.setStatus(
-                                flangeBanco.getStatus()
-                        );
-                    }
+                if (!arquivo.startsWith(diretorio.normalize())) {
+                    throw new IOException("Nome de arquivo inválido.");
                 }
+
+                arquivoFoto.transferTo(arquivo.toFile());
+                flange.setFoto(nomeArquivo);
+            } else if (flangeExistente != null) {
+                flange.setFoto(flangeExistente.getFoto());
+            }
+
+            if (flangeExistente != null) {
+                flange.setStatus(flangeExistente.getStatus());
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            model.addAttribute("erro", "Não foi possível salvar a foto da flange.");
+            model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
+
+            if (usuario.getRole() == Role.ADMIN) {
+                model.addAttribute(
+                        "unidades",
+                        unidadeRepository.findAll().stream()
+                                .filter(Unidade::isAtivo)
+                                .toList()
+                );
+            }
+
+            return flange.getId() != null
+                    ? "flange/alterar"
+                    : "flange/cadastro";
         }
 
         if (flange.getStatus() == null) {
@@ -361,7 +390,7 @@ public class FlangeController {
         return "redirect:/flange/listagem";
     }
 
-    @GetMapping("/flange/excluir/{id}")
+    @PostMapping("/flange/excluir/{id}")
     public String excluir(
             @PathVariable Long id,
             Authentication authentication) {

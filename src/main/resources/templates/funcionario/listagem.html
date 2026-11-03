@@ -67,7 +67,14 @@
                 <td th:text="${#temporals.format(f.data_nascimento, 'dd/MM/yyyy')}"></td>
                 <td class="acoes-celula">
                     <a th:href="@{/funcionario/alterar/{id}(id=${f.id})}" class="btn btn-alter" style="padding: 6px 12px; font-size: 0.8rem;">Alterar</a>
-                    <a th:href="@{/funcionario/excluir/{id}(id=${f.id})}" class="btn btn-excluir" style="padding: 6px 12px; font-size: 0.8rem;" onclick="return confirm('Confirmar remoção do registro?')">Excluir</a>
+                    <form th:action="@{/funcionario/excluir/{id}(id=${f.id})}"
+                          method="post"
+                          style="display: inline; margin: 0;">
+                        <button type="submit"
+                                class="btn btn-excluir"
+                                style="padding: 6px 12px; font-size: 0.8rem;"
+                                onclick="return confirm('Confirmar remoção do registro?')">Excluir</button>
+                    </form>
                 </td>
             </tr>
             </tbody>

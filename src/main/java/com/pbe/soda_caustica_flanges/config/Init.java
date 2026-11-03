@@ -3,6 +3,7 @@ package com.pbe.soda_caustica_flanges.config;
 import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -12,51 +13,61 @@ public class Init implements CommandLineRunner {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final String adminEmail;
+    private final String adminPassword;
 
     public Init(
             UsuarioRepository repository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            @Value("${app.admin.email:}") String adminEmail,
+            @Value("${app.admin.password:}") String adminPassword
     ) {
-
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.adminEmail = adminEmail;
+        this.adminPassword = adminPassword;
     }
 
     @Override
     public void run(String... args) {
+        boolean emailInformado = adminEmail != null && !adminEmail.isBlank();
+        boolean senhaInformada = adminPassword != null && !adminPassword.isBlank();
 
-        // Verifica se o administrador já existe
-        if (repository.findByEmail("admin@admin.com").isEmpty()) {
-
-            Usuario admin = new Usuario();
-
-            admin.setNome("Administrador");
-
-            admin.setEmail("admin@admin.com");
-
-            admin.setSenha(
-                    passwordEncoder.encode("123")
+        if (!emailInformado && !senhaInformada) {
+            System.out.println(
+                    "Bootstrap ADMIN não configurado. Defina ADMIN_EMAIL e ADMIN_PASSWORD para criar a conta inicial."
             );
-
-            admin.setRole(Role.ADMIN);
-
-            admin.setAtivo(true);
-
-            repository.save(admin);
-
-            System.out.println("=================================");
-            System.out.println("USUÁRIO ADMIN CRIADO");
-            System.out.println("Nome: Administrador");
-            System.out.println("E-mail: admin@admin.com");
-            System.out.println("Senha: 123");
-            System.out.println("Função: ADMIN");
-            System.out.println("=================================");
-
-        } else {
-
-            System.out.println("=================================");
-            System.out.println("USUÁRIO ADMIN JÁ EXISTE");
-            System.out.println("=================================");
+            return;
         }
+
+        if (!emailInformado || !senhaInformada) {
+            throw new IllegalStateException(
+                    "Configure ADMIN_EMAIL e ADMIN_PASSWORD juntos para criar a conta ADMIN inicial."
+            );
+        }
+
+        if (adminPassword.length() < 12) {
+            throw new IllegalStateException(
+                    "ADMIN_PASSWORD deve possuir pelo menos 12 caracteres."
+            );
+        }
+
+        String emailNormalizado = adminEmail.trim().toLowerCase();
+
+        if (repository.findByEmail(emailNormalizado).isPresent()) {
+            System.out.println("A conta ADMIN configurada já existe. Nenhuma senha foi alterada.");
+            return;
+        }
+
+        Usuario admin = new Usuario();
+        admin.setNome("Administrador");
+        admin.setEmail(emailNormalizado);
+        admin.setSenha(passwordEncoder.encode(adminPassword));
+        admin.setRole(Role.ADMIN);
+        admin.setAtivo(true);
+
+        repository.save(admin);
+
+        System.out.println("Conta ADMIN inicial criada com sucesso.");
     }
 }
