@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Locale;
+
 @Configuration
 public class SecurityConfig {
 
@@ -26,7 +28,9 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return email -> {
 
-            Usuario usuario = repository.findByEmail(email)
+            String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
+
+            Usuario usuario = repository.findByEmail(emailNormalizado)
                     .orElseThrow(() ->
                             new UsernameNotFoundException(
                                     "Usuário não encontrado: " + email
