@@ -94,11 +94,15 @@
                     </a>
 
                     <!-- EXCLUIR -->
-                    <a th:href="@{'/flange/excluir/' + ${p.id}}"
-                       class="btn btn-excluir"
-                       onclick="return confirm('Deseja realmente excluir este registro?');">
-                        Excluir
-                    </a>
+                    <form th:action="@{'/flange/excluir/' + ${p.id}}"
+                          method="post"
+                          style="display: inline; margin: 0;">
+                        <button type="submit"
+                                class="btn btn-excluir"
+                                onclick="return confirm('Deseja realmente excluir este registro?');">
+                            Excluir
+                        </button>
+                    </form>
 
                 </td>
 
