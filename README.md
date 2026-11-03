@@ -115,8 +115,8 @@ Substitua os valores de exemplo pelas credenciais locais configuradas no seu MyS
 
 ```powershell
 $env:DB_URL = "jdbc:mysql://localhost:3306/soda_caustica_flanges?createDatabaseIfNotExist=true"
-$env:DB_USERNAME = "root"
-$env:DB_PASSWORD = "SUA_NOVA_SENHA_DO_MYSQL"
+$env:DB_USERNAME = "soda_app"
+$env:DB_PASSWORD = "A_MESMA_SENHA_CONFIGURADA_NO_SETUP_SQL"
 
 # Para criar uma nova conta ADMIN inicial, use um e-mail ainda não cadastrado.
 $env:ADMIN_EMAIL = "admin-projeto@example.com"
