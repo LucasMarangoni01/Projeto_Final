@@ -10,87 +10,131 @@
 
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/usuario.css}">
 </head>
 
 <body>
 
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main>
+<main class="usuarios-main">
 
-    <div class="topo-listagem">
-        <div>
-            <span class="section-label">
-                ADMINISTRAÇÃO
-            </span>
-
-            <h2>
-                Gerenciamento de Usuários
-            </h2>
+    <section class="usuarios-heading">
+        <div class="usuarios-heading-copy">
+            <span class="usuarios-eyebrow">ADMINISTRAÇÃO DO SISTEMA</span>
+            <h1>Gerenciamento de usuários</h1>
+            <p>Administre contas, permissões e vínculos com as unidades industriais.</p>
         </div>
-    </div>
+
+        <div class="usuarios-heading-meta">
+            <span class="usuarios-count">
+                <strong th:text="${#lists.size(usuarios)}">0</strong>
+                <span>contas cadastradas</span>
+            </span>
+        </div>
+    </section>
 
     <div class="usuario-alert"
          th:if="${erro == 'status'}">
-        Você não pode desativar a própria conta.
+        <span class="usuario-alert-icon">!</span>
+        <span>Você não pode desativar a própria conta.</span>
     </div>
 
     <div class="usuario-alert"
          th:if="${erro == 'role'}">
-        Você não pode remover sua própria permissão de ADMIN.
+        <span class="usuario-alert-icon">!</span>
+        <span>Você não pode remover sua própria permissão de ADMIN.</span>
     </div>
 
     <div class="usuario-alert"
          th:if="${erro == 'unidade'}">
-        Não foi possível alterar a unidade do usuário.
+        <span class="usuario-alert-icon">!</span>
+        <span>Não foi possível alterar a unidade do usuário.</span>
     </div>
 
-    <div class="card">
+    <section class="usuarios-summary">
+        <article class="usuarios-summary-card">
+            <span class="usuarios-summary-icon usuarios-icon-total">U</span>
+            <div>
+                <span class="usuarios-summary-label">CONTAS CADASTRADAS</span>
+                <strong th:text="${#lists.size(usuarios)}">0</strong>
+                <small>Usuários registrados no sistema</small>
+            </div>
+        </article>
 
-        <p class="usuario-descricao">
-            Gerencie os usuários cadastrados,
-            suas permissões, unidades e status de acesso.
-        </p>
+        <article class="usuarios-summary-card">
+            <span class="usuarios-summary-icon usuarios-icon-admin">A</span>
+            <div>
+                <span class="usuarios-summary-label">ADMINISTRAÇÃO</span>
+                <strong>ADMIN</strong>
+                <small>Gerencia usuários e unidades</small>
+            </div>
+        </article>
 
-        <div class="table-container">
+        <article class="usuarios-summary-card">
+            <span class="usuarios-summary-icon usuarios-icon-access">✓</span>
+            <div>
+                <span class="usuarios-summary-label">CONTROLE DE ACESSO</span>
+                <strong>Ativo</strong>
+                <small>Permissões individuais por conta</small>
+            </div>
+        </article>
+    </section>
 
-            <table>
+    <section class="usuarios-panel">
+        <div class="usuarios-panel-header">
+            <div>
+                <span class="usuarios-panel-kicker">CONTAS E PERMISSÕES</span>
+                <h2>Usuários cadastrados</h2>
+                <p>Consulte os dados e ajuste o acesso de cada usuário.</p>
+            </div>
 
+            <label class="usuarios-search" for="filtroUsuarios">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                <input
+                        id="filtroUsuarios"
+                        type="search"
+                        placeholder="Buscar por nome, e-mail ou unidade..."
+                        autocomplete="off">
+            </label>
+        </div>
+
+        <div class="usuarios-table-meta">
+            <span><strong id="usuariosVisiveis" th:text="${#lists.size(usuarios)}">0</strong> usuários exibidos</span>
+            <span class="usuarios-table-hint">Os dados são atualizados conforme os cadastros do sistema.</span>
+        </div>
+
+        <div class="table-container usuarios-table-container">
+            <table class="usuarios-table" id="tabelaUsuarios">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>E-mail</th>
+                    <th>Usuário</th>
                     <th>Unidade</th>
                     <th>Permissão</th>
                     <th>Status</th>
-                    <th>Ações</th>
+                    <th class="usuarios-actions-heading">Ações</th>
                 </tr>
                 </thead>
 
                 <tbody>
-
-                <tr th:each="usuario : ${usuarios}">
-
+                <th:block th:each="usuario : ${usuarios}">
+                <tr data-usuario-row>
                     <td>
-                        <span class="badge-id"
-                              th:text="${usuario.id}">
-                            1
-                        </span>
+                        <div class="usuario-cell">
+                            <span class="usuario-avatar"
+                                  th:text="${#strings.substring(usuario.nome, 0, 1).toUpperCase()}">U</span>
+                            <span class="usuario-cell-info">
+                                <strong th:text="${usuario.nome}">Usuário</strong>
+                                <small th:text="${usuario.email}">email@gmail.com</small>
+                                <small class="usuario-id" th:text="${'ID: ' + usuario.id}">ID: 1</small>
+                            </span>
+                        </div>
                     </td>
 
                     <td>
-                        <strong th:text="${usuario.nome}">
-                            Usuário
-                        </strong>
-                    </td>
-
-                    <td th:text="${usuario.email}">
-                        email@gmail.com
-                    </td>
-
-                    <td>
-
                         <span
                                 th:if="${usuario.unidade != null}"
                                 class="usuario-unidade"
@@ -101,52 +145,37 @@
                         <span
                                 th:if="${usuario.unidade == null}"
                                 class="usuario-unidade-pendente">
-                            Pendente
+                            Unidade pendente
                         </span>
-
                     </td>
 
                     <td>
-
                         <span
                                 class="usuario-role"
-                                th:classappend="${usuario.role.name() == 'ADMIN'}
-                                    ? ' role-admin'
-                                    : ' role-user'"
+                                th:classappend="${usuario.role.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
                                 th:text="${usuario.role}">
                             USER
                         </span>
-
                     </td>
 
                     <td>
-
                         <span
                                 class="usuario-status"
-                                th:classappend="${usuario.ativo}
-                                    ? ' status-ativo'
-                                    : ' status-inativo'">
-
+                                th:classappend="${usuario.ativo} ? ' status-ativo' : ' status-inativo'">
                             <span class="status-dot-table"></span>
-
-                            <span
-                                    th:text="${usuario.ativo
-                                        ? 'ATIVO'
-                                        : 'INATIVO'}">
-                                ATIVO
-                            </span>
-
+                            <span th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}">Ativo</span>
                         </span>
-
                     </td>
 
                     <td>
-
-                        <div class="acoes">
-
+                        <div class="usuario-row-actions">
                             <a
                                     class="btn-editar"
                                     th:href="@{/usuarios/editar/{id}(id=${usuario.id})}">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                                </svg>
                                 Editar
                             </a>
 
@@ -164,12 +193,10 @@
                                 <button
                                         type="submit"
                                         class="btn-status"
-                                        th:text="${usuario.ativo
-                                            ? 'Desativar'
-                                            : 'Ativar'}">
+                                        th:classappend="${usuario.ativo} ? ' btn-status-disable' : ' btn-status-enable'"
+                                        th:text="${usuario.ativo ? 'Desativar' : 'Ativar'}">
                                     Desativar
                                 </button>
-
                             </form>
 
                             <span
@@ -177,32 +204,30 @@
                                     class="usuario-proprio">
                                 Minha conta
                             </span>
-
                         </div>
-
                     </td>
-
                 </tr>
+                </th:block>
 
                 <tr th:if="${#lists.isEmpty(usuarios)}">
-
-                    <td
-                            colspan="7"
-                            class="tabela-vazia">
-
-                        Nenhum usuário cadastrado.
-
+                    <td colspan="5" class="usuarios-empty">
+                        <span class="usuarios-empty-icon">U</span>
+                        <strong>Nenhum usuário cadastrado</strong>
+                        <small>Quando houver contas cadastradas, elas aparecerão aqui.</small>
                     </td>
-
                 </tr>
 
+                <tr id="usuariosSemResultado" hidden>
+                    <td colspan="5" class="usuarios-empty">
+                        <span class="usuarios-empty-icon">⌕</span>
+                        <strong>Nenhum resultado encontrado</strong>
+                        <small>Tente pesquisar usando outro nome, e-mail ou unidade.</small>
+                    </td>
+                </tr>
                 </tbody>
-
             </table>
-
         </div>
-
-    </div>
+    </section>
 
 </main>
 
@@ -212,6 +237,48 @@
         Todos os direitos reservados.
     </p>
 </footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoBusca = document.getElementById("filtroUsuarios");
+        const linhas = Array.from(document.querySelectorAll("#tabelaUsuarios tbody tr[data-usuario-row]"));
+        const contador = document.getElementById("usuariosVisiveis");
+        const semResultado = document.getElementById("usuariosSemResultado");
+
+        if (!campoBusca || !contador || !semResultado) {
+            return;
+        }
+
+        // As linhas começam sempre visíveis; o filtro só oculta itens após a pesquisa.
+        linhas.forEach(function (linha) {
+            linha.hidden = false;
+            linha.removeAttribute("hidden");
+        });
+
+        function filtrarUsuarios() {
+            const termo = campoBusca.value.trim().toLocaleLowerCase("pt-BR");
+            let quantidadeVisivel = 0;
+
+            linhas.forEach(function (linha) {
+                const conteudo = (linha.innerText || linha.textContent || "")
+                    .toLocaleLowerCase("pt-BR");
+                const corresponde = termo === "" || conteudo.includes(termo);
+
+                linha.hidden = !corresponde;
+
+                if (corresponde) {
+                    quantidadeVisivel++;
+                }
+            });
+
+            contador.textContent = quantidadeVisivel;
+            semResultado.hidden = quantidadeVisivel !== 0 || linhas.length === 0;
+        }
+
+        filtrarUsuarios();
+        campoBusca.addEventListener("input", filtrarUsuarios);
+    });
+</script>
 
 <script th:src="@{/menu.js}"></script>
 

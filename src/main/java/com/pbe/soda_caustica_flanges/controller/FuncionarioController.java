@@ -64,7 +64,7 @@ public class FuncionarioController {
     // ==============================
     // EXCLUIR ( /funcionario/excluir/{id} )
     // ==============================
-    @GetMapping("/funcionario/excluir/{id}")
+    @PostMapping("/funcionario/excluir/{id}")
     public String excluir(@PathVariable Long id) {
         funcionarioRepository.deleteById(id);
         return "redirect:/funcionario/listagem";

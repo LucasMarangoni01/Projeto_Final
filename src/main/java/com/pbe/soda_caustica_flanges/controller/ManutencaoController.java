@@ -86,7 +86,7 @@ public class ManutencaoController {
         return "manutencao/cadastro";
     }
 
-    @GetMapping("/manutencao/excluir/{id}")
+    @PostMapping("/manutencao/excluir/{id}")
     public String excluir(@PathVariable Long id) {
         manutencaoRepository.deleteById(id);
         return "redirect:/manutencao/listagem";
