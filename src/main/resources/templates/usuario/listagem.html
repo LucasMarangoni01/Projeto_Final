@@ -120,7 +120,8 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="usuario : ${usuarios}" data-usuario-row>
+                <th:block th:each="usuario : ${usuarios}">
+                <tr data-usuario-row>
                     <td>
                         <div class="usuario-cell">
                             <span class="usuario-avatar"
@@ -206,6 +207,7 @@
                         </div>
                     </td>
                 </tr>
+                </th:block>
 
                 <tr th:if="${#lists.isEmpty(usuarios)}">
                     <td colspan="5" class="usuarios-empty">
@@ -239,7 +241,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const campoBusca = document.getElementById("filtroUsuarios");
-        const linhas = Array.from(document.querySelectorAll("[data-usuario-row]"));
+        const linhas = Array.from(document.querySelectorAll("#tabelaUsuarios tbody tr[data-usuario-row]"));
         const contador = document.getElementById("usuariosVisiveis");
         const semResultado = document.getElementById("usuariosSemResultado");
 
@@ -247,14 +249,20 @@
             return;
         }
 
+        // As linhas começam sempre visíveis; o filtro só oculta itens após a pesquisa.
+        linhas.forEach(function (linha) {
+            linha.hidden = false;
+            linha.removeAttribute("hidden");
+        });
+
         function filtrarUsuarios() {
             const termo = campoBusca.value.trim().toLocaleLowerCase("pt-BR");
             let quantidadeVisivel = 0;
 
             linhas.forEach(function (linha) {
-                const corresponde = linha.textContent
-                    .toLocaleLowerCase("pt-BR")
-                    .includes(termo);
+                const conteudo = (linha.innerText || linha.textContent || "")
+                    .toLocaleLowerCase("pt-BR");
+                const corresponde = termo === "" || conteudo.includes(termo);
 
                 linha.hidden = !corresponde;
 
@@ -267,6 +275,7 @@
             semResultado.hidden = quantidadeVisivel !== 0 || linhas.length === 0;
         }
 
+        filtrarUsuarios();
         campoBusca.addEventListener("input", filtrarUsuarios);
     });
 </script>
