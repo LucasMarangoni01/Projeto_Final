@@ -105,7 +105,7 @@ As credenciais não devem ser armazenadas no repositório. O projeto carrega aut
 4. No `.env`, substitua o valor de `DB_PASSWORD` pela mesma senha colocada no script SQL. Mantenha `DB_USERNAME=soda_app`.
 5. No IntelliJ, abra **Run > Edit Configurations...** e selecione a configuração da aplicação.
 6. Em **Environment variables**, remova valores antigos de `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`. O IntelliJ pode sobrescrever os valores do arquivo `.env`.
-7. Confirme que o **Working directory** aponta para a pasta raiz do projeto e execute novamente.
+7. Confirme que o **Working directory** aponta para a pasta raiz do projeto (a mesma pasta onde estão `pom.xml`, `.env.example` e a pasta `src`) e execute novamente. O arquivo `.env` não vem dentro do ZIP do GitHub: você precisa criá-lo copiando `.env.example`. Sem ele, a aplicação usa o usuário padrão `soda_app` e senha vazia; o MySQL recusará a conexão até você configurar a senha.
 
 O arquivo `.env` deve usar o formato `NOME=valor`, sem `export` e sem aspas. Não compartilhe esse arquivo nem envie sua senha pelo chat. Se você não conseguir entrar no Workbench com uma conta administrativa, será necessário recuperar esse acesso antes de executar o script; não existe uma alteração segura no Spring Boot que possa corrigir uma senha recusada pelo próprio MySQL.
 
