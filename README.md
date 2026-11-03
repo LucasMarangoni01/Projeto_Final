@@ -85,7 +85,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ## Configuração do ambiente local
 
-As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Para evitar usar a conta administrativa `root` na aplicação, crie uma conta exclusiva chamada `soda_app` usando o script `database/setup.sql`. Depois copie `.env.example` para `.env` e configure a mesma senha nos dois locais.
+As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Para evitar usar a conta administrativa `root` na aplicação, crie uma conta exclusiva chamada `soda_app` usando o script `database/setup.sql`. Depois copie `.env.example` para `.env` e configure a mesma senha nos dois locais. Para criar o primeiro administrador, preencha também `ADMIN_EMAIL` com um e-mail ainda não cadastrado e `ADMIN_PASSWORD` com uma senha de pelo menos 12 caracteres. Sem essas duas variáveis, nenhum ADMIN inicial será criado.
 
 ### Variáveis necessárias
 
@@ -129,7 +129,7 @@ As variáveis definidas dessa forma permanecem disponíveis apenas na janela atu
 
 ### Atenção ao administrador já existente
 
-O bootstrap cria uma conta ADMIN somente quando o e-mail configurado ainda não existe. Ele não redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
+Contas criadas pelo formulário público recebem o perfil USER e ficam sem unidade inicialmente; por segurança, não conseguem entrar até que um ADMIN as associe a uma unidade ativa. O primeiro ADMIN deve ser criado pelas variáveis `ADMIN_EMAIL` e `ADMIN_PASSWORD` no `.env`. O bootstrap cria essa conta somente quando o e-mail configurado ainda não existe. Ele não promove nem redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
 
 ### Rotação de credenciais
 
