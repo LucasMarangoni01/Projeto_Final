@@ -320,11 +320,23 @@ public class FlangeController {
 
             if (arquivoFoto != null && !arquivoFoto.isEmpty()) {
 
-                String nomeArquivo =
-                        UUID.randomUUID()
-                                + "_"
-                                + Paths.get(arquivoFoto.getOriginalFilename())
-                                        .getFileName();
+                String nomeOriginal = arquivoFoto.getOriginalFilename();
+                String extensao = "";
+
+                if (nomeOriginal != null) {
+                    String nomeLimpo = Paths.get(nomeOriginal).getFileName().toString();
+                    int ponto = nomeLimpo.lastIndexOf('.');
+
+                    if (ponto >= 0) {
+                        String extensaoInformada = nomeLimpo.substring(ponto).toLowerCase();
+
+                        if (extensaoInformada.matches("\\.(jpg|jpeg|png|webp)")) {
+                            extensao = extensaoInformada;
+                        }
+                    }
+                }
+
+                String nomeArquivo = UUID.randomUUID() + extensao;
 
                 Path diretorio =
                         Paths.get(uploadDir).toAbsolutePath();
