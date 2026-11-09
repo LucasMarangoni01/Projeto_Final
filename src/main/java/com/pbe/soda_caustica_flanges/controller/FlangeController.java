@@ -57,7 +57,7 @@ public class FlangeController {
 
         } else {
 
-            if (usuario.getUnidade() == null) {
+            if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
 
                 model.addAttribute(
                         "flanges",
