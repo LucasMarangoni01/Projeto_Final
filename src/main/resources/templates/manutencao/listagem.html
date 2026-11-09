@@ -17,6 +17,7 @@
             <p th:if="${!ehAdmin and usuarioLogado.unidade != null}"
                th:text="${'Registros da unidade ' + usuarioLogado.unidade.nome}">Unidade</p>
             <p th:if="${ehAdmin}">Visão administrativa de todas as unidades.</p>
+            <p>O autor do lançamento e o funcionário executor são identificados separadamente.</p>
         </div>
         <a th:href="@{/manutencao/cadastro}" class="btn btn-primary">+ Registrar manutenção</a>
     </header>
@@ -40,6 +41,8 @@
                     <th>Flange</th>
                     <th>Funcionário</th>
                     <th>Unidade</th>
+                    <th>Registrado por</th>
+                    <th>Lançado em</th>
                     <th th:if="${ehAdmin}">Ações administrativas</th>
                     <th th:unless="${ehAdmin}">Registro</th>
                 </tr>
@@ -53,6 +56,8 @@
                     <td th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}"></td>
                     <td th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}"></td>
                     <td th:text="${manutencao.flange != null and manutencao.flange.unidade != null ? manutencao.flange.unidade.nome : 'Sem unidade'}"></td>
+                    <td th:text="${manutencao.registradoPorEmail != null ? manutencao.registradoPorEmail : 'Registro legado'}">Registro legado</td>
+                    <td th:text="${manutencao.registradoEm != null ? #temporals.format(manutencao.registradoEm, 'dd/MM/yyyy HH:mm') : 'Não registrado'}">Não registrado</td>
                     <td th:if="${ehAdmin}" class="acoes">
                         <a th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}" class="btn btn-edit">Editar</a>
                         <form th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}" method="post" style="display:inline">
@@ -63,7 +68,7 @@
                     <td th:unless="${ehAdmin}"><span class="badge">Somente leitura</span></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(manutencoes)}">
-                    <td th:colspan="${ehAdmin ? 8 : 8}" style="text-align:center;padding:28px">Nenhuma manutenção encontrada para esta unidade.</td>
+                    <td th:colspan="${10}" style="text-align:center;padding:28px">Nenhuma manutenção encontrada para esta unidade.</td>
                 </tr>
                 </tbody>
             </table>
