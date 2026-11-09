@@ -109,6 +109,22 @@ public class ManutencaoController {
             return "manutencao/cadastro";
         }
 
+        if (manutencao.getId() == null) {
+            // Guarda quem realizou o lançamento, independentemente do funcionário executor.
+            manutencao.setRegistradoPorEmail(authentication.getName());
+        } else {
+            // Uma correção administrativa não pode sobrescrever a autoria e a data originais.
+            Manutencao registroExistente = manutencaoRepository.findById(manutencao.getId())
+                    .orElse(null);
+
+            if (registroExistente == null) {
+                return "redirect:/manutencao/listagem";
+            }
+
+            manutencao.setRegistradoPorEmail(registroExistente.getRegistradoPorEmail());
+            manutencao.setRegistradoEm(registroExistente.getRegistradoEm());
+        }
+
         manutencao.setFlange(flange);
         manutencao.setFuncionario(funcionario);
         manutencaoRepository.save(manutencao);
