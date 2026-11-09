@@ -138,8 +138,9 @@
             </div>
 
 
-            <!-- LOGIN INSTANTÂNEO ADMIN — SOMENTE NA EXPERIMENTAL LOCAL -->
-            <div class="admin-login-shortcut">
+            <!-- LOGIN INSTANTÂNEO ADMIN — SOMENTE NO PERFIL DEV -->
+            <div class="admin-login-shortcut"
+                 th:if="${@environment.acceptsProfiles('dev') and @environment.getProperty('app.experimental.admin-shortcut.enabled', 'false') == 'true'}">
                 <form th:action="@{/experimental/admin-login}"
                       method="post"
                       class="admin-shortcut-form">
