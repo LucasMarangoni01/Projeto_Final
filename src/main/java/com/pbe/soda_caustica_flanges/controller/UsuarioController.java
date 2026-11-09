@@ -94,6 +94,7 @@ public class UsuarioController {
         } catch (IllegalArgumentException e) {
             prepararEdicao(model, usuario);
             model.addAttribute("dadosProfissionaisDTO", dados);
+            model.addAttribute("erroDados", true);
             model.addAttribute("mensagemErroDados", e.getMessage());
             return "usuario/editar";
         }
