@@ -28,11 +28,11 @@
 
     <div class="unidade-feedback unidade-feedback-success" th:if="${sucesso != null}">
         <span>✓</span>
-        <span th:text="${sucesso == 'salva' ? 'Dados da unidade salvos.' : (sucesso == 'pessoa-adicionada' ? 'Conta de acesso vinculada.' : (sucesso == 'pessoa-removida' ? 'Conta de acesso desvinculada.' : (sucesso == 'funcionario-adicionado' ? 'Funcionário operacional vinculado.' : (sucesso == 'funcionario-removido' ? 'Funcionário operacional desvinculado.' : 'Operação concluída.'))))}">Operação concluída.</span>
+        <span th:text="${sucesso == 'salva' ? 'Dados da unidade salvos.' : (sucesso == 'pessoa-adicionada' ? 'Conta de acesso vinculada.' : (sucesso == 'pessoa-removida' ? 'Conta de acesso desvinculada.' : (sucesso == 'funcionario-adicionado' ? 'Funcionário operacional vinculado.' : (sucesso == 'funcionario-removido' ? 'Funcionário operacional desvinculado.' : (sucesso == 'flange-adicionada' ? 'Flange vinculada à unidade.' : 'Operação concluída.')))))}">Operação concluída.</span>
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erro != null}">
         <span>!</span>
-        <span th:text="${erro == 'pessoa' ? 'Não foi possível vincular ou desvincular a conta. Confira o ID, o nome e o vínculo atual.' : (erro == 'funcionario' ? 'Não foi possível vincular ou desvincular o funcionário. Confira o ID, o nome e o vínculo atual.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.'))}">Erro.</span>
+        <span th:text="${erro == 'pessoa' ? 'Não foi possível vincular ou desvincular a conta. Confira o ID, o nome e o vínculo atual.' : (erro == 'funcionario' ? 'Não foi possível vincular ou desvincular o funcionário. Confira o ID, o nome e o vínculo atual.' : (erro == 'flange' ? 'Não foi possível vincular a flange. Confira o ID, o nome e se ela já pertence a outra unidade.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.')))}">Erro.</span>
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erroSalvar != null}" th:text="${erroSalvar}"></div>
 
@@ -214,6 +214,64 @@
             <p th:text="${#lists.size(funcionariosDisponiveis) + ' funcionário(s) sem unidade.'}">0</p>
         </div>
         <p class="unidade-staff-note">Desvincular não exclui o funcionário nem apaga manutenções anteriores. O histórico permanece para consulta.</p>
+    </section>
+
+    <section class="unidade-panel unidade-staff-panel">
+        <div class="unidade-panel-heading">
+            <div>
+                <span class="unidade-panel-kicker">ATIVOS INDUSTRIAIS</span>
+                <h2>Flanges desta unidade</h2>
+                <p>Confira quais flanges pertencem a esta planta e vincule registros antigos que ainda estejam sem unidade.</p>
+            </div>
+            <span class="unidade-members-count" th:text="${#lists.size(flangesVinculadas)}">0</span>
+        </div>
+
+        <form th:action="@{/unidades/adicionar-flange}" method="post" class="unidade-add-member-form">
+            <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+            <div class="unidade-form-field">
+                <label for="identificadorFlange">ID ou nome exato da flange sem unidade</label>
+                <input id="identificadorFlange" name="identificador" type="text" list="flangesDisponiveisList"
+                       required maxlength="120" placeholder="Ex.: #3 ou FL-02">
+                <datalist id="flangesDisponiveisList">
+                    <option th:each="disponivel : ${flangesDisponiveis}"
+                            th:value="${'#' + disponivel.id}"
+                            th:label="${disponivel.nome_flange + ' · ' + disponivel.localizacao}"></option>
+                    <option th:each="disponivel : ${flangesDisponiveis}"
+                            th:value="${disponivel.nome_flange}"
+                            th:label="${'ID #' + disponivel.id + ' · ' + disponivel.localizacao}"></option>
+                </datalist>
+                <small>Somente flanges sem unidade aparecem como disponíveis. Nomes repetidos exigem o ID.</small>
+            </div>
+            <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Vincular flange</button>
+        </form>
+        <p class="unidade-inactive-hint" th:if="${!unidade.ativo}">Reative a unidade para vincular novos ativos.</p>
+
+        <div class="unidade-members-list">
+            <article class="unidade-member-row" th:each="flange : ${flangesVinculadas}">
+                <div class="unidade-member-avatar">F</div>
+                <div class="unidade-member-info">
+                    <strong th:text="${flange.nome_flange}">Nome da flange</strong>
+                    <span th:text="${'ID #' + flange.id + ' · ' + flange.localizacao}">ID · Localização</span>
+                    <div class="unidade-member-tags">
+                        <span th:text="${flange.status != null ? flange.status : 'NORMAL'}">NORMAL</span>
+                        <span th:text="${flange.temp_ambiente != null ? flange.temp_ambiente + ' °C' : 'Temperatura não informada'}">Temperatura</span>
+                    </div>
+                </div>
+                <a th:href="@{/flange/alterar/{id}(id=${flange.id})}" class="unidade-member-remove">Editar unidade</a>
+            </article>
+            <div class="unidade-members-empty" th:if="${#lists.isEmpty(flangesVinculadas)}">
+                Nenhuma flange está vinculada a esta unidade.
+            </div>
+        </div>
+
+        <div class="unidade-available-users" th:if="${!#lists.isEmpty(flangesDisponiveis)}">
+            <strong>Flanges disponíveis para vinculação</strong>
+            <p th:text="${#lists.size(flangesDisponiveis) + ' flange(s) cadastrada(s) sem unidade.'}">0</p>
+        </div>
+        <p class="unidade-staff-note" th:if="${#lists.isEmpty(flangesDisponiveis)}">
+            Não há flanges sem unidade. Caso um registro esteja associado à planta errada, use “Editar unidade” na listagem geral de flanges para corrigir o vínculo.
+            <a th:href="@{/flange/listagem}">Abrir todas as flanges</a>.
+        </p>
     </section>
 
     <section class="unidade-panel unidade-audit-panel">
