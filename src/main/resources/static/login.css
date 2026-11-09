@@ -918,3 +918,93 @@ body::before {
     }
 
 }
+
+/* =========================================================
+   ATALHO EXPERIMENTAL — ACESSO ADMIN
+========================================================= */
+.admin-login-shortcut {
+    margin: 0 0 20px;
+}
+.admin-shortcut-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 58px;
+    padding: 11px 13px;
+    border: 1px solid rgba(96,165,250,.32);
+    border-radius: 10px;
+    background: linear-gradient(110deg, rgba(37,99,235,.16), rgba(30,64,175,.08));
+    color: #eaf2ff;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.admin-shortcut-button:hover {
+    border-color: rgba(96,165,250,.62);
+    background: linear-gradient(110deg, rgba(37,99,235,.24), rgba(30,64,175,.13));
+    transform: translateY(-1px);
+}
+.admin-shortcut-button:focus-visible {
+    outline: 3px solid rgba(96,165,250,.35);
+    outline-offset: 3px;
+}
+.admin-shortcut-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 1px solid rgba(96,165,250,.25);
+    border-radius: 9px;
+    background: rgba(37,99,235,.18);
+    color: #93c5fd;
+    font-size: 16px;
+}
+.admin-shortcut-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.admin-shortcut-copy strong {
+    color: #eaf2ff;
+    font-size: 12px;
+    font-weight: 800;
+}
+.admin-shortcut-copy small {
+    color: #91a9ca;
+    font-size: 10px;
+    line-height: 1.35;
+}
+.admin-shortcut-arrow {
+    color: #93c5fd;
+    font-size: 18px;
+    transition: transform .18s ease;
+}
+.admin-shortcut-button[aria-expanded="true"] .admin-shortcut-arrow {
+    transform: rotate(90deg);
+}
+.admin-shortcut-message {
+    margin-top: 9px;
+    padding: 10px 12px;
+    border: 1px solid rgba(96,165,250,.19);
+    border-radius: 8px;
+    background: rgba(37,99,235,.08);
+    color: #a9c3e8;
+    font-size: 10px;
+    line-height: 1.5;
+}
+.admin-shortcut-message[hidden] {
+    display: none !important;
+}
+.admin-login-shortcut + .alert {
+    margin-top: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+    .admin-shortcut-button,
+    .admin-shortcut-arrow {
+        transition: none;
+    }
+}
