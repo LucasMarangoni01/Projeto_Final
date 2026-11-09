@@ -86,10 +86,7 @@ public class UsuarioService {
 
         Usuario usuario = buscarPorEmail(email);
         usuario.setNome(dados.getNome().trim());
-        usuario.setTelefone(normalizarCampo(dados.getTelefone()));
-        usuario.setCargo(normalizarCampo(dados.getCargo()));
-        usuario.setSetor(normalizarCampo(dados.getSetor()));
-        usuario.setMatricula(normalizarCampo(dados.getMatricula()));
+        usuario.setTelefone(formatarTelefone(dados.getTelefone()));
 
         if (novaFoto != null && !novaFoto.isBlank()) {
             usuario.setFotoPerfil(novaFoto);
@@ -102,7 +99,7 @@ public class UsuarioService {
                 salvo,
                 salvo.getEmail(),
                 "PERFIL_ATUALIZADO",
-                "Dados de contato e identificação profissional atualizados."
+                "Nome e telefone de contato atualizados pelo próprio usuário."
         );
 
         if (novaFoto != null && !novaFoto.isBlank()) {
@@ -122,6 +119,40 @@ public class UsuarioService {
         }
 
         return salvo;
+    }
+
+    @Transactional
+    public void alterarDadosProfissionais(
+            Long id,
+            DadosProfissionaisDTO dados,
+            String emailAdministrador) {
+
+        Usuario usuario = buscarPorId(id);
+
+        String matriculaAnterior = normalizarCampo(usuario.getMatricula());
+        String cargoAnterior = normalizarCampo(usuario.getCargo());
+        String setorAnterior = normalizarCampo(usuario.getSetor());
+
+        usuario.setMatricula(normalizarCampo(dados.getMatricula()));
+        usuario.setCargo(normalizarCampo(dados.getCargo()));
+        usuario.setSetor(normalizarCampo(dados.getSetor()));
+
+        boolean houveAlteracao =
+                !java.util.Objects.equals(matriculaAnterior, usuario.getMatricula())
+                || !java.util.Objects.equals(cargoAnterior, usuario.getCargo())
+                || !java.util.Objects.equals(setorAnterior, usuario.getSetor());
+
+        if (!houveAlteracao) {
+            return;
+        }
+
+        Usuario salvo = repository.save(usuario);
+        auditoriaService.registrar(
+                salvo,
+                emailAdministrador,
+                "DADOS_PROFISSIONAIS_ALTERADOS",
+                "Matrícula, cargo ou setor atualizados por um administrador."
+        );
     }
 
     @Transactional
@@ -242,6 +273,29 @@ public class UsuarioService {
             return "";
         }
         return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String formatarTelefone(String telefone) {
+        if (telefone == null || telefone.isBlank()) {
+            return null;
+        }
+
+        String numeros = telefone.replaceAll("\\D", "");
+
+        if (numeros.length() != 10 && numeros.length() != 11) {
+            throw new IllegalArgumentException(
+                    "Informe um telefone válido com DDD: (11) 99999-9999."
+            );
+        }
+
+        String ddd = numeros.substring(0, 2);
+        String numero = numeros.substring(2);
+        int tamanhoPrefixo = numero.length() == 9 ? 5 : 4;
+
+        return "(" + ddd + ") "
+                + numero.substring(0, tamanhoPrefixo)
+                + "-"
+                + numero.substring(tamanhoPrefixo);
     }
 
     private String normalizarCampo(String valor) {
