@@ -40,7 +40,7 @@ public class HomeController {
 
         if (usuario.getRole() == Role.ADMIN) {
             model.addAttribute("flanges", flangeRepository.findAll());
-        } else if (usuario.getUnidade() == null) {
+        } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             model.addAttribute("flanges", Collections.emptyList());
         } else {
             model.addAttribute(
