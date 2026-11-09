@@ -31,6 +31,13 @@
 
     </div>
 
+    <div th:if="${param.erro != null}" class="alerta-erro" style="margin-bottom:16px;">
+        Não é possível excluir uma flange que possui manutenções registradas. Preserve o histórico operacional.
+    </div>
+    <div th:if="${param.sucesso != null}" class="badge ok-b" style="margin-bottom:16px;">
+        Registro removido.
+    </div>
+
     <!-- Tabela -->
     <div class="table-container">
 
