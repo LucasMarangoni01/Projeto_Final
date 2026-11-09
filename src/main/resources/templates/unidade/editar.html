@@ -111,8 +111,16 @@
                 <input type="hidden" name="unidadeId" th:value="${unidade.id}">
                 <div class="unidade-form-field">
                     <label for="identificador">ID ou nome completo da pessoa</label>
-                    <input id="identificador" name="identificador" type="text" required maxlength="120" placeholder="Ex.: 18 ou Maria da Silva">
-                    <small>Se houver nomes repetidos, informe o ID da conta para evitar vincular a pessoa errada.</small>
+                    <input id="identificador" name="identificador" type="text" list="usuariosDisponiveisList" required maxlength="120" placeholder="Ex.: #18 ou Maria da Silva">
+                    <datalist id="usuariosDisponiveisList">
+                        <option th:each="disponivel : ${usuariosDisponiveis}"
+                                th:value="${'#' + disponivel.id}"
+                                th:label="${disponivel.nome + ' · ' + disponivel.email}"></option>
+                        <option th:each="disponivel : ${usuariosDisponiveis}"
+                                th:value="${disponivel.nome}"
+                                th:label="${'ID #' + disponivel.id}"></option>
+                    </datalist>
+                    <small>Digite um nome exato ou selecione a sugestão com ID. Se houver nomes repetidos, use o ID.</small>
                 </div>
                 <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Adicionar pessoa</button>
             </form>
@@ -163,8 +171,16 @@
             <input type="hidden" name="unidadeId" th:value="${unidade.id}">
             <div class="unidade-form-field">
                 <label for="identificadorFuncionario">ID ou nome completo do funcionário</label>
-                <input id="identificadorFuncionario" name="identificador" type="text" required maxlength="120" placeholder="Ex.: 42 ou João da Silva">
-                <small>Se houver nomes repetidos, informe o ID do cadastro para selecionar a pessoa correta.</small>
+                <input id="identificadorFuncionario" name="identificador" type="text" list="funcionariosDisponiveisList" required maxlength="120" placeholder="Ex.: #42 ou João da Silva">
+                <datalist id="funcionariosDisponiveisList">
+                    <option th:each="disponivel : ${funcionariosDisponiveis}"
+                            th:value="${'#' + disponivel.id}"
+                            th:label="${disponivel.nome_funcionario}"></option>
+                    <option th:each="disponivel : ${funcionariosDisponiveis}"
+                            th:value="${disponivel.nome_funcionario}"
+                            th:label="${'ID #' + disponivel.id}"></option>
+                </datalist>
+                <small>Digite um nome exato ou selecione a sugestão com ID. Se houver nomes repetidos, use o ID.</small>
             </div>
             <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Adicionar funcionário</button>
         </form>
