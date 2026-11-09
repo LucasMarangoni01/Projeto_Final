@@ -7,8 +7,6 @@ import com.pbe.soda_caustica_flanges.config.LoginSuccessHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,7 +42,6 @@ public class ExperimentalAdminLoginController {
     private final UsuarioRepository usuarioRepository;
     private final UserDetailsService userDetailsService;
     private final LoginSuccessHandler loginSuccessHandler;
-    private final Environment environment;
     private final boolean shortcutEnabled;
     private final String configuredAdminEmail;
     private final SecurityContextRepository securityContextRepository =
@@ -54,13 +51,11 @@ public class ExperimentalAdminLoginController {
             UsuarioRepository usuarioRepository,
             UserDetailsService userDetailsService,
             LoginSuccessHandler loginSuccessHandler,
-            Environment environment,
             @Value("${app.experimental.admin-shortcut.enabled:false}") boolean shortcutEnabled,
             @Value("${app.experimental.admin-shortcut.email:}") String configuredAdminEmail) {
         this.usuarioRepository = usuarioRepository;
         this.userDetailsService = userDetailsService;
         this.loginSuccessHandler = loginSuccessHandler;
-        this.environment = environment;
         this.shortcutEnabled = shortcutEnabled;
         this.configuredAdminEmail = configuredAdminEmail;
     }
@@ -127,7 +122,7 @@ public class ExperimentalAdminLoginController {
     }
 
     private boolean atalhoPermitido(HttpServletRequest request) {
-        if (!shortcutEnabled || !environment.acceptsProfiles(Profiles.of("dev"))) {
+        if (!shortcutEnabled) {
             return false;
         }
 
