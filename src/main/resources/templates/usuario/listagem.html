@@ -37,13 +37,13 @@
     <div class="usuario-alert"
          th:if="${erro == 'status'}">
         <span class="usuario-alert-icon">!</span>
-        <span>Você não pode desativar a própria conta.</span>
+        <span>Não é possível desativar a própria conta ou a última conta ADMIN ativa.</span>
     </div>
 
     <div class="usuario-alert"
          th:if="${erro == 'role'}">
         <span class="usuario-alert-icon">!</span>
-        <span>Você não pode remover sua própria permissão de ADMIN.</span>
+        <span>Não é possível remover sua própria permissão ou a última conta ADMIN ativa.</span>
     </div>
 
     <div class="usuario-alert"
