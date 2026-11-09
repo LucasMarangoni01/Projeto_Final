@@ -103,8 +103,8 @@ public class ManutencaoController {
                 prepararFormulario(model, manutencao, usuario);
                 return "manutencao/cadastro";
             }
-        } else if (!flange.getUnidade().isAtivo()) {
-            model.addAttribute("erro", "Não é possível registrar manutenção em uma unidade arquivada.");
+        } else if (!flange.getUnidade().isAtivo() && manutencao.getId() == null) {
+            model.addAttribute("erro", "Não é possível registrar uma nova manutenção em uma unidade arquivada.");
             prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
         }
