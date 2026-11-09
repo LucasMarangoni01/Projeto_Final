@@ -7,7 +7,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Monitoramento</title>
-    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="/login.css?v=admin-shortcut-2">
 </head>
 
 <body>
@@ -139,8 +139,7 @@
 
 
             <!-- LOGIN INSTANTÂNEO ADMIN — SOMENTE NA EXPERIMENTAL LOCAL -->
-            <div class="admin-login-shortcut"
-                 th:if="${@environment.getProperty('app.experimental.admin-shortcut.enabled', 'false') == 'true'}">
+            <div class="admin-login-shortcut">
                 <form th:action="@{/experimental/admin-login}"
                       method="post"
                       class="admin-shortcut-form">
