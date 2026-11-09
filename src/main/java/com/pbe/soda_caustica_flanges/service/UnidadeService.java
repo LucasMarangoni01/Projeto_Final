@@ -362,8 +362,8 @@ public class UnidadeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Flange> listarFlangesDisponiveis() {
-        return flangeRepository.findByUnidadeIsNullOrderByIdAsc();
+    public List<Flange> listarFlangesDisponiveis(Long unidadeId) {
+        return flangeRepository.findForaDaUnidade(unidadeId);
     }
 
     @Transactional
@@ -376,26 +376,37 @@ public class UnidadeService {
 
         Flange flange = resolverFlange(identificador);
 
-        if (flange.getUnidade() != null) {
-            if (flange.getUnidade().getId().equals(unidadeId)) {
-                throw new IllegalArgumentException("Essa flange já está vinculada a esta unidade.");
-            }
+        Unidade unidadeAnterior = flange.getUnidade();
 
-            throw new IllegalArgumentException(
-                    "Essa flange já pertence à unidade " + flange.getUnidade().getNome()
-                            + ". Para transferi-la, abra a edição da flange e selecione a nova unidade."
-            );
+        if (unidadeAnterior != null && unidadeAnterior.getId().equals(unidadeId)) {
+            throw new IllegalArgumentException("Essa flange já está vinculada a esta unidade.");
         }
 
         flange.setUnidade(unidade);
         Flange salva = flangeRepository.save(flange);
 
+        String detalhe = "Flange " + salva.getNome_flange() + " (ID #" + salva.getId()
+                + ") vinculada à unidade " + unidade.getNome() + " (UNIDADE #" + unidadeId + ").";
+
+        if (unidadeAnterior != null) {
+            auditoriaService.registrar(
+                    unidadeAnterior,
+                    atorEmail,
+                    "FLANGE_TRANSFERIDA",
+                    "Flange " + salva.getNome_flange() + " (ID #" + salva.getId()
+                            + ") transferida desta unidade para " + unidade.getNome()
+                            + " (UNIDADE #" + unidadeId + ")."
+            );
+            detalhe = "Flange " + salva.getNome_flange() + " (ID #" + salva.getId()
+                    + ") recebida por transferência da unidade " + unidadeAnterior.getNome()
+                    + " (UNIDADE #" + unidadeAnterior.getId() + ").";
+        }
+
         auditoriaService.registrar(
                 unidade,
                 atorEmail,
-                "FLANGE_ADICIONADA",
-                "Flange " + salva.getNome_flange() + " (ID #" + salva.getId()
-                        + ") vinculada à unidade."
+                unidadeAnterior == null ? "FLANGE_ADICIONADA" : "FLANGE_RECEBIDA",
+                detalhe
         );
 
         return salva;
