@@ -13,6 +13,8 @@ public interface FlangeRepository
 
     List<Flange> findByUnidadeId(Long unidadeId);
 
+    long countByUnidadeId(Long unidadeId);
+
     @Query("""
         SELECT f
         FROM Flange f
