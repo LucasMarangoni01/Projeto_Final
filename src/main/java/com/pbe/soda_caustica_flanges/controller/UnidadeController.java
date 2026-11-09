@@ -150,6 +150,23 @@ public class UnidadeController {
         }
     }
 
+    @PostMapping("/adicionar-flange")
+    public String adicionarFlange(
+            @RequestParam Long unidadeId,
+            @RequestParam String identificador,
+            Authentication authentication) {
+        try {
+            unidadeService.adicionarFlange(
+                    unidadeId,
+                    identificador,
+                    authentication.getName()
+            );
+            return "redirect:/unidades/editar/" + unidadeId + "?sucesso=flange-adicionada";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/unidades/editar/" + unidadeId + "?erro=flange";
+        }
+    }
+
     @PostMapping("/alterar-status")
     public String alterarStatus(
             @RequestParam Long id,
@@ -190,6 +207,8 @@ public class UnidadeController {
         );
         model.addAttribute("totalFuncionarios", unidadeService.contarFuncionarios(unidade.getId()));
         model.addAttribute("totalFlanges", unidadeService.contarFlanges(unidade.getId()));
+        model.addAttribute("flangesVinculadas", unidadeService.listarFlangesVinculadas(unidade.getId()));
+        model.addAttribute("flangesDisponiveis", unidadeService.listarFlangesDisponiveis());
         model.addAttribute("totalManutencoes", unidadeService.contarManutencoes(unidade.getId()));
         model.addAttribute("historicoUnidade", unidadeService.buscarHistorico(unidade.getId()));
     }
