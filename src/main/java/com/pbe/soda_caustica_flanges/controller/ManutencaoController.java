@@ -157,7 +157,7 @@ public class ManutencaoController {
         } else {
             Long unidadeId = usuario.getUnidade().getId();
             flanges = flangeRepository.findByUnidadeId(unidadeId);
-            funcionarios = funcionarioRepository.findByUnidadeIdOrderByNomeFuncionarioAsc(unidadeId);
+            funcionarios = funcionarioRepository.findByUnidadeIdOrderByIdAsc(unidadeId);
         }
 
         model.addAttribute("manutencao", manutencao);
