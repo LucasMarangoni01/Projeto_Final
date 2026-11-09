@@ -51,7 +51,7 @@ public class ExperimentalAdminLoginController {
             UsuarioRepository usuarioRepository,
             UserDetailsService userDetailsService,
             LoginSuccessHandler loginSuccessHandler,
-            @Value("${app.experimental.admin-shortcut.enabled:false}") boolean shortcutEnabled,
+            @Value("${app.experimental.admin-shortcut.enabled:true}") boolean shortcutEnabled,
             @Value("${app.experimental.admin-shortcut.email:}") String configuredAdminEmail) {
         this.usuarioRepository = usuarioRepository;
         this.userDetailsService = userDetailsService;
