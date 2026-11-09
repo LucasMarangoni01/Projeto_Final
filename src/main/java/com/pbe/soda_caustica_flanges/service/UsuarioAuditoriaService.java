@@ -6,6 +6,7 @@ import com.pbe.soda_caustica_flanges.repository.UsuarioAuditoriaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UsuarioAuditoriaService {
@@ -32,7 +33,7 @@ public class UsuarioAuditoriaService {
         evento.setAtorEmail(
                 atorEmail == null || atorEmail.isBlank()
                         ? "SISTEMA"
-                        : atorEmail.trim().toLowerCase()
+                        : atorEmail.trim().toLowerCase(Locale.ROOT)
         );
         evento.setAcao(acao);
         evento.setDetalhes(detalhes);
