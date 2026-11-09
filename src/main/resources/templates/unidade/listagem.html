@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return (valor || "")
             .toLocaleLowerCase("pt-BR")
             .normalize("NFD")
-            .replace(/[\\u0300-\\u036f]/g, "");
+            .replace(/[\u0300-\u036f]/g, "");
     }
 
     function filtrarUnidades() {
