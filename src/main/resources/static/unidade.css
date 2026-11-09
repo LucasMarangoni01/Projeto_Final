@@ -1165,3 +1165,91 @@
         padding-top: 16px;
     }
 }
+
+/* =========================================================
+   ALINHAMENTO DOS COLABORADORES E USUÁRIOS DA UNIDADE
+========================================================= */
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-avatar {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-info {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    width: 100%;
+    align-self: center;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-info strong {
+    display: block;
+    max-width: 100%;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-info > span {
+    display: block;
+    max-width: 100%;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-info .unidade-member-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) > form {
+    grid-column: 3;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+    width: auto !important;
+    min-width: max-content;
+    max-width: 100%;
+    margin: 0 !important;
+}
+.unidade-panel .unidade-member-row:not(.unidade-transfer-row) .unidade-member-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    min-height: 34px;
+    padding: 7px 11px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+}
+@media (max-width: 560px) {
+    .unidade-panel .unidade-member-row:not(.unidade-transfer-row) {
+        grid-template-columns: 36px minmax(0, 1fr);
+        column-gap: 10px;
+    }
+    .unidade-panel .unidade-member-row:not(.unidade-transfer-row) > .unidade-member-info {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    .unidade-panel .unidade-member-row:not(.unidade-transfer-row) > form {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: start;
+        width: auto !important;
+    }
+}
