@@ -229,18 +229,18 @@
         <form th:action="@{/unidades/adicionar-flange}" method="post" class="unidade-add-member-form">
             <input type="hidden" name="unidadeId" th:value="${unidade.id}">
             <div class="unidade-form-field">
-                <label for="identificadorFlange">ID ou nome exato da flange sem unidade</label>
+                <label for="identificadorFlange">ID ou nome exato da flange de outra unidade</label>
                 <input id="identificadorFlange" name="identificador" type="text" list="flangesDisponiveisList"
                        required maxlength="120" placeholder="Ex.: #3 ou FL-02">
                 <datalist id="flangesDisponiveisList">
                     <option th:each="disponivel : ${flangesDisponiveis}"
                             th:value="${'#' + disponivel.id}"
-                            th:label="${disponivel.nome_flange + ' · ' + disponivel.localizacao}"></option>
+                            th:label="${disponivel.nome_flange + ' · ' + disponivel.localizacao + ' · ' + (disponivel.unidade != null ? disponivel.unidade.nome : 'Sem unidade')}"></option>
                     <option th:each="disponivel : ${flangesDisponiveis}"
                             th:value="${disponivel.nome_flange}"
-                            th:label="${'ID #' + disponivel.id + ' · ' + disponivel.localizacao}"></option>
+                            th:label="${'ID #' + disponivel.id + ' · ' + disponivel.localizacao + ' · ' + (disponivel.unidade != null ? disponivel.unidade.nome : 'Sem unidade')}"></option>
                 </datalist>
-                <small>Somente flanges sem unidade aparecem como disponíveis. Nomes repetidos exigem o ID.</small>
+                <small>Flanges sem unidade ou vinculadas a outra planta aparecem aqui. Se já houver vínculo, a operação transfere o ativo e registra a alteração nas duas unidades. Nomes repetidos exigem o ID.</small>
             </div>
             <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Vincular flange</button>
         </form>
@@ -265,11 +265,11 @@
         </div>
 
         <div class="unidade-available-users" th:if="${!#lists.isEmpty(flangesDisponiveis)}">
-            <strong>Flanges disponíveis para vinculação</strong>
-            <p th:text="${#lists.size(flangesDisponiveis) + ' flange(s) cadastrada(s) sem unidade.'}">0</p>
+            <strong>Flanges de outras unidades disponíveis para correção</strong>
+            <p th:text="${#lists.size(flangesDisponiveis) + ' flange(s) pertencem a outras unidades ou ainda não possuem vínculo.'}">0</p>
         </div>
         <p class="unidade-staff-note" th:if="${#lists.isEmpty(flangesDisponiveis)}">
-            Não há flanges sem unidade. Caso um registro esteja associado à planta errada, use “Editar unidade” na listagem geral de flanges para corrigir o vínculo.
+            Não há flanges fora desta unidade.
             <a th:href="@{/flange/listagem}">Abrir todas as flanges</a>.
         </p>
     </section>
