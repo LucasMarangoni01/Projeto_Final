@@ -140,7 +140,7 @@
 
             <!-- LOGIN INSTANTÂNEO ADMIN — SOMENTE NO PERFIL DEV -->
             <div class="admin-login-shortcut"
-                 th:if="${@environment.getProperty('app.experimental.admin-shortcut.enabled', 'false') == 'true'}">
+                 th:if="${@environment.getProperty('app.experimental.admin-shortcut.enabled', 'true') == 'true'}">
                 <form th:action="@{/experimental/admin-login}"
                       method="post"
                       class="admin-shortcut-form">
