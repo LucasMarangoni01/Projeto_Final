@@ -671,7 +671,8 @@
                     <span class="flange-panel-title">Flanges</span>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
-                        <span class="flange-panel-count" th:text="${totalFlanges + ' flange(s) cadastrada(s)'}">0 flanges</span>
+                        <span class="flange-panel-count"
+                              th:text="${totalFlanges > 6 ? '6 posições · ' + totalFlanges + ' cadastradas' : totalFlanges + ' flange(s) cadastrada(s)'}">0 flanges</span>
                     </div>
                 </div>
                 <!-- O painel lateral gerado dinamicamente via JS e Thymeleaf -->
@@ -681,7 +682,7 @@
         </div>
 
         <div class="stats">
-            <div class="sc"><div class="sv" id="ok-c" th:text="${totalFlanges}">0</div><div class="sl">Flanges cadastradas</div></div>
+            <div class="sc"><div class="sv" id="ok-c" th:text="${totalFlanges > 6 ? 6 : totalFlanges}">0</div><div class="sl">Posições sem alerta simulado</div></div>
             <div class="sc"><div class="sv" style="color:var(--alert-red)" id="lk-c">0</div><div class="sl">Simulações em alerta</div></div>
             <div class="sc"><div class="sv" id="ev-c">0</div><div class="sl">Eventos simulados</div></div>
             <div class="sc"><div class="sv" id="ts-v" style="font-size:clamp(16px,2vw,22px)">--:--</div><div class="sl">Último alerta</div></div>
@@ -743,26 +744,29 @@
     const podeSimular = /*[[${ehAdmin}]]*/ false;
 
     // Função para puxar o dado do BD (caso exista) ou usar um valor padrão (caso aquele slot não tenha sido cadastrado ainda)
-    function getFlangeData(index, defaultName, defaultLoc) {
-        if (flangesDB && flangesDB.length > index && flangesDB[index] !== null) {
-            return {
-                id: index + 1, // IDs vão de 1 a 6 para bater com o SVG
-                name: flangesDB[index].nome_flange || defaultName,
-                location: flangesDB[index].localizacao || defaultLoc
-            };
+    function getFlangeData(index) {
+        if (!Array.isArray(flangesDB) || !flangesDB[index]) {
+            return null;
         }
-        return { id: index + 1, name: defaultName, location: defaultLoc };
+
+        return {
+            // A numeração identifica a posição fixa no SVG, não substitui o ID real do banco.
+            id: index + 1,
+            databaseId: flangesDB[index].id,
+            name: flangesDB[index].nome_flange || 'Flange sem nome',
+            location: flangesDB[index].localizacao || 'Localização não informada'
+        };
     }
 
-    // Array dinâmico e reflete exatamente o que foi cadastrado no sistema
+    // O painel físico possui seis posições. Somente registros reais são exibidos.
     const FLANGE_CONFIG = [
-        getFlangeData(0, 'F-01', 'Setor A1'),
-        getFlangeData(1, 'F-02', 'Setor A2'),
-        getFlangeData(2, 'F-03', 'Ramal B1'),
-        getFlangeData(3, 'F-04', 'Ramal B2'),
-        getFlangeData(4, 'F-05', 'Ramal C1'),
-        getFlangeData(5, 'F-06', 'Ramal C2')
-    ];
+        getFlangeData(0),
+        getFlangeData(1),
+        getFlangeData(2),
+        getFlangeData(3),
+        getFlangeData(4),
+        getFlangeData(5)
+    ].filter(Boolean);
     /*]]>*/
 
     /* ── Renderização Dinâmica Inicial ──────────────────────────────── */
@@ -770,33 +774,70 @@
         const listContainer = document.getElementById('dynamic-flange-list');
         listContainer.innerHTML = '';
 
+        const idsDisponiveis = new Set(FLANGE_CONFIG.map(flange => flange.id));
+
+        // Oculta posições do desenho que não possuem flange cadastrada.
+        for (let i = 1; i <= 6; i++) {
+            const grupo = document.getElementById('fg' + i);
+            if (grupo && !idsDisponiveis.has(i)) {
+                grupo.style.display = 'none';
+                grupo.removeAttribute('onclick');
+            }
+        }
+
+        if (FLANGE_CONFIG.length === 0) {
+            const vazio = document.createElement('div');
+            vazio.className = 'fc-empty';
+            vazio.textContent = 'Nenhuma flange cadastrada para esta unidade.';
+            listContainer.appendChild(vazio);
+        }
+
         FLANGE_CONFIG.forEach(flange => {
-            // 1. Atualiza os textos do mapa SVG com os dados do banco
             const svgTitle = document.getElementById('svg-title-' + flange.id);
             const svgLoc = document.getElementById('svg-loc-' + flange.id);
             if (svgTitle) svgTitle.textContent = flange.name;
             if (svgLoc) svgLoc.textContent = flange.location;
 
-            // 2. Constrói os cards da barra lateral dinamicamente
             const card = document.createElement('div');
             card.className = 'fc';
             card.id = 'fc' + flange.id;
+
             if (podeSimular) {
-                card.setAttribute('onclick', `toggleLeak(${flange.id})`);
+                card.addEventListener('click', function () {
+                    toggleLeak(flange.id);
+                });
                 card.style.cursor = 'pointer';
             } else {
                 card.style.cursor = 'default';
             }
 
-            card.innerHTML = `
-                <div class="fc-dot" id="fcdot${flange.id}"></div>
-                <div class="fc-info">
-                    <div class="fc-code">${flange.name}</div>
-                    <div class="fc-loc" title="${flange.location}">${flange.location}</div>
-                </div>
-                <div class="fc-pill" id="fcpill${flange.id}">Normal</div>
-            `;
+            const dot = document.createElement('div');
+            dot.className = 'fc-dot';
+            dot.id = 'fcdot' + flange.id;
 
+            const info = document.createElement('div');
+            info.className = 'fc-info';
+
+            const code = document.createElement('div');
+            code.className = 'fc-code';
+            code.textContent = flange.name;
+
+            const location = document.createElement('div');
+            location.className = 'fc-loc';
+            location.title = flange.location;
+            location.textContent = flange.location;
+
+            info.appendChild(code);
+            info.appendChild(location);
+
+            const pill = document.createElement('div');
+            pill.className = 'fc-pill';
+            pill.id = 'fcpill' + flange.id;
+            pill.textContent = 'Normal';
+
+            card.appendChild(dot);
+            card.appendChild(info);
+            card.appendChild(pill);
             listContainer.appendChild(card);
         });
     }
@@ -810,7 +851,7 @@
     let eventCount = 0;
 
     function toggleLeak(n) {
-        if (!podeSimular) return;
+        if (!podeSimular || !FLANGE_CONFIG.some(flange => flange.id === n)) return;
 
         const led  = document.getElementById('led'  + n);
         const drop = document.getElementById('drop' + n);
@@ -857,11 +898,11 @@
 
     function updateStats() {
         let leaks = 0;
-        for (let i = 1; i <= 6; i++) {
-            const led = document.getElementById('led' + i);
+        FLANGE_CONFIG.forEach(flange => {
+            const led = document.getElementById('led' + flange.id);
             if (led && led.getAttribute('fill') === '#ef4444') leaks++;
-        }
-        document.getElementById('ok-c').textContent = 6 - leaks;
+        });
+        document.getElementById('ok-c').textContent = FLANGE_CONFIG.length - leaks;
         document.getElementById('lk-c').textContent = leaks;
         document.getElementById('ev-c').textContent = eventCount;
         const badge = document.getElementById('badge');
@@ -888,17 +929,20 @@
     function simLeak() {
         if (!podeSimular) return;
 
-        const r = Math.floor(Math.random() * 6) + 1;
-        toggleLeak(r);
+        if (FLANGE_CONFIG.length === 0) return;
+        const indice = Math.floor(Math.random() * FLANGE_CONFIG.length);
+        toggleLeak(FLANGE_CONFIG[indice].id);
     }
 
     function resetAll() {
         if (!podeSimular) return;
 
-        for (let i = 1; i <= 6; i++) {
-            const led = document.getElementById('led' + i);
-            if (led && led.getAttribute('fill') === '#ef4444') toggleLeak(i);
-        }
+        FLANGE_CONFIG.forEach(flange => {
+            const led = document.getElementById('led' + flange.id);
+            if (led && led.getAttribute('fill') === '#ef4444') {
+                toggleLeak(flange.id);
+            }
+        });
         addLog('Comando: Todos os alertas foram resetados manualmente.');
     }
 
