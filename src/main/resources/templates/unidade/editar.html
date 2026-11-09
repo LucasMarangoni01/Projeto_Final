@@ -28,11 +28,11 @@
 
     <div class="unidade-feedback unidade-feedback-success" th:if="${sucesso != null}">
         <span>✓</span>
-        <span th:text="${sucesso == 'salva' ? 'Dados da unidade salvos.' : (sucesso == 'pessoa-adicionada' ? 'Pessoa vinculada à unidade.' : (sucesso == 'pessoa-removida' ? 'Pessoa desvinculada da unidade.' : 'Operação concluída.'))}">Operação concluída.</span>
+        <span th:text="${sucesso == 'salva' ? 'Dados da unidade salvos.' : (sucesso == 'pessoa-adicionada' ? 'Conta de acesso vinculada.' : (sucesso == 'pessoa-removida' ? 'Conta de acesso desvinculada.' : (sucesso == 'funcionario-adicionado' ? 'Funcionário operacional vinculado.' : (sucesso == 'funcionario-removido' ? 'Funcionário operacional desvinculado.' : 'Operação concluída.'))))}">Operação concluída.</span>
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erro != null}">
         <span>!</span>
-        <span th:text="${erro == 'pessoa' ? 'Não foi possível adicionar ou remover a pessoa. Confira o ID, o nome e o vínculo atual.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.')}">Erro.</span>
+        <span th:text="${erro == 'pessoa' ? 'Não foi possível vincular ou desvincular a conta. Confira o ID, o nome e o vínculo atual.' : (erro == 'funcionario' ? 'Não foi possível vincular ou desvincular o funcionário. Confira o ID, o nome e o vínculo atual.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.'))}">Erro.</span>
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erroSalvar != null}" th:text="${erroSalvar}"></div>
 
@@ -148,6 +148,57 @@
             </div>
         </section>
     </div>
+
+    <section class="unidade-panel unidade-staff-panel">
+        <div class="unidade-panel-heading">
+            <div>
+                <span class="unidade-panel-kicker">EQUIPE OPERACIONAL</span>
+                <h2>Funcionários da unidade</h2>
+                <p>Gerencie os cadastros de funcionários usados como executores nos registros de manutenção. Este cadastro é separado das contas de login.</p>
+            </div>
+            <span class="unidade-members-count" th:text="${#lists.size(funcionariosVinculados)}">0</span>
+        </div>
+
+        <form th:action="@{/unidades/adicionar-funcionario}" method="post" class="unidade-add-member-form">
+            <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+            <div class="unidade-form-field">
+                <label for="identificadorFuncionario">ID ou nome completo do funcionário</label>
+                <input id="identificadorFuncionario" name="identificador" type="text" required maxlength="120" placeholder="Ex.: 42 ou João da Silva">
+                <small>Se houver nomes repetidos, informe o ID do cadastro para selecionar a pessoa correta.</small>
+            </div>
+            <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Adicionar funcionário</button>
+        </form>
+        <p class="unidade-inactive-hint" th:if="${!unidade.ativo}">Reative a unidade para vincular novos funcionários.</p>
+
+        <div class="unidade-members-list">
+            <article class="unidade-member-row" th:each="funcionario : ${funcionariosVinculados}">
+                <div class="unidade-member-avatar"
+                     th:text="${#strings.substring(funcionario.nome_funcionario, 0, 1).toUpperCase()}">F</div>
+                <div class="unidade-member-info">
+                    <strong th:text="${funcionario.nome_funcionario}">Nome do funcionário</strong>
+                    <span th:text="${'ID #' + funcionario.id}">ID #1</span>
+                    <div class="unidade-member-tags" th:if="${funcionario.funcionario_flange != null and !#strings.isEmpty(funcionario.funcionario_flange)}">
+                        <span th:text="${'Flange: ' + funcionario.funcionario_flange}">Flange</span>
+                    </div>
+                </div>
+                <form th:action="@{/unidades/remover-funcionario}" method="post">
+                    <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+                    <input type="hidden" name="funcionarioId" th:value="${funcionario.id}">
+                    <button type="submit" class="unidade-member-remove"
+                            onclick="return confirm('Desvincular este funcionário? O cadastro e o histórico de manutenções serão preservados.')">Desvincular</button>
+                </form>
+            </article>
+            <div class="unidade-members-empty" th:if="${#lists.isEmpty(funcionariosVinculados)}">
+                Nenhum funcionário operacional vinculado a esta unidade.
+            </div>
+        </div>
+
+        <div class="unidade-available-users" th:if="${!#lists.isEmpty(funcionariosDisponiveis)}">
+            <strong>Cadastros de funcionários disponíveis</strong>
+            <p th:text="${#lists.size(funcionariosDisponiveis) + ' funcionário(s) sem unidade.'}">0</p>
+        </div>
+        <p class="unidade-staff-note">Desvincular não exclui o funcionário nem apaga manutenções anteriores. O histórico permanece para consulta.</p>
+    </section>
 
     <section class="unidade-panel unidade-audit-panel">
         <div class="unidade-panel-heading">
