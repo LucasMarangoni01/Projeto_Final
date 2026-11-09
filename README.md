@@ -83,6 +83,22 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ---
 
+### Matriz de permissões por perfil
+
+| Recurso | USER | ADMIN |
+|---|---|---|
+| Dashboard | Consulta dados da própria unidade | Consulta todas as unidades |
+| Flanges | Consulta flanges da própria unidade | Cadastra, consulta, edita e exclui |
+| Funcionários operacionais | Consulta funcionários da própria unidade | Cadastra, consulta, edita e exclui; define a unidade |
+| Manutenções | Consulta o histórico da própria unidade e registra novos lançamentos | Consulta todas as unidades, registra, edita e exclui |
+| Meu perfil | Edita nome, telefone e foto; altera a própria senha | Mesmos recursos para a própria conta |
+| Dados profissionais (matrícula, cargo e setor) | Somente leitura | Edita pela administração de usuários |
+| Usuários e permissões | Sem acesso administrativo | Gerencia contas, perfis, status e vínculos |
+| Unidades | Sem acesso administrativo | Cria, edita, arquiva, reativa, remove unidades vazias e gerencia membros |
+| Incidentes | Sem acesso administrativo | Administração dos registros |
+
+As restrições são aplicadas no Spring Security e nos controladores/serviços. Esconder links no menu é apenas uma melhoria de interface, não o mecanismo de segurança. USER só pode registrar manutenção nova; não pode editar ou apagar um lançamento já enviado. O formulário valida que a flange e o funcionário pertençam à mesma unidade do usuário. Contas USER sem unidade ativa não podem autenticar.
+
 ### Governança dos dados do usuário
 
 O titular da conta pode atualizar o nome, a foto e o telefone de contato. O telefone é formatado automaticamente com DDD (por exemplo, `(11) 99999-9999`; telefones fixos usam `(11) 9999-9999`). Matrícula, cargo e setor são dados corporativos: somente um ADMIN pode alterá-los na tela de edição administrativa do usuário. As mudanças são registradas na trilha de auditoria.
