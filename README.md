@@ -155,8 +155,8 @@ $env:ADMIN_PASSWORD = "Use-Uma-Senha-Forte-Com-12+Caracteres"
 
 ### Atenção ao administrador já existente
 
-Contas criadas pelo formulário público recebem o perfil USER e ficam sem unidade inicialmente; por segurança, não conseguem entrar até que um ADMIN as associe a uma unidade ativa. O primeiro ADMIN deve ser criado pelas variáveis `ADMIN_EMAIL` e `ADMIN_PASSWORD` no `.env`. O bootstrap cria essa conta somente quando o e-mail configurado ainda não existe. Ele não promove nem redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
+Contas criadas pelo formulário público recebem o perfil USER e ficam sem unidade inicialmente; por segurança, não conseguem entrar até que um ADMIN as associe a uma unidade ativa. O primeiro ADMIN deve ser criado pelas variáveis de ambiente `ADMIN_EMAIL` e `ADMIN_PASSWORD` na configuração de execução do IntelliJ ou no terminal. O bootstrap cria essa conta somente quando o e-mail configurado ainda não existe. Ele não promove nem redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
 
 ### Rotação de credenciais
 
-Se uma senha já foi publicada no histórico de um repositório público, alterá-la apenas no arquivo atual não é suficiente. Troque a senha correspondente no próprio MySQL e atualize a variável `DB_PASSWORD`. Senhas administrativas antigas também devem ser substituídas ou as respectivas contas desativadas.
+Se uma senha já foi publicada no histórico de um repositório público, alterá-la apenas no arquivo atual não é suficiente. Troque a senha correspondente no próprio MySQL e atualize `spring.datasource.password` em `application.properties` (ou injete a nova credencial por um mecanismo de segredos da implantação). Senhas administrativas antigas também devem ser substituídas ou as respectivas contas desativadas.
