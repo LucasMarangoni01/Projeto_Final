@@ -946,7 +946,7 @@
 
 <script th:inline="javascript">
     const flangesMapa = /*[[${flangesMapa}]]*/ [];
-    const podeSimular = /*[[\${ehAdmin}]]*/ false;
+    const podeSimular = /*[[${ehAdmin}]]*/ false;
 
     // Somente DTOs simples são enviados ao navegador. Nenhuma entidade JPA é serializada.
     const FLANGE_CONFIG = Array.isArray(flangesMapa)
