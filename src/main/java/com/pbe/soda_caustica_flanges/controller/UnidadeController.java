@@ -4,6 +4,7 @@ import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.service.UnidadeService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -56,6 +57,7 @@ public class UnidadeController {
 
         if (result.hasErrors()) {
             model.addAttribute("modoEdicao", unidade.getId() != null);
+            model.addAttribute("erroSalvar", "Confira os campos destacados. O cadastro não foi salvo porque há informações inválidas.");
             return unidade.getId() == null ? "unidade/cadastro" : carregarDetalheComErros(unidade, model);
         }
 
@@ -64,6 +66,13 @@ public class UnidadeController {
             return "redirect:/unidades/editar/" + salva.getId() + "?sucesso=salva";
         } catch (IllegalArgumentException e) {
             model.addAttribute("erroSalvar", e.getMessage());
+            model.addAttribute("modoEdicao", unidade.getId() != null);
+            return unidade.getId() == null ? "unidade/cadastro" : carregarDetalheComErros(unidade, model);
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute(
+                    "erroSalvar",
+                    "O banco recusou o cadastro. Verifique se o código interno já está em uso e confira os dados obrigatórios."
+            );
             model.addAttribute("modoEdicao", unidade.getId() != null);
             return unidade.getId() == null ? "unidade/cadastro" : carregarDetalheComErros(unidade, model);
         }
