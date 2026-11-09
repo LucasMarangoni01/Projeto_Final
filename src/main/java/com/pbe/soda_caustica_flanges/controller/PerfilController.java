@@ -133,7 +133,14 @@ public class PerfilController {
 
     @GetMapping("/perfil/foto/{nomeArquivo:.+}")
     @ResponseBody
-    public ResponseEntity<byte[]> fotoPerfil(@PathVariable String nomeArquivo) {
+    public ResponseEntity<byte[]> fotoPerfil(
+            @PathVariable String nomeArquivo,
+            Authentication authentication) {
+        if (authentication == null
+                || !usuarioService.podeVisualizarFoto(nomeArquivo, authentication.getName())) {
+            return ResponseEntity.notFound().build();
+        }
+
         try {
             FotoPerfilService.FotoCarregada foto = fotoPerfilService.carregar(nomeArquivo);
             return ResponseEntity.ok()
