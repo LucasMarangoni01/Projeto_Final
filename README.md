@@ -83,6 +83,15 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ---
 
+### Gestão de pessoas por unidade
+
+A ficha da unidade mantém duas listas separadas:
+
+- **Contas de acesso:** somente contas USER ativas podem ser vinculadas por ID ou nome exato. Administradores continuam com acesso global. Desvincular bloqueia o login até nova associação, sem excluir a conta.
+- **Funcionários operacionais:** cadastros usados como executores de manutenção também podem ser vinculados/desvinculados por ID ou nome exato. A desvinculação preserva o cadastro e os registros históricos.
+
+Quando houver nomes repetidos, o sistema exige o ID para evitar associar a pessoa errada. Unidades arquivadas preservam os vínculos e o histórico; a exclusão definitiva só é permitida quando não há contas, funcionários ou flanges associados.
+
 ### Matriz de permissões por perfil
 
 | Recurso | USER | ADMIN |
