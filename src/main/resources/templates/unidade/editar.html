@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar unidade | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/unidade.css}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main class="unidades-main unidade-detail-main">
+    <header class="unidade-detail-header">
+        <div>
+            <a th:href="@{/unidades}" class="unidade-back-link">← Todas as unidades</a>
+            <span class="unidade-label">PAINEL DA PLANTA INDUSTRIAL</span>
+            <h1 th:text="${unidade.nome}">Unidade Industrial</h1>
+            <p th:text="${unidade.localizacao}">Localização</p>
+        </div>
+        <span class="unidade-status unidade-detail-status"
+              th:classappend="${unidade.ativo} ? ' status-ativo' : ' status-inativo'">
+            <span class="unidade-status-dot"></span>
+            <span th:text="${unidade.ativo ? 'UNIDADE ATIVA' : 'UNIDADE ARQUIVADA'}">ATIVA</span>
+        </span>
+    </header>
+
+    <div class="unidade-feedback unidade-feedback-success" th:if="${sucesso != null}">
+        <span>✓</span>
+        <span th:text="${sucesso == 'salva' ? 'Dados da unidade salvos.' : (sucesso == 'pessoa-adicionada' ? 'Pessoa vinculada à unidade.' : (sucesso == 'pessoa-removida' ? 'Pessoa desvinculada da unidade.' : 'Operação concluída.'))}">Operação concluída.</span>
+    </div>
+    <div class="unidade-feedback unidade-feedback-error" th:if="${erro != null}">
+        <span>!</span>
+        <span th:text="${erro == 'pessoa' ? 'Não foi possível adicionar ou remover a pessoa. Confira o ID, o nome e o vínculo atual.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.')}">Erro.</span>
+    </div>
+    <div class="unidade-feedback unidade-feedback-error" th:if="${erroSalvar != null}" th:text="${erroSalvar}"></div>
+
+    <section class="unidade-detail-metrics">
+        <article><span>COLABORADORES</span><strong th:text="${#lists.size(usuariosVinculados)}">0</strong><small>Contas vinculadas à unidade</small></article>
+        <article><span>CONTAS ATIVAS</span><strong th:text="${#lists.size(usuariosVinculados.?[ativo])}">0</strong><small>Usuários habilitados</small></article>
+        <article><span>FLANGES</span><strong th:text="${totalFlanges}">0</strong><small>Ativos cadastrados na planta</small></article>
+        <article><span>MANUTENÇÕES</span><strong th:text="${totalManutencoes}">0</strong><small>Registros associados às flanges</small></article>
+    </section>
+
+    <div class="unidade-detail-grid">
+        <section class="unidade-panel">
+            <div class="unidade-panel-heading">
+                <div>
+                    <span class="unidade-panel-kicker">CADASTRO CORPORATIVO</span>
+                    <h2>Dados da unidade</h2>
+                    <p>Identificação, localização e contato operacional da planta.</p>
+                </div>
+                <span class="unidade-record-id" th:text="${'UNIDADE #' + unidade.id}">UNIDADE #1</span>
+            </div>
+
+            <form th:action="@{/unidades/salvar}" th:object="${unidade}" method="post" class="unidade-form">
+                <input type="hidden" th:field="*{id}">
+                <div class="unidade-form-grid">
+                    <div class="unidade-form-field">
+                        <label for="nome">Nome da unidade *</label>
+                        <input id="nome" type="text" th:field="*{nome}" maxlength="100" required>
+                        <small th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+                    </div>
+                    <div class="unidade-form-field">
+                        <label for="codigo">Código interno</label>
+                        <input id="codigo" type="text" th:field="*{codigo}" maxlength="30" placeholder="Ex.: PLT-SP-01">
+                        <small th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></small>
+                    </div>
+                    <div class="unidade-form-field unidade-field-wide">
+                        <label for="localizacao">Localização *</label>
+                        <input id="localizacao" type="text" th:field="*{localizacao}" maxlength="150" required placeholder="Cidade, estado e endereço da planta">
+                        <small th:if="${#fields.hasErrors('localizacao')}" th:errors="*{localizacao}"></small>
+                    </div>
+                    <div class="unidade-form-field">
+                        <label for="responsavel">Responsável pela unidade</label>
+                        <input id="responsavel" type="text" th:field="*{responsavel}" maxlength="100" placeholder="Nome do responsável">
+                    </div>
+                    <div class="unidade-form-field">
+                        <label for="telefoneContato">Telefone de contato</label>
+                        <input id="telefoneContato" type="tel" th:field="*{telefoneContato}" maxlength="25" placeholder="(11) 4000-0000">
+                    </div>
+                    <div class="unidade-form-field unidade-field-wide">
+                        <label for="emailContato">E-mail operacional</label>
+                        <input id="emailContato" type="email" th:field="*{emailContato}" maxlength="120" placeholder="manutencao@empresa.com.br">
+                        <small th:if="${#fields.hasErrors('emailContato')}" th:errors="*{emailContato}"></small>
+                    </div>
+                    <div class="unidade-form-field unidade-field-wide">
+                        <label for="descricao">Descrição / observações operacionais</label>
+                        <textarea id="descricao" th:field="*{descricao}" rows="3" maxlength="600" placeholder="Informações úteis sobre esta planta, área ou operação..."></textarea>
+                    </div>
+                </div>
+                <div class="unidade-form-actions">
+                    <span>As alterações ficam registradas no histórico administrativo da unidade.</span>
+                    <button type="submit" class="unidade-btn unidade-btn-primary">Salvar dados da unidade</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="unidade-panel unidade-members-panel">
+            <div class="unidade-panel-heading">
+                <div>
+                    <span class="unidade-panel-kicker">ACESSO À PLANTA</span>
+                    <h2>Colaboradores e usuários</h2>
+                    <p>Adicione contas existentes pelo ID ou pelo nome completo.</p>
+                </div>
+                <span class="unidade-members-count" th:text="${#lists.size(usuariosVinculados)}">0</span>
+            </div>
+
+            <form th:action="@{/unidades/adicionar-pessoa}" method="post" class="unidade-add-member-form">
+                <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+                <div class="unidade-form-field">
+                    <label for="identificador">ID ou nome completo da pessoa</label>
+                    <input id="identificador" name="identificador" type="text" required maxlength="120" placeholder="Ex.: 18 ou Maria da Silva">
+                    <small>Se houver nomes repetidos, informe o ID da conta para evitar vincular a pessoa errada.</small>
+                </div>
+                <button type="submit" class="unidade-btn unidade-btn-primary" th:disabled="${!unidade.ativo}">+ Adicionar pessoa</button>
+            </form>
+            <p class="unidade-inactive-hint" th:if="${!unidade.ativo}">Reative a unidade para incluir novos colaboradores.</p>
+
+            <div class="unidade-members-list">
+                <article class="unidade-member-row" th:each="pessoa : ${usuariosVinculados}">
+                    <div class="unidade-member-avatar"
+                         th:text="${#strings.substring(pessoa.nome, 0, 1).toUpperCase()}">U</div>
+                    <div class="unidade-member-info">
+                        <strong th:text="${pessoa.nome}">Nome do usuário</strong>
+                        <span th:text="${'ID #' + pessoa.id + ' · ' + pessoa.email}">ID · e-mail</span>
+                        <div class="unidade-member-tags">
+                            <span th:text="${pessoa.role}">USER</span>
+                            <span th:classappend="${pessoa.ativo} ? ' member-active' : ' member-inactive'"
+                                  th:text="${pessoa.ativo ? 'ATIVO' : 'INATIVO'}">ATIVO</span>
+                        </div>
+                    </div>
+                    <form th:action="@{/unidades/remover-pessoa}" method="post">
+                        <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+                        <input type="hidden" name="usuarioId" th:value="${pessoa.id}">
+                        <button type="submit" class="unidade-member-remove"
+                                onclick="return confirm('Desvincular esta pessoa da unidade? A conta não será excluída.')"
+                                th:disabled="${!unidade.ativo}">Desvincular</button>
+                    </form>
+                </article>
+                <div class="unidade-members-empty" th:if="${#lists.isEmpty(usuariosVinculados)}">
+                    Nenhuma conta vinculada a esta unidade.
+                </div>
+            </div>
+            <div class="unidade-available-users" th:if="${!#lists.isEmpty(usuariosDisponiveis)}">
+                <strong>Contas disponíveis para vinculação</strong>
+                <p th:text="${#lists.size(usuariosDisponiveis) + ' conta(s) ativa(s) sem unidade.'}">0</p>
+            </div>
+        </section>
+    </div>
+
+    <section class="unidade-panel unidade-audit-panel">
+        <div class="unidade-panel-heading">
+            <div>
+                <span class="unidade-panel-kicker">RASTREABILIDADE</span>
+                <h2>Histórico da unidade</h2>
+                <p>Alterações de cadastro e movimentações de pessoas nesta planta.</p>
+            </div>
+        </div>
+        <div class="unidade-audit-list">
+            <article th:each="evento : ${historicoUnidade}">
+                <div class="unidade-audit-dot"></div>
+                <div class="unidade-audit-content">
+                    <strong th:text="${evento.acao}">AÇÃO</strong>
+                    <p th:text="${evento.detalhes}">Detalhes</p>
+                    <small th:text="${#temporals.format(evento.dataEvento, 'dd/MM/yyyy HH:mm:ss') + ' · ' + evento.atorEmail}">Data · responsável</small>
+                </div>
+            </article>
+            <p class="unidade-members-empty" th:if="${#lists.isEmpty(historicoUnidade)}">Ainda não há eventos registrados.</p>
+        </div>
+    </section>
+
+    <section class="unidade-danger-zone">
+        <div>
+            <span>CONTROLE DA UNIDADE</span>
+            <h2>Arquivamento e remoção</h2>
+            <p>Arquivar bloqueia novos vínculos e mantém os registros históricos. A remoção definitiva só é permitida quando não existem pessoas ou flanges vinculadas.</p>
+        </div>
+        <div class="unidade-danger-actions">
+            <form th:action="@{/unidades/alterar-status}" method="post">
+                <input type="hidden" name="id" th:value="${unidade.id}">
+                <button type="submit" class="unidade-btn unidade-btn-secondary"
+                        th:text="${unidade.ativo ? 'Arquivar unidade' : 'Reativar unidade'}">Arquivar</button>
+            </form>
+            <form th:if="${#lists.isEmpty(usuariosVinculados) and totalFlanges == 0}"
+                  th:action="@{/unidades/excluir}" method="post">
+                <input type="hidden" name="id" th:value="${unidade.id}">
+                <button type="submit" class="unidade-btn unidade-btn-danger"
+                        onclick="return confirm('Remover definitivamente esta unidade? Esta ação não pode ser desfeita.')">Excluir definitivamente</button>
+            </form>
+            <span class="unidade-delete-blocked"
+                  th:unless="${#lists.isEmpty(usuariosVinculados) and totalFlanges == 0}">Exclusão bloqueada: há vínculos ou ativos históricos.</span>
+        </div>
+    </section>
+</main>
+
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
+<script th:src="@{/menu.js}"></script>
+</body>
+</html>
