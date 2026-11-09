@@ -17,6 +17,14 @@ public interface FlangeRepository
 
     List<Flange> findByUnidadeIsNullOrderByIdAsc();
 
+    @Query("""
+        SELECT f
+        FROM Flange f
+        WHERE f.unidade IS NULL OR f.unidade.id <> :unidadeId
+        ORDER BY f.id ASC
+        """)
+    List<Flange> findForaDaUnidade(@Param("unidadeId") Long unidadeId);
+
     long countByUnidadeId(Long unidadeId);
 
     @Query("""
