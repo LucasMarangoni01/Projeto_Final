@@ -97,7 +97,7 @@ public class ManutencaoController {
         }
 
         if (!admin) {
-            if (usuario.getUnidade() == null
+            if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
                     || !flange.getUnidade().getId().equals(usuario.getUnidade().getId())) {
                 model.addAttribute("erro", "Você só pode registrar manutenções em ativos da sua unidade.");
                 prepararFormulario(model, manutencao, usuario);
