@@ -83,6 +83,20 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ---
 
+### Funcionalidades do módulo de usuários
+
+O módulo de contas oferece recursos de identificação, controle de acesso e rastreabilidade:
+
+- Foto de perfil individual (JPEG/PNG, até 2 MB), armazenada em diretório privado e servida por rota autenticada; quando não há foto, o sistema usa um avatar padrão.
+- Edição do nome, telefone e informações profissionais (matrícula, cargo e setor) pelo titular da conta.
+- Alteração de senha mediante confirmação da senha atual, com mínimo de 12 caracteres.
+- Perfis de acesso ADMIN e USER, ativação/desativação e associação a uma unidade industrial.
+- Bloqueio de contas USER sem unidade ativa vinculada e proteção contra desativar ou rebaixar o último administrador ativo.
+- Data de criação, último acesso e registro dos principais eventos: cadastro, login, alteração de perfil, foto, senha, unidade, permissão e status.
+- Consulta dos últimos 30 eventos por conta na área de perfil e na administração de usuários.
+
+A alteração de e-mail de acesso não é oferecida no autoatendimento: o e-mail funciona como identificador único e deve ser tratado como dado administrativo. O histórico é uma trilha operacional da aplicação, não substitui um sistema corporativo de auditoria com retenção, imutabilidade e controles de acesso dedicados.
+
 ## Configuração do ambiente local
 
 As credenciais não devem ser armazenadas no repositório. O projeto carrega automaticamente um arquivo local chamado `.env` na raiz. Esse arquivo é ignorado pelo Git e não será publicado. Para evitar usar a conta administrativa `root` na aplicação, crie uma conta exclusiva chamada `soda_app` usando o script `database/setup.sql`. Depois copie `.env.example` para `.env` e configure a mesma senha nos dois locais. Para criar o primeiro administrador, preencha também `ADMIN_EMAIL` com um e-mail ainda não cadastrado e `ADMIN_PASSWORD` com uma senha de pelo menos 12 caracteres. Sem essas duas variáveis, nenhum ADMIN inicial será criado.
