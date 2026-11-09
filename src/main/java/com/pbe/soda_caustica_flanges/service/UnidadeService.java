@@ -153,6 +153,30 @@ public class UnidadeService {
     }
 
     @Transactional
+    public void excluirUnidade(Long id, String atorEmail) {
+        Unidade unidade = buscarPorId(id);
+
+        long usuarios = usuarioRepository.countByUnidadeId(id);
+        long flanges = flangeRepository.countByUnidadeId(id);
+
+        if (usuarios > 0 || flanges > 0) {
+            throw new IllegalArgumentException(
+                    "Esta unidade possui " + usuarios + " usuário(s) e "
+                            + flanges + " flange(s) vinculados. Arquive a unidade para preservar o histórico."
+            );
+        }
+
+        auditoriaService.registrar(
+                unidade,
+                atorEmail,
+                "UNIDADE_EXCLUIDA",
+                "Unidade sem usuários ou flanges vinculados removida definitivamente."
+        );
+
+        repository.delete(unidade);
+    }
+
+    @Transactional
     public Usuario adicionarUsuario(Long unidadeId, String identificador, String atorEmail) {
         Unidade unidade = buscarPorId(unidadeId);
 
@@ -163,6 +187,12 @@ public class UnidadeService {
         }
 
         Usuario usuario = resolverUsuario(identificador);
+
+        if (!usuario.isAtivo()) {
+            throw new IllegalArgumentException(
+                    "Ative a conta da pessoa antes de vinculá-la a uma unidade."
+            );
+        }
 
         if (usuario.getUnidade() != null) {
             if (usuario.getUnidade().getId().equals(unidadeId)) {
