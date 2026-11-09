@@ -16,6 +16,7 @@ public class UnidadeService {
     private final UsuarioRepository usuarioRepository;
     private final FlangeRepository flangeRepository;
     private final ManutencaoRepository manutencaoRepository;
+    private final FuncionarioRepository funcionarioRepository;
     private final UnidadeAuditoriaService auditoriaService;
     private final UsuarioAuditoriaService usuarioAuditoriaService;
 
@@ -24,12 +25,14 @@ public class UnidadeService {
             UsuarioRepository usuarioRepository,
             FlangeRepository flangeRepository,
             ManutencaoRepository manutencaoRepository,
+            FuncionarioRepository funcionarioRepository,
             UnidadeAuditoriaService auditoriaService,
             UsuarioAuditoriaService usuarioAuditoriaService) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.flangeRepository = flangeRepository;
         this.manutencaoRepository = manutencaoRepository;
+        this.funcionarioRepository = funcionarioRepository;
         this.auditoriaService = auditoriaService;
         this.usuarioAuditoriaService = usuarioAuditoriaService;
     }
@@ -41,6 +44,7 @@ public class UnidadeService {
                         unidade,
                         usuarioRepository.countByUnidadeId(unidade.getId()),
                         usuarioRepository.countByUnidadeIdAndAtivoTrue(unidade.getId()),
+                        funcionarioRepository.countByUnidadeId(unidade.getId()),
                         flangeRepository.countByUnidadeId(unidade.getId()),
                         manutencaoRepository.countByFlange_Unidade_Id(unidade.getId())
                 ))
@@ -70,7 +74,11 @@ public class UnidadeService {
     }
 
     public List<Usuario> listarUsuariosDisponiveis() {
-        return usuarioRepository.findByUnidadeIsNullOrderByNomeAsc();
+        return usuarioRepository.findByUnidadeIsNullAndAtivoTrueOrderByNomeAsc();
+    }
+
+    public long contarFuncionarios(Long unidadeId) {
+        return funcionarioRepository.countByUnidadeId(unidadeId);
     }
 
     public long contarFlanges(Long unidadeId) {
@@ -157,11 +165,13 @@ public class UnidadeService {
         Unidade unidade = buscarPorId(id);
 
         long usuarios = usuarioRepository.countByUnidadeId(id);
+        long funcionarios = funcionarioRepository.countByUnidadeId(id);
         long flanges = flangeRepository.countByUnidadeId(id);
 
-        if (usuarios > 0 || flanges > 0) {
+        if (usuarios > 0 || funcionarios > 0 || flanges > 0) {
             throw new IllegalArgumentException(
-                    "Esta unidade possui " + usuarios + " usuário(s) e "
+                    "Esta unidade possui " + usuarios + " conta(s), "
+                            + funcionarios + " funcionário(s) e "
                             + flanges + " flange(s) vinculados. Arquive a unidade para preservar o histórico."
             );
         }
@@ -170,7 +180,7 @@ public class UnidadeService {
                 unidade,
                 atorEmail,
                 "UNIDADE_EXCLUIDA",
-                "Unidade sem usuários ou flanges vinculados removida definitivamente."
+                "Unidade sem usuários, funcionários ou flanges vinculados removida definitivamente."
         );
 
         repository.delete(unidade);
