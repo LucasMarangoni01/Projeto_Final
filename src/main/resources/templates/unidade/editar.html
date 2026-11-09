@@ -253,7 +253,7 @@
             <p>Confira a unidade atual e transfira somente os ativos que realmente pertencem a esta planta.</p>
         </div>
         <div class="unidade-members-list" th:if="${!#lists.isEmpty(flangesDisponiveis)}">
-            <article class="unidade-member-row" th:each="flangeExterna : ${flangesDisponiveis}">
+            <article class="unidade-member-row unidade-transfer-row" th:each="flangeExterna : ${flangesDisponiveis}">
                 <div class="unidade-member-avatar">F</div>
                 <div class="unidade-member-info">
                     <strong th:text="${flangeExterna.nome_flange}">Nome da flange</strong>
