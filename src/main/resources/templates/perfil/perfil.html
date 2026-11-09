@@ -70,10 +70,12 @@
                         <img id="previewFotoPerfil"
                              th:if="${usuarioLogado.fotoPerfil != null}"
                              th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                             th:data-default-src="@{/img/avatar-default.svg}"
                              alt="Pré-visualização da foto">
                         <img id="previewFotoPerfil"
                              th:unless="${usuarioLogado.fotoPerfil != null}"
                              th:src="@{/img/avatar-default.svg}"
+                             th:data-default-src="@{/img/avatar-default.svg}"
                              alt="Ícone padrão">
                     </div>
                     <div class="perfil-photo-controls">
@@ -82,9 +84,17 @@
                         <label class="perfil-file-button" for="fotoPerfil">Escolher imagem</label>
                         <input id="fotoPerfil" name="fotoPerfil" type="file" accept="image/jpeg,image/png" hidden>
                         <label class="perfil-remove-photo" th:if="${usuarioLogado.fotoPerfil != null}">
-                            <input type="checkbox" name="removerFoto" value="true">
-                            Remover foto atual
+                            <input id="removerFoto" type="checkbox" name="removerFoto" value="true">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7h16"></path>
+                                <path d="M10 11v6M14 11v6"></path>
+                                <path d="m5 7 1 13h12l1-13M9 7V4h6v3"></path>
+                            </svg>
+                            <span>Remover foto</span>
                         </label>
+                        <small class="perfil-remove-hint" th:if="${usuarioLogado.fotoPerfil != null}">
+                            A remoção será aplicada ao salvar as alterações.
+                        </small>
                     </div>
                 </div>
 
@@ -170,6 +180,81 @@
         </aside>
     </div>
 
+    <section class="perfil-panel perfil-admin-panel"
+             th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+        <div class="perfil-panel-heading">
+            <div>
+                <span class="perfil-panel-kicker">ACESSO RESTRITO · ADMINISTRADOR</span>
+                <h2>Informações administrativas</h2>
+                <p>Dados de controle da conta, disponíveis somente para administradores.</p>
+            </div>
+            <span class="perfil-admin-lock" aria-label="Área administrativa restrita">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                ADMIN
+            </span>
+        </div>
+
+        <div class="perfil-admin-grid">
+            <article class="perfil-admin-item">
+                <span>IDENTIFICADOR INTERNO</span>
+                <strong th:text="${'USR-' + usuarioLogado.id}">USR-1</strong>
+                <small>Referência única desta conta no sistema.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>NÍVEL DE PERMISSÃO</span>
+                <strong th:text="${usuarioLogado.role}">ADMIN</strong>
+                <small>Define quais áreas administrativas podem ser acessadas.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>STATUS DA CONTA</span>
+                <strong th:text="${usuarioLogado.ativo ? 'ATIVA' : 'INATIVA'}"
+                        th:classappend="${usuarioLogado.ativo ? ' admin-value-active' : ' admin-value-inactive'}">ATIVA</strong>
+                <small>Contas inativas não conseguem autenticar.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>UNIDADE VINCULADA</span>
+                <strong th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.nome : 'Sem unidade vinculada'}">Unidade</strong>
+                <small th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.localizacao : 'Conta administrativa sem unidade específica.'}">Localização</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>STATUS DA UNIDADE</span>
+                <strong th:text="${usuarioLogado.unidade == null ? 'NÃO SE APLICA' : (usuarioLogado.unidade.ativo ? 'ATIVA' : 'INATIVA')}">ATIVA</strong>
+                <small>Indica se a unidade vinculada está habilitada no sistema.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>CRIADA EM</span>
+                <strong th:text="${usuarioLogado.criadoEm != null ? #temporals.format(usuarioLogado.criadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</strong>
+                <small>Data de criação do registro.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>ÚLTIMA ATUALIZAÇÃO</span>
+                <strong th:text="${usuarioLogado.atualizadoEm != null ? #temporals.format(usuarioLogado.atualizadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</strong>
+                <small>Última alteração dos dados da conta.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>ÚLTIMO ACESSO</span>
+                <strong th:text="${usuarioLogado.ultimoAcesso != null ? #temporals.format(usuarioLogado.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Ainda não registrado'}">-</strong>
+                <small>Último login concluído com sucesso.</small>
+            </article>
+        </div>
+
+        <div class="perfil-admin-notice">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 21 20H3L12 3Z"></path>
+                <path d="M12 9v5M12 17h.01"></path>
+            </svg>
+            <p><strong>Campos protegidos:</strong> permissão, unidade e status não podem ser modificados nesta página. Essas alterações devem ser realizadas na administração de usuários, com registro no histórico da conta.</p>
+        </div>
+
+        <div class="perfil-admin-actions">
+            <a th:href="@{/usuarios}" class="perfil-secondary-button">Gerenciar usuários</a>
+            <a th:href="@{/unidades}" class="perfil-secondary-button">Gerenciar unidades</a>
+        </div>
+    </section>
+
     <section class="perfil-panel perfil-audit-panel">
         <div class="perfil-panel-heading">
             <div>
@@ -206,6 +291,8 @@
         const input = document.getElementById("fotoPerfil");
         const preview = document.getElementById("previewFotoPerfil");
         const fileLabel = document.querySelector(".perfil-file-button");
+        const removePhoto = document.getElementById("removerFoto");
+        const defaultPhoto = preview ? preview.dataset.defaultSrc : null;
 
         if (!input || !preview) return;
 
@@ -219,11 +306,23 @@
                 return;
             }
 
+            if (removePhoto) removePhoto.checked = false;
+
             const url = URL.createObjectURL(arquivo);
             preview.src = url;
             preview.onload = function () { URL.revokeObjectURL(url); };
             if (fileLabel) fileLabel.textContent = arquivo.name;
         });
+
+        if (removePhoto) {
+            removePhoto.addEventListener("change", function () {
+                if (removePhoto.checked) {
+                    input.value = "";
+                    preview.src = defaultPhoto;
+                    if (fileLabel) fileLabel.textContent = "Escolher imagem";
+                }
+            });
+        }
     });
 </script>
 <script th:src="@{/menu.js}"></script>
