@@ -53,31 +53,17 @@
         </div>
     </section>
 
-    <div class="unidade-list-toolbar">
-        <div>
-            <h2>Plantas cadastradas
-                <span class="unidade-result-count"
-                      th:text="${#lists.size(unidadesResumo) + (#lists.size(unidadesResumo) == 1 ? ' resultado' : ' resultados')}">0 resultados</span>
-            </h2>
-            <p>Pesquise por nome, código, localização, responsável, autor do cadastro ou outros dados da planta.</p>
-        </div>
-
-        <form class="unidade-search-form" th:action="@{/unidades}" method="get" role="search">
-            <label class="unidade-search" for="filtroUnidades">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 5 5"></path></svg>
-                <input id="filtroUnidades"
-                       name="busca"
-                       type="search"
-                       th:value="${busca}"
-                       placeholder="Buscar unidade, código, responsável..."
-                       autocomplete="off">
-            </label>
-            <button type="submit" class="unidade-btn unidade-btn-primary unidade-search-submit">Buscar</button>
-            <a th:if="${busca != null and !#strings.isEmpty(busca)}"
-               th:href="@{/unidades}"
-               class="unidade-btn unidade-btn-secondary unidade-search-clear">Limpar</a>
-        </form>
-    </div>
+    <div class="unidade-workspace">
+        <section class="unidade-plants-column">
+            <div class="unidade-list-toolbar">
+                <div>
+                    <h2>Plantas cadastradas
+                        <span class="unidade-result-count"
+                              th:text="${#lists.size(unidadesResumo) + (#lists.size(unidadesResumo) == 1 ? ' resultado' : ' resultados')}">0 resultados</span>
+                    </h2>
+                    <p>Consulte e gerencie as plantas localizadas pelo filtro ao lado.</p>
+                </div>
+            </div>
 
     <section class="unidade-grid">
         <article class="unidade-card unidade-card-modern"
@@ -165,7 +151,92 @@
             <p th:text="${'Não encontramos resultados para: ' + busca}">Nenhum resultado.</p>
             <a th:href="@{/unidades}" class="unidade-btn unidade-btn-secondary">Limpar pesquisa</a>
         </div>
-    </section>
+    </section>        </section>
+    <aside class="unidade-sidebar">
+        <section class="unidade-sidebar-panel unidade-sidebar-search-panel">
+            <span class="unidade-panel-kicker">PESQUISA GERAL</span>
+            <h2>Encontrar informação</h2>
+            <p>Pesquise sem precisar percorrer todos os cartões. A busca considera os dados da unidade e quem realizou o cadastro.</p>
+
+            <form class="unidade-sidebar-search-form" th:action="@{/unidades}" method="get" role="search">
+                <label class="unidade-sidebar-search-field" for="filtroUnidades">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="m16 16 5 5"></path>
+                    </svg>
+                    <input id="filtroUnidades"
+                           name="busca"
+                           type="search"
+                           th:value="${busca}"
+                           placeholder="Nome, código, pessoa, e-mail..."
+                           autocomplete="off">
+                </label>
+                <button type="submit" class="unidade-btn unidade-btn-primary">Buscar</button>
+                <a th:if="${busca != null and !#strings.isEmpty(busca)}"
+                   th:href="@{/unidades}"
+                   class="unidade-btn unidade-btn-secondary">Limpar filtro</a>
+            </form>
+
+            <div class="unidade-sidebar-search-result">
+                <strong th:text="${#lists.size(unidadesResumo)}">0</strong>
+                <span th:text="${#lists.size(unidadesResumo) == 1 ? 'unidade encontrada' : 'unidades encontradas'}">unidades encontradas</span>
+                <span th:if="${busca != null and !#strings.isEmpty(busca)}"
+                      th:text="${'para “' + busca + '”'}">termo pesquisado</span>
+            </div>
+        </section>
+
+        <section class="unidade-sidebar-panel unidade-registration-panel">
+            <div class="unidade-sidebar-heading">
+                <div>
+                    <span class="unidade-panel-kicker">RASTREABILIDADE</span>
+                    <h2>Quem cadastrou</h2>
+                    <p>Responsável e informações de cada planta encontrada.</p>
+                </div>
+                <span class="unidade-sidebar-total" th:text="${#lists.size(registrosCadastro)}">0</span>
+            </div>
+
+            <div class="unidade-registration-list">
+                <article class="unidade-registration-card" th:each="resumo : ${registrosCadastro}">
+                    <div class="unidade-registration-user">
+                        <span class="unidade-registration-avatar"
+                              th:text="${resumo.criadoPorNome != null and !#strings.isEmpty(resumo.criadoPorNome) ? #strings.substring(resumo.criadoPorNome, 0, 1).toUpperCase() : 'U'}">U</span>
+                        <div>
+                            <strong th:text="${resumo.criadoPorNome != null ? resumo.criadoPorNome : 'Autor não identificado'}">Nome do usuário</strong>
+                            <span th:text="${resumo.criadoPorEmail != null ? resumo.criadoPorEmail : 'Conta não identificada'}">E-mail do usuário</span>
+                        </div>
+                    </div>
+
+                    <div class="unidade-registration-details">
+                        <span class="unidade-registration-label">UNIDADE CADASTRADA</span>
+                        <strong th:text="${resumo.unidade.nome}">Nome da unidade</strong>
+                        <p th:text="${resumo.unidade.localizacao}">Localização da unidade</p>
+                        <p th:if="${resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)}"
+                           th:text="${'Código: ' + resumo.unidade.codigo}">Código interno</p>
+                        <p th:if="${resumo.unidade.responsavel != null and !#strings.isEmpty(resumo.unidade.responsavel)}"
+                           th:text="${'Responsável: ' + resumo.unidade.responsavel}">Responsável pela planta</p>
+                        <p th:if="${resumo.unidade.criadoEm != null}"
+                           th:text="${'Cadastro: ' + #temporals.format(resumo.unidade.criadoEm, 'dd/MM/yyyy HH:mm')}">Data do cadastro</p>
+                        <p th:if="${resumo.unidade.descricao != null and !#strings.isEmpty(resumo.unidade.descricao)}"
+                           th:text="${resumo.unidade.descricao}">Descrição da unidade</p>
+                    </div>
+
+                    <div class="unidade-registration-report">
+                        <span>RELATÓRIO DA UNIDADE</span>
+                        <p>Espaço reservado para o relatório de cadastro. A funcionalidade será definida em uma próxima etapa.</p>
+                    </div>
+
+                    <a th:href="@{/unidades/editar/{id}(id=${resumo.unidade.id})}"
+                       class="unidade-registration-link">Abrir cadastro da unidade <span>→</span></a>
+                </article>
+
+                <div class="unidade-registration-empty" th:if="${#lists.isEmpty(registrosCadastro)}">
+                    <strong>Nenhum cadastro para exibir.</strong>
+                    <p th:text="${busca != null and !#strings.isEmpty(busca) ? 'Tente outro termo de pesquisa.' : 'As unidades cadastradas aparecerão aqui.'}">Nenhum cadastro.</p>
+                </div>
+            </div>
+        </section>
+    </aside>
+    </div>
 </main>
 
 <footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
