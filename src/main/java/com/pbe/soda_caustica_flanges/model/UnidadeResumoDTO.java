@@ -6,5 +6,7 @@ public record UnidadeResumoDTO(
         long usuariosAtivos,
         long totalFuncionarios,
         long totalFlanges,
-        long totalManutencoes) {
+        long totalManutencoes,
+        String criadoPorNome,
+        String criadoPorEmail) {
 }
