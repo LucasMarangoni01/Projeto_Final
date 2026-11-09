@@ -18,7 +18,7 @@
                     <a th:href="@{/flange/listagem}">Flanges</a>
                 </li>
 
-                <li>
+                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
                     <a th:href="@{/flange/cadastro}">Cadastrar Flange</a>
                 </li>
 
@@ -26,7 +26,7 @@
                     <a th:href="@{/funcionario/listagem}">Funcionários</a>
                 </li>
 
-                <li>
+                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
                     <a th:href="@{/funcionario/cadastro}">
                         Cadastrar Funcionário
                     </a>
@@ -40,7 +40,7 @@
 
                 <li>
                     <a th:href="@{/manutencao/cadastro}">
-                        Cadastrar Manutenção
+                        Registrar Manutenção
                     </a>
                 </li>
 
@@ -150,7 +150,8 @@
                             Listagem de Flanges
                         </a>
 
-                        <a th:href="@{/flange/cadastro}">
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/flange/cadastro}">
                             Cadastrar Flange
                         </a>
 
@@ -158,7 +159,8 @@
                             Listagem Funcionários
                         </a>
 
-                        <a th:href="@{/funcionario/cadastro}">
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/funcionario/cadastro}">
                             Cadastrar Funcionário
                         </a>
 
@@ -167,12 +169,17 @@
                         </a>
 
                         <a th:href="@{/manutencao/cadastro}">
-                            Cadastrar Manutenção
+                            Registrar Manutenção
                         </a>
 
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/usuarios}">
                             Usuários
+                        </a>
+
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/unidades}">
+                            Unidades
                         </a>
 
                         <a th:href="@{/perfil}">
