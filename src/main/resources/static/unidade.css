@@ -1151,3 +1151,17 @@
         width: auto;
     }
 }
+
+/* Separador visual entre os cards das unidades e o painel de filtro */
+@media (min-width: 901px) {
+    .unidade-sidebar {
+        border-left: 1px solid rgba(148,163,184,.22);
+        padding-left: 18px;
+    }
+}
+@media (max-width: 900px) {
+    .unidade-sidebar {
+        border-top: 1px solid rgba(148,163,184,.22);
+        padding-top: 16px;
+    }
+}
