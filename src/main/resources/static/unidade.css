@@ -682,3 +682,42 @@
         white-space: normal;
     }
 }
+
+/* Pesquisa de unidades com envio GET: funciona sem depender de JavaScript */
+.unidade-search-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: min(560px, 100%);
+    margin: 0;
+}
+.unidade-search-form .unidade-search {
+    flex: 1 1 280px;
+    width: auto;
+    min-width: 0;
+}
+.unidade-search-form .unidade-btn {
+    min-height: 40px;
+    flex: 0 0 auto;
+    padding: 9px 14px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+.unidade-search-submit { color: #dbeafe; }
+.unidade-search-clear { color: #d5dfef; }
+@media (max-width: 650px) {
+    .unidade-search-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        width: 100%;
+    }
+    .unidade-search-form .unidade-search {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+    .unidade-search-form .unidade-search-submit,
+    .unidade-search-form .unidade-search-clear {
+        width: 100%;
+    }
+}
