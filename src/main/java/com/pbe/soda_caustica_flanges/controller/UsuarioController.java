@@ -1,14 +1,17 @@
 package com.pbe.soda_caustica_flanges.controller;
 
+import com.pbe.soda_caustica_flanges.model.DadosProfissionaisDTO;
 import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.service.UnidadeService;
 import com.pbe.soda_caustica_flanges.service.UsuarioAuditoriaService;
 import com.pbe.soda_caustica_flanges.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,18 +54,49 @@ public class UsuarioController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(
+            @PathVariable Long id,
+            Model model,
+            @RequestParam(required = false) String sucesso,
+            @RequestParam(required = false) String erro) {
+
+        Usuario usuario = usuarioService.buscarPorId(id);
+        prepararEdicao(model, usuario);
+        model.addAttribute("sucessoDados", "dados".equals(sucesso));
+        model.addAttribute("erroDados", "dados".equals(erro));
+        return "usuario/editar";
+    }
+
+    @PostMapping("/alterar-dados-profissionais")
+    public String alterarDadosProfissionais(
+            @RequestParam Long id,
+            @Valid @ModelAttribute("dadosProfissionaisDTO") DadosProfissionaisDTO dados,
+            BindingResult result,
+            Authentication authentication,
+            Model model) {
+
         Usuario usuario = usuarioService.buscarPorId(id);
 
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("roles", Role.values());
-        model.addAttribute("unidades", unidadeService.listarAtivas());
-        model.addAttribute(
-                "historicoUsuario",
-                auditoriaService.buscarPorUsuario(usuario.getId())
-        );
+        if (result.hasErrors()) {
+            prepararEdicao(model, usuario);
+            model.addAttribute("dadosProfissionaisDTO", dados);
+            model.addAttribute("erroDados", true);
+            return "usuario/editar";
+        }
 
-        return "usuario/editar";
+        try {
+            usuarioService.alterarDadosProfissionais(
+                    id,
+                    dados,
+                    authentication.getName()
+            );
+            return "redirect:/usuarios/editar/" + id + "?sucesso=dados";
+        } catch (IllegalArgumentException e) {
+            prepararEdicao(model, usuario);
+            model.addAttribute("dadosProfissionaisDTO", dados);
+            model.addAttribute("mensagemErroDados", e.getMessage());
+            return "usuario/editar";
+        }
     }
 
     @PostMapping("/alterar-role")
@@ -106,5 +140,16 @@ public class UsuarioController {
         } catch (IllegalArgumentException e) {
             return "redirect:/usuarios?erro=status";
         }
+    }
+
+    private void prepararEdicao(Model model, Usuario usuario) {
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("roles", Role.values());
+        model.addAttribute("unidades", unidadeService.listarAtivas());
+        model.addAttribute("dadosProfissionaisDTO", new DadosProfissionaisDTO(usuario));
+        model.addAttribute(
+                "historicoUsuario",
+                auditoriaService.buscarPorUsuario(usuario.getId())
+        );
     }
 }
