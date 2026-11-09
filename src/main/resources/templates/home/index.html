@@ -499,7 +499,7 @@
                     Demonstração visual: alertas e alterações de status nesta tela são simulados no navegador e não substituem leituras de sensores reais.
                 </div>
             </div>
-            <div class="badge ok-b" id="badge">Sistema normal</div>
+            <div class="badge ok-b" id="badge">Simulação sem alerta</div>
         </div>
 
         <div class="body-row">
@@ -713,11 +713,11 @@
 
         <div class="legend-item">
             <div class="leg-circle" style="background:#22c55e;box-shadow:0 0 6px #22c55e;"></div>
-            <span><strong style="color:var(--text-primary)">Verde:</strong> Status Normal — sensor estável.</span>
+            <span><strong style="color:var(--text-primary)">Verde:</strong> Estado normal na simulação.</span>
         </div>
         <div class="legend-item">
             <div class="leg-circle" style="background:#ef4444;box-shadow:0 0 6px #ef4444;"></div>
-            <span><strong style="color:var(--text-primary)">Vermelho:</strong> Vazamento detectado (Alerta).</span>
+            <span><strong style="color:var(--text-primary)">Vermelho:</strong> Alerta de vazamento simulado.</span>
         </div>
         <div class="legend-item">
             <div class="leg-box" style="background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.5);"></div>
@@ -870,7 +870,7 @@
             led.setAttribute('fill', '#ef4444');
             led.setAttribute('stroke', '#b91c1c');
             if (drop) drop.setAttribute('opacity', '1');
-            addLog(`ALERTA: Vazamento detectado na Flange ${flangeName}`, true);
+            addLog(`SIMULAÇÃO: Alerta de vazamento na Flange ${flangeName}`, true);
             eventCount++;
             syncCard(n, true);
         } else {
@@ -913,12 +913,12 @@
         const badge = document.getElementById('badge');
         if (leaks > 0) {
             badge.className = 'badge al-b';
-            badge.textContent = 'Atenção: Vazamento';
+            badge.textContent = 'Simulação: alerta';
             document.getElementById('ts-v').textContent =
                 new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
         } else {
             badge.className = 'badge ok-b';
-            badge.textContent = 'Sistema normal';
+            badge.textContent = 'Simulação sem alerta';
         }
     }
 
