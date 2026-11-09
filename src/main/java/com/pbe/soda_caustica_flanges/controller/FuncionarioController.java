@@ -107,7 +107,7 @@ public class FuncionarioController {
 
     @PostMapping("/funcionario/excluir/{id}")
     public String excluir(@PathVariable Long id) {
-        if (manutencaoRepository.countByFuncionarioId(id) > 0) {
+        if (manutencaoRepository.countByFuncionario_Id(id) > 0) {
             return "redirect:/funcionario/listagem?erro=historico";
         }
 
