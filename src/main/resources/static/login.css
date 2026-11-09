@@ -918,3 +918,83 @@ body::before {
     }
 
 }
+
+/* =========================================================
+   ATALHO EXPERIMENTAL — LOGIN INSTANTÂNEO ADMIN
+========================================================= */
+.admin-login-shortcut {
+    margin: 0 0 20px;
+}
+.admin-shortcut-form {
+    width: 100%;
+    margin: 0;
+}
+.admin-shortcut-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 60px;
+    padding: 12px 14px;
+    border: 1px solid rgba(96,165,250,.38);
+    border-radius: 10px;
+    background: linear-gradient(110deg, rgba(37,99,235,.22), rgba(30,64,175,.10));
+    color: #eaf2ff;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.admin-shortcut-button:hover {
+    border-color: rgba(96,165,250,.72);
+    background: linear-gradient(110deg, rgba(37,99,235,.32), rgba(30,64,175,.17));
+    box-shadow: 0 8px 22px rgba(20,65,150,.18);
+    transform: translateY(-1px);
+}
+.admin-shortcut-button:focus-visible {
+    outline: 3px solid rgba(96,165,250,.35);
+    outline-offset: 3px;
+}
+.admin-shortcut-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border: 1px solid rgba(96,165,250,.28);
+    border-radius: 9px;
+    background: rgba(37,99,235,.22);
+    color: #bfdbfe;
+    font-size: 17px;
+}
+.admin-shortcut-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.admin-shortcut-copy strong {
+    color: #f1f6ff;
+    font-size: 12px;
+    font-weight: 800;
+}
+.admin-shortcut-copy small {
+    color: #9db7dc;
+    font-size: 10px;
+    line-height: 1.35;
+}
+.admin-shortcut-arrow {
+    color: #bfdbfe;
+    font-size: 19px;
+}
+.admin-shortcut-local-note {
+    margin: 7px 2px 0;
+    color: #7187a7;
+    font-size: 9px;
+    line-height: 1.4;
+}
+@media (prefers-reduced-motion: reduce) {
+    .admin-shortcut-button {
+        transition: none;
+    }
+}

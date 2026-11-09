@@ -635,7 +635,432 @@
             .dashboard-section-heading { align-items: flex-start; flex-direction: column; }
             .dashboard-data-source { text-align: left; }
         }
-</style>
+
+
+        /* ── Dashboard mobile-first refinements ─────────────────────── */
+        .map-card-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 10px;
+        }
+        .map-card-heading > div {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .map-card-heading strong {
+            color: var(--text-primary);
+            font-size: 12px;
+            line-height: 1.25;
+        }
+        .map-card-hint {
+            color: #8fa8c9;
+            font-size: 8px;
+            text-align: right;
+        }
+        .map-viewport {
+            width: 100%;
+            min-width: 0;
+        }
+        .flange-search {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 38px;
+            margin: 10px 10px 0;
+            padding: 0 10px;
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
+            background: rgba(0,0,0,.16);
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        .flange-search:focus-within {
+            border-color: rgba(96,165,250,.7);
+            box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+        }
+        .flange-search svg {
+            width: 15px;
+            height: 15px;
+            flex: 0 0 15px;
+            fill: none;
+            stroke: #91a8c8;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+        }
+        .flange-search input {
+            width: 100%;
+            min-width: 0;
+            height: 36px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 11px;
+        }
+        .flange-search input::placeholder { color: #8198b9; }
+        .flange-search kbd {
+            flex: 0 0 auto;
+            padding: 2px 5px;
+            border: 1px solid var(--border-strong);
+            border-radius: 4px;
+            color: #8fa8c9;
+            font-family: var(--font-mono);
+            font-size: 9px;
+        }
+        .flange-search-meta {
+            min-height: 18px;
+            padding: 4px 12px 0;
+            color: #8fa8c9;
+            font-size: 8px;
+        }
+        .fc-search-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 20px 12px;
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius-sm);
+            color: #dbeafe;
+            font-size: 10px;
+            text-align: center;
+        }
+        .fc-search-empty span {
+            color: #91a8c8;
+            font-size: 9px;
+        }
+        .dashboard-flange-card[hidden],
+        .fc-search-empty[hidden] {
+            display: none !important;
+        }
+
+        /* Tablet */
+        @media (max-width: 1050px) {
+            .body-row {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 12px;
+            }
+            .flange-panel { grid-row: 1; }
+            .map-card { grid-row: 2; }
+            .flange-list {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                max-height: none;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 760px) {
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .dash {
+                width: 100%;
+                max-width: 100%;
+                padding: 12px 12px max(22px, env(safe-area-inset-bottom));
+                gap: 12px;
+            }
+            .topbar {
+                align-items: flex-start;
+                gap: 10px;
+                padding-bottom: 12px;
+            }
+            .topbar-meta {
+                width: 100%;
+                min-width: 0;
+                gap: 4px;
+            }
+            .topbar-eyebrow {
+                font-size: 9px;
+                letter-spacing: .1em;
+            }
+            .topbar-title {
+                font-size: clamp(16px, 4.4vw, 19px);
+                line-height: 1.25;
+            }
+            .topbar-unit,
+            .topbar-sub {
+                font-size: 10px;
+                line-height: 1.45;
+                overflow-wrap: anywhere;
+            }
+            .dashboard-data-note {
+                margin-top: 5px;
+                font-size: 9px;
+                line-height: 1.5;
+            }
+            .badge {
+                align-self: flex-start;
+                height: 29px;
+                padding: 0 10px;
+                font-size: 8px;
+                letter-spacing: .06em;
+            }
+
+            /* Prioriza os dados e as flanges antes do desenho técnico. */
+            .dashboard-status-section { order: 2; }
+            .body-row { order: 3; }
+            .dashboard-log-section { order: 4; }
+            .dashboard-simulation-controls { order: 5; }
+            .dashboard-readonly-note { order: 6; }
+
+            .dashboard-section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 4px;
+                margin: 2px 0 8px;
+            }
+            .dashboard-section-heading h2 {
+                font-size: 14px;
+            }
+            .dashboard-data-source {
+                text-align: left;
+                font-size: 8px;
+            }
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 8px;
+            }
+            .sc {
+                min-width: 0;
+                padding: 11px 12px;
+                gap: 5px;
+                border-radius: 9px;
+            }
+            .sc:first-child { grid-column: 1 / -1; }
+            .sv { font-size: 23px; }
+            .sl {
+                font-size: 9px;
+                line-height: 1.3;
+            }
+
+            .body-row {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) !important;
+                align-items: start !important;
+                gap: 12px;
+            }
+            .flange-panel,
+            .map-card {
+                width: 100% !important;
+                min-width: 0;
+                border-radius: 12px;
+            }
+            .flange-panel { grid-row: 1; }
+            .map-card {
+                grid-row: 2;
+                padding: 10px;
+            }
+            .flange-panel-header {
+                min-height: 52px;
+                padding: 11px 13px;
+                gap: 8px;
+            }
+            .flange-panel-title {
+                font-size: 10px;
+                letter-spacing: .08em;
+            }
+            .flange-panel-header > div {
+                gap: 7px !important;
+            }
+            .flange-panel-count {
+                font-size: 9px;
+                text-align: right;
+                overflow-wrap: anywhere;
+            }
+            .btn-legend {
+                height: 30px;
+                padding: 0 9px;
+                font-size: 8px;
+            }
+            .flange-search {
+                min-height: 42px;
+                margin: 10px 10px 0;
+                padding: 0 11px;
+            }
+            .flange-search input {
+                height: 40px;
+                font-size: 12px;
+            }
+            .flange-search-meta {
+                padding: 5px 12px 0;
+                min-height: 19px;
+                font-size: 8px;
+            }
+            .flange-list {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 7px;
+                max-height: none !important;
+                min-height: 0;
+                padding: 8px;
+                overflow: visible;
+            }
+            .dashboard-flange-card {
+                display: grid;
+                grid-template-columns: 10px minmax(0, 1fr) auto;
+                align-items: start;
+                gap: 8px;
+                min-width: 0;
+                padding: 11px 10px;
+                border-radius: 8px;
+            }
+            .dashboard-flange-card .fc-dot {
+                width: 9px;
+                height: 9px;
+                margin-top: 4px;
+            }
+            .dashboard-flange-card .fc-info {
+                grid-column: 2;
+                grid-row: 1;
+                min-width: 0;
+            }
+            .dashboard-flange-card .fc-code {
+                font-size: 12px;
+                line-height: 1.3;
+                overflow-wrap: anywhere;
+            }
+            .dashboard-flange-card .fc-loc {
+                margin-top: 2px;
+                font-size: 10px;
+                line-height: 1.35;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+                overflow-wrap: anywhere;
+            }
+            .dashboard-flange-card .fc-details {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px 8px;
+                margin-top: 7px;
+                font-size: 9px;
+                line-height: 1.35;
+            }
+            .dashboard-flange-card .fc-pill {
+                grid-column: 3;
+                grid-row: 1;
+                justify-self: end;
+                align-self: start;
+                max-width: 100px;
+                padding: 4px 7px;
+                font-size: 8px;
+                line-height: 1.25;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+            .fc-empty,
+            .fc-search-empty {
+                padding: 18px 12px;
+                font-size: 10px;
+                line-height: 1.45;
+            }
+
+            .map-card-heading {
+                margin: 0 1px 9px;
+                align-items: flex-end;
+            }
+            .map-card-heading strong { font-size: 12px; }
+            .map-card-hint {
+                max-width: 125px;
+                font-size: 8px;
+                line-height: 1.35;
+            }
+            .map-viewport {
+                width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                border-radius: 8px;
+                overscroll-behavior-x: contain;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(96,165,250,.55) rgba(0,0,0,.15);
+                touch-action: pan-x pan-y;
+            }
+            .map-viewport::-webkit-scrollbar { height: 5px; }
+            .map-viewport::-webkit-scrollbar-track {
+                background: rgba(0,0,0,.16);
+                border-radius: 9px;
+            }
+            .map-viewport::-webkit-scrollbar-thumb {
+                background: rgba(96,165,250,.55);
+                border-radius: 9px;
+            }
+            .map-svg {
+                width: 650px;
+                min-width: 650px;
+                max-width: none;
+                height: auto;
+            }
+
+            .log-box {
+                max-height: 180px;
+                padding: 8px 10px;
+            }
+            .log-row {
+                align-items: flex-start;
+                gap: 8px;
+                font-size: 9px;
+                line-height: 1.45;
+            }
+            .lt { min-width: 48px; }
+            .dashboard-simulation-controls {
+                align-items: stretch;
+                gap: 7px;
+                padding: 10px;
+                border: 1px solid var(--border-strong);
+                border-radius: 10px;
+                background: rgba(16,40,140,.45);
+            }
+            .simulation-label,
+            .simulation-counter {
+                width: 100%;
+                font-size: 9px;
+                line-height: 1.4;
+            }
+            .dashboard-simulation-controls .btn {
+                flex: 1 1 calc(50% - 7px);
+                min-width: 0;
+                min-height: 39px;
+                height: auto;
+                padding: 8px 9px;
+                white-space: normal;
+                font-size: 10px;
+            }
+            .dashboard-readonly-note {
+                margin: 0;
+                padding: 9px 10px;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                font-size: 9px;
+                line-height: 1.5;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .dash { padding-left: 9px; padding-right: 9px; }
+            .flange-panel-header { padding-left: 10px; padding-right: 10px; }
+            .flange-panel-header > div { gap: 5px !important; }
+            .dashboard-flange-card { padding: 10px 9px; }
+            .dashboard-flange-card .fc-details { font-size: 8px; }
+            .map-svg { width: 620px; min-width: 620px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .fc,
+            .badge,
+            .btn {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        </style>
 </head>
 <body>
 
@@ -663,6 +1088,14 @@
         <div class="body-row">
 
             <div class="map-card">
+                <div class="map-card-heading">
+                    <div>
+                        <span class="topbar-eyebrow">VISÃO DA PLANTA</span>
+                        <strong>Mapa do processo</strong>
+                    </div>
+                    <span class="map-card-hint">Deslize para explorar</span>
+                </div>
+                <div class="map-viewport" tabindex="0" role="region" aria-label="Mapa horizontal da planta de flanges">
                 <svg class="map-svg" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
 
                     <rect x="0" y="0" width="860" height="340" rx="8" fill="#002456" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
@@ -822,6 +1255,7 @@
                     <text x="430" y="333" text-anchor="middle" font-size="7.5" fill="#8aa4c8" font-family="monospace">As posições representam somente flanges cadastradas nesta unidade</text>
 
                 </svg>
+                </div>
             </div>
 
             <div class="flange-panel">
@@ -833,6 +1267,19 @@
                               th:text="${'Cadastradas: ' + totalFlanges}">0 flanges</span>
                     </div>
                 </div>
+                <label class="flange-search" for="flangeSearch">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 4.5 4.5"></path>
+                    </svg>
+                    <input id="flangeSearch"
+                           type="search"
+                           placeholder="Buscar flange, local ou status..."
+                           autocomplete="off"
+                           aria-label="Buscar flange por nome, local ou status">
+                    <kbd>/</kbd>
+                </label>
+                <div class="flange-search-meta" id="flangeSearchMeta" aria-live="polite"></div>
                 <div class="flange-list" id="dynamic-flange-list">
                     <article class="fc dashboard-flange-card"
                              th:each="flange : ${flanges}"
@@ -861,7 +1308,11 @@
                         <strong>Nenhuma flange cadastrada nesta unidade.</strong>
                         <span>Cadastre uma flange para que ela apareça neste painel.</span>
                     </div>
-                    <div class="fc-overflow-note" th:if="${totalFlanges > 6}">
+                    <div class="fc-search-empty" id="flangeSearchEmpty" hidden>
+                        <strong>Nenhuma flange encontrada.</strong>
+                        <span>Tente outro nome, local ou status.</span>
+                    </div>
+                    <div class="fc-overflow-note" data-flange-overflow th:if="${totalFlanges > 6}">
                         O mapa mostra as seis primeiras posições. As demais flanges continuam listadas acima.
                     </div>
                 </div>
@@ -1080,6 +1531,59 @@
         updateStats();
     }
 
+    function normalizarBuscaFlange(valor) {
+        return (valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLocaleLowerCase('pt-BR');
+    }
+
+    function initializeFlangeSearch() {
+        const input = document.getElementById('flangeSearch');
+        const cards = Array.from(document.querySelectorAll('.dashboard-flange-card'));
+        const empty = document.getElementById('flangeSearchEmpty');
+        const meta = document.getElementById('flangeSearchMeta');
+        const overflow = document.querySelector('[data-flange-overflow]');
+
+        if (!input) return;
+
+        function filtrar() {
+            const termo = normalizarBuscaFlange(input.value.trim());
+            let visiveis = 0;
+
+            cards.forEach(function (card) {
+                const conteudo = normalizarBuscaFlange(card.innerText || card.textContent || '');
+                const corresponde = termo === '' || conteudo.includes(termo);
+                card.hidden = !corresponde;
+                if (corresponde) visiveis++;
+            });
+
+            if (empty) empty.hidden = termo === '' || visiveis > 0;
+            if (overflow) overflow.hidden = termo !== '';
+            if (meta) {
+                meta.textContent = termo === ''
+                    ? cards.length + (cards.length === 1 ? ' flange listada' : ' flanges listadas')
+                    : visiveis + (visiveis === 1 ? ' resultado' : ' resultados');
+            }
+        }
+
+        input.addEventListener('input', filtrar);
+        filtrar();
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === '/' && !event.ctrlKey && !event.metaKey
+                    && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                event.preventDefault();
+                input.focus();
+            }
+            if (event.key === 'Escape' && document.activeElement === input) {
+                input.value = '';
+                filtrar();
+                input.blur();
+            }
+        });
+    }
+
     function updateStats() {
         const contador = document.getElementById('lk-c');
         if (contador) contador.textContent = String(alertasSimulados.size);
@@ -1139,6 +1643,7 @@
             });
         }
         initializeFlangeData();
+        initializeFlangeSearch();
     });
 </script>
 

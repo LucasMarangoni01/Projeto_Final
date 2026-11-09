@@ -113,6 +113,9 @@ public class SecurityConfig {
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
 
+                        // Atalho de desenvolvimento: o próprio controller exige perfil dev e loopback.
+                        .requestMatchers(HttpMethod.POST, "/experimental/admin-login").permitAll()
+
                         // Operações do próprio perfil autenticado.
                         .requestMatchers("/perfil/**").authenticated()
 

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - hardening/stabilizacao-seguranca
+      - experimental/atalho-acesso-admin
   pull_request:
     branches:
       - main

@@ -38,11 +38,19 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         usuarioRepository.findByEmail(email).ifPresent(usuario -> {
             usuario.setUltimoAcesso(LocalDateTime.now());
             usuarioRepository.save(usuario);
+            boolean atalhoExperimental = Boolean.TRUE.equals(
+                    request.getAttribute("experimentalAdminShortcut")
+            );
+
             auditoriaService.registrar(
                     usuario,
                     usuario.getEmail(),
-                    "LOGIN_REALIZADO",
-                    "Acesso ao sistema realizado com sucesso."
+                    atalhoExperimental
+                            ? "LOGIN_ADMIN_ATALHO_EXPERIMENTAL"
+                            : "LOGIN_REALIZADO",
+                    atalhoExperimental
+                            ? "Sessão ADMIN iniciada pelo atalho experimental local."
+                            : "Acesso ao sistema realizado com sucesso."
             );
         });
 
