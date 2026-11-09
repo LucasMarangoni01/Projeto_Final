@@ -38,4 +38,11 @@ public class UnidadeAuditoriaService {
     public List<UnidadeAuditoria> buscarPorUnidade(Long unidadeId) {
         return repository.findTop30ByUnidadeIdOrderByDataEventoDesc(unidadeId);
     }
+
+    public java.util.Optional<UnidadeAuditoria> buscarEventoCriacao(Long unidadeId) {
+        return repository.findFirstByUnidadeIdAndAcaoOrderByDataEventoAsc(
+                unidadeId,
+                "UNIDADE_CRIADA"
+        );
+    }
 }
