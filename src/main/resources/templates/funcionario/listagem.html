@@ -41,7 +41,7 @@
             <div class="topbar-eyebrow">Recursos Humanos · Planta Industrial</div>
             <div class="topbar-title">Listagem de Funcionários</div>
         </div>
-        <a th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
+        <a th:if="${ehAdmin}" th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
     </div>
 
     <div th:if="${mensagem}" class="badge ok-b" style="margin-bottom: 24px;" th:text="${mensagem}"></div>
@@ -52,6 +52,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
+                <th>Unidade</th>
                 <th>Flange Designada</th>
                 <th>Idade</th>
                 <th>Nascimento</th>
@@ -62,10 +63,11 @@
             <tr th:each="f : ${funcionarios}">
                 <td th:text="${f.id}" style="font-family: var(--font-mono); color: var(--amber);"></td>
                 <td th:text="${f.nome_funcionario}" style="font-weight: 700;"></td>
+                <td th:text="${f.unidade != null ? f.unidade.nome : 'Sem unidade'}"></td>
                 <td><span class="fc-pill" th:text="${f.funcionario_flange}"></span></td>
                 <td th:text="${f.idade}"></td>
                 <td th:text="${#temporals.format(f.data_nascimento, 'dd/MM/yyyy')}"></td>
-                <td class="acoes-celula">
+                <td class="acoes-celula" th:if="${ehAdmin}">
                     <a th:href="@{/funcionario/alterar/{id}(id=${f.id})}" class="btn btn-alter" style="padding: 6px 12px; font-size: 0.8rem;">Alterar</a>
                     <form th:action="@{/funcionario/excluir/{id}(id=${f.id})}"
                           method="post"
@@ -76,6 +78,7 @@
                                 onclick="return confirm('Confirmar remoção do registro?')">Excluir</button>
                     </form>
                 </td>
+                <td th:unless="${ehAdmin}"><span class="badge">Somente leitura</span></td>
             </tr>
             </tbody>
         </table>
