@@ -136,6 +136,7 @@ public class UnidadeController {
                 "usuariosDisponiveis",
                 unidadeService.listarUsuariosDisponiveis()
         );
+        model.addAttribute("totalFuncionarios", unidadeService.contarFuncionarios(unidade.getId()));
         model.addAttribute("totalFlanges", unidadeService.contarFlanges(unidade.getId()));
         model.addAttribute("totalManutencoes", unidadeService.contarManutencoes(unidade.getId()));
         model.addAttribute("historicoUnidade", unidadeService.buscarHistorico(unidade.getId()));
