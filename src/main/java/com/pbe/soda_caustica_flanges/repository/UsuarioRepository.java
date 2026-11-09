@@ -17,6 +17,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findByUnidadeIsNullOrderByNomeAsc();
 
+    List<Usuario> findByUnidadeIsNullAndAtivoTrueOrderByNomeAsc();
+
     List<Usuario> findByNomeIgnoreCase(String nome);
 
     long countByUnidadeId(Long unidadeId);
