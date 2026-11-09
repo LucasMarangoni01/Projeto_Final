@@ -248,6 +248,32 @@
         </form>
         <p class="unidade-inactive-hint" th:if="${!unidade.ativo}">Reative a unidade para vincular novos ativos.</p>
 
+        <div class="unidade-available-users" th:if="${!#lists.isEmpty(flangesDisponiveis)}">
+            <strong>Flanges fora desta unidade</strong>
+            <p>Confira a unidade atual e transfira somente os ativos que realmente pertencem a esta planta.</p>
+        </div>
+        <div class="unidade-members-list" th:if="${!#lists.isEmpty(flangesDisponiveis)}">
+            <article class="unidade-member-row" th:each="flangeExterna : ${flangesDisponiveis}">
+                <div class="unidade-member-avatar">F</div>
+                <div class="unidade-member-info">
+                    <strong th:text="${flangeExterna.nome_flange}">Nome da flange</strong>
+                    <span th:text="${'ID #' + flangeExterna.id + ' · ' + flangeExterna.localizacao}">ID · Localização</span>
+                    <div class="unidade-member-tags">
+                        <span th:text="${flangeExterna.unidade != null ? 'Unidade atual: ' + flangeExterna.unidade.nome : 'SEM UNIDADE'}">Unidade atual</span>
+                        <span th:text="${flangeExterna.status != null ? flangeExterna.status : 'NORMAL'}">NORMAL</span>
+                    </div>
+                </div>
+                <form th:action="@{/unidades/adicionar-flange}" method="post">
+                    <input type="hidden" name="unidadeId" th:value="${unidade.id}">
+                    <input type="hidden" name="identificador" th:value="${'#' + flangeExterna.id}">
+                    <button type="submit" class="unidade-btn unidade-btn-primary"
+                            onclick="return confirm('Transferir esta flange para esta unidade? O histórico de manutenção acompanha o cadastro da flange. Confirme que o ativo realmente pertence a esta planta.')">
+                        Transferir para esta unidade
+                    </button>
+                </form>
+            </article>
+        </div>
+
         <div class="unidade-members-list">
             <article class="unidade-member-row" th:each="flange : ${flangesVinculadas}">
                 <div class="unidade-member-avatar">F</div>
