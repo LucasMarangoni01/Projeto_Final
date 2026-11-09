@@ -110,16 +110,12 @@
                    class="mobile-user">
 
                     <div class="user-avatar">
-
-                        <svg viewBox="0 0 24 24"
-                             aria-hidden="true">
-                            <circle cx="12"
-                                    cy="8"
-                                    r="3.2"></circle>
-
-                            <path d="M5.5 20c.6-4 3-6 6.5-6s5.9 2 6.5 6"></path>
-                        </svg>
-
+                        <img th:if="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                             alt="Foto de perfil">
+                        <img th:unless="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/img/avatar-default.svg}"
+                             alt="Ícone padrão de perfil">
                     </div>
 
                     <div class="user-info-text">
