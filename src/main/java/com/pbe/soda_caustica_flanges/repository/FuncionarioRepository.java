@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> {
 
-    List<Funcionario> findByUnidadeIdOrderByNomeFuncionarioAsc(Long unidadeId);
+    List<Funcionario> findByUnidadeIdOrderByIdAsc(Long unidadeId);
 
     long countByUnidadeId(Long unidadeId);
 }
