@@ -21,6 +21,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findByUnidadeIsNullAndAtivoTrueOrderByNomeAsc();
 
+    List<Usuario> findByUnidadeIsNullAndAtivoTrueAndRoleOrderByNomeAsc(Role role);
+
     List<Usuario> findByNomeIgnoreCase(String nome);
 
     long countByUnidadeId(Long unidadeId);
