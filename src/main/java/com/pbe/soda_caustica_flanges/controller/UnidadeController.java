@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/unidades")
@@ -154,7 +155,8 @@ public class UnidadeController {
     public String adicionarFlange(
             @RequestParam Long unidadeId,
             @RequestParam String identificador,
-            Authentication authentication) {
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         try {
             unidadeService.adicionarFlange(
                     unidadeId,
@@ -163,6 +165,7 @@ public class UnidadeController {
             );
             return "redirect:/unidades/editar/" + unidadeId + "?sucesso=flange-adicionada";
         } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erroDetalhe", e.getMessage());
             return "redirect:/unidades/editar/" + unidadeId + "?erro=flange";
         }
     }
