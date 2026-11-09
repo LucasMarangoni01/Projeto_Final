@@ -189,7 +189,7 @@
                         onclick="return confirm('Remover definitivamente esta unidade? Esta ação não pode ser desfeita.')">Excluir definitivamente</button>
             </form>
             <span class="unidade-delete-blocked"
-                  th:unless="${#lists.isEmpty(usuariosVinculados) and totalFlanges == 0}">Exclusão bloqueada: há vínculos ou ativos históricos.</span>
+                  th:unless="${#lists.isEmpty(usuariosVinculados) and totalFuncionarios == 0 and totalFlanges == 0}">Exclusão bloqueada: há contas, funcionários ou ativos históricos.</span>
         </div>
     </section>
 </main>
