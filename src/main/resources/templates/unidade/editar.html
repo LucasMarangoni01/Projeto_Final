@@ -32,7 +32,9 @@
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erro != null}">
         <span>!</span>
-        <span th:text="${erro == 'pessoa' ? 'Não foi possível vincular ou desvincular a conta. Confira o ID, o nome e o vínculo atual.' : (erro == 'funcionario' ? 'Não foi possível vincular ou desvincular o funcionário. Confira o ID, o nome e o vínculo atual.' : (erro == 'flange' ? 'Não foi possível vincular a flange. Confira o ID, o nome e se ela já pertence a outra unidade.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.')))}">Erro.</span>
+        <span th:if="${erroDetalhe != null}" th:text="${erroDetalhe}">Não foi possível concluir a operação.</span>
+        <span th:unless="${erroDetalhe != null}"
+              th:text="${erro == 'pessoa' ? 'Não foi possível vincular ou desvincular a conta. Confira o ID, o nome e o vínculo atual.' : (erro == 'funcionario' ? 'Não foi possível vincular ou desvincular o funcionário. Confira o ID, o nome e o vínculo atual.' : (erro == 'flange' ? 'Não foi possível vincular a flange. Confira o ID, o nome e o vínculo atual.' : (erro == 'exclusao' ? 'Não é possível remover uma unidade que possui pessoas ou ativos vinculados. Arquive-a para preservar o histórico.' : 'Não foi possível concluir a operação.')))}">Erro.</span>
     </div>
     <div class="unidade-feedback unidade-feedback-error" th:if="${erroSalvar != null}" th:text="${erroSalvar}"></div>
 
