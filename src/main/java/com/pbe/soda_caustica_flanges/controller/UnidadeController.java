@@ -22,23 +22,79 @@ public class UnidadeController {
     }
 
     @GetMapping
-    public String listar(Model model,
-                         @RequestParam(required = false) String sucesso,
-                         @RequestParam(required = false) String erro) {
-        var resumos = unidadeService.listarResumos();
-        model.addAttribute("unidadesResumo", resumos);
-        model.addAttribute("totalUnidadesAtivas", resumos.stream()
+    public String listar(
+            Model model,
+            @RequestParam(required = false) String sucesso,
+            @RequestParam(required = false) String erro,
+            @RequestParam(required = false) String busca) {
+
+        // Os indicadores gerais continuam considerando todas as unidades.
+        var todasUnidades = unidadeService.listarResumos();
+        String termo = normalizarBusca(busca);
+
+        var unidadesFiltradas = termo.isBlank()
+                ? todasUnidades
+                : todasUnidades.stream()
+                        .filter(resumo -> correspondeBusca(resumo, termo))
+                        .toList();
+
+        model.addAttribute("unidadesResumo", unidadesFiltradas);
+        model.addAttribute("busca", busca == null ? "" : busca);
+        model.addAttribute("totalUnidadesAtivas", todasUnidades.stream()
                 .filter(resumo -> resumo.unidade().isAtivo())
                 .count());
-        model.addAttribute("totalUsuariosCadastrados", resumos.stream()
+        model.addAttribute("totalUsuariosCadastrados", todasUnidades.stream()
                 .mapToLong(resumo -> resumo.totalUsuarios())
                 .sum());
-        model.addAttribute("totalFuncionariosCadastrados", resumos.stream()
+        model.addAttribute("totalFuncionariosCadastrados", todasUnidades.stream()
                 .mapToLong(resumo -> resumo.totalFuncionarios())
                 .sum());
         model.addAttribute("sucesso", sucesso);
         model.addAttribute("erro", erro);
         return "unidade/listagem";
+    }
+
+    private boolean correspondeBusca(
+            com.pbe.soda_caustica_flanges.model.UnidadeResumoDTO resumo,
+            String termoNormalizado) {
+
+        Unidade unidade = resumo.unidade();
+        String dados = String.join(" ",
+                valorBusca(unidade.getId()),
+                valorBusca(unidade.getNome()),
+                valorBusca(unidade.getCodigo()),
+                valorBusca(unidade.getLocalizacao()),
+                valorBusca(unidade.getResponsavel()),
+                valorBusca(unidade.getTelefoneContato()),
+                valorBusca(unidade.getEmailContato()),
+                valorBusca(unidade.getDescricao()),
+                valorBusca(resumo.criadoPorNome()),
+                valorBusca(resumo.criadoPorEmail()),
+                valorBusca(resumo.totalUsuarios()),
+                valorBusca(resumo.totalFuncionarios()),
+                valorBusca(resumo.totalFlanges()),
+                valorBusca(resumo.totalManutencoes()),
+                unidade.isAtivo() ? "ativa ativo" : "arquivada inativa"
+        );
+
+        return normalizarBusca(dados).contains(termoNormalizado);
+    }
+
+    private String valorBusca(Object valor) {
+        return valor == null ? "" : valor.toString();
+    }
+
+    private String normalizarBusca(String valor) {
+        if (valor == null || valor.isBlank()) {
+            return "";
+        }
+
+        return java.text.Normalizer.normalize(
+                        valor.trim(),
+                        java.text.Normalizer.Form.NFD
+                )
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase(java.util.Locale.ROOT);
     }
 
     @GetMapping("/cadastro")
