@@ -44,7 +44,7 @@ public class FuncionarioController {
         } else if (usuario.getUnidade() == null) {
             funcionarios = Collections.emptyList();
         } else {
-            funcionarios = funcionarioRepository.findByUnidadeIdOrderByNomeFuncionarioAsc(
+            funcionarios = funcionarioRepository.findByUnidadeIdOrderByIdAsc(
                     usuario.getUnidade().getId()
             );
         }
@@ -69,7 +69,7 @@ public class FuncionarioController {
             Model model) {
 
         if (unidadeId == null) {
-            result.rejectValue("unidade", "unidade.obrigatoria", "Selecione a unidade do funcionário.");
+            result.reject("unidade.obrigatoria", "Selecione a unidade do funcionário.");
         }
 
         Unidade unidade = unidadeId == null
@@ -77,7 +77,7 @@ public class FuncionarioController {
                 : unidadeRepository.findById(unidadeId).orElse(null);
 
         if (unidade == null || !unidade.isAtivo()) {
-            result.rejectValue("unidade", "unidade.invalida", "Selecione uma unidade ativa.");
+            result.reject("unidade.invalida", "Selecione uma unidade ativa.");
         }
 
         if (result.hasErrors()) {
