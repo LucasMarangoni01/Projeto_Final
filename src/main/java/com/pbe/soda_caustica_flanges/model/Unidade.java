@@ -1,7 +1,7 @@
 package com.pbe.soda_caustica_flanges.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -37,8 +37,9 @@ public class Unidade {
     @Column(name = "telefone_contato", length = 25)
     private String telefoneContato;
 
-    @Email(message = "Informe um e-mail de contato válido.")
     @Size(max = 120, message = "O e-mail deve ter no máximo 120 caracteres.")
+    @Pattern(regexp = "^$|^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$",
+            message = "Informe um e-mail de contato válido.")
     @Column(name = "email_contato", length = 120)
     private String emailContato;
 
@@ -49,10 +50,10 @@ public class Unidade {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    @Column(name = "criado_em", nullable = false)
+    @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
-    @Column(name = "atualizado_em", nullable = false)
+    @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
     public Unidade() {
