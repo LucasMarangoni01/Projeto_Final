@@ -478,7 +478,164 @@
             .flange-list { grid-template-columns: 1fr; }
             .btn { flex: 1 1 auto; justify-content: center; }
         }
-    </style>
+    
+        /* ── Dashboard restoration and responsive data layout ───────── */
+        .dash { overflow: visible; min-height: 0; }
+        .body-row {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 300px) !important;
+            align-items: stretch !important;
+            width: 100%;
+            min-width: 0;
+        }
+        .map-card { min-width: 0; width: 100%; }
+        .flange-panel {
+            display: flex !important;
+            visibility: visible !important;
+            width: auto !important;
+            min-width: 0;
+            min-height: 100%;
+            align-self: stretch;
+        }
+        .flange-list {
+            display: flex !important;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 470px;
+            min-height: 130px;
+            overflow-y: auto;
+        }
+        .dashboard-flange-card {
+            align-items: flex-start;
+            min-width: 0;
+            gap: 9px;
+            cursor: default;
+        }
+        .dashboard-flange-card .fc-info { min-width: 0; flex: 1; }
+        .dashboard-flange-card .fc-code { overflow-wrap: anywhere; }
+        .fc-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 6px;
+            color: #91a8c8;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            line-height: 1.4;
+        }
+        .fc-pill {
+            flex-shrink: 0;
+            max-width: 95px;
+            white-space: normal;
+            text-align: center;
+        }
+        .fc-status-normal { color: #86efac; }
+        .fc-status-warning { color: #fcd34d; }
+        .fc-status-critical { color: #fca5a5; }
+        .fc-status-maintenance { color: #93c5fd; }
+        .fc-status-simulated {
+            border-color: rgba(239,68,68,.35) !important;
+            background: rgba(239,68,68,.12) !important;
+            color: #fecaca !important;
+        }
+        .fc-simulated-alert { border-color: rgba(239,68,68,.42) !important; }
+        .fc-empty {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 18px 12px;
+            color: #dbeafe;
+            font-size: 10px;
+            text-align: center;
+        }
+        .fc-empty span { color: #91a8c8; font-size: 9px; }
+        .fc-overflow-note {
+            padding: 8px 10px;
+            border-top: 1px solid var(--border);
+            color: #91a8c8;
+            font-size: 8px;
+            line-height: 1.45;
+        }
+        .topbar-unit {
+            color: #9bb6da;
+            font-size: 9px;
+        }
+        .dashboard-status-section, .dashboard-log-section {
+            display: block !important;
+            width: 100%;
+            min-width: 0;
+            visibility: visible !important;
+        }
+        .dashboard-section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px;
+            margin: 4px 0 10px;
+        }
+        .dashboard-section-heading h2 {
+            margin-top: 3px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .dashboard-data-source {
+            color: #8fa8c9;
+            font-size: 8px;
+            text-align: right;
+        }
+        .stats {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: var(--gap-sm);
+            width: 100%;
+            visibility: visible !important;
+        }
+        .status-normal-number { color: #86efac !important; }
+        .status-warning-number { color: #fcd34d !important; }
+        .status-critical-number { color: #fca5a5 !important; }
+        .status-maintenance-number { color: #93c5fd !important; }
+        .dashboard-log-section .log-box {
+            display: block !important;
+            width: 100%;
+            min-height: 58px;
+            max-height: 150px;
+            visibility: visible !important;
+        }
+        .dashboard-simulation-controls {
+            display: flex !important;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+            visibility: visible !important;
+        }
+        .simulation-label, .simulation-counter {
+            color: #9bb6da;
+            font-size: 9px;
+        }
+        .simulation-counter strong { color: #fca5a5; }
+        .dashboard-readonly-note {
+            display: block !important;
+            margin-top: 4px;
+            color: #9bb6da;
+            font-size: 9px;
+            line-height: 1.5;
+        }
+        @media (max-width: 1050px) {
+            .body-row { grid-template-columns: minmax(0, 1fr) !important; }
+            .flange-panel { width: 100% !important; }
+            .flange-list {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                max-height: none;
+            }
+            .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 600px) {
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .dashboard-section-heading { align-items: flex-start; flex-direction: column; }
+            .dashboard-data-source { text-align: left; }
+        }
+</style>
 </head>
 <body>
 
@@ -491,6 +648,7 @@
             <div class="topbar-meta">
                 <div class="topbar-eyebrow">Sistema de Monitoramento · NaOH 32%</div>
                 <div class="topbar-title">Planta de Flanges — Soda Cáustica</div>
+                <div class="topbar-unit" th:text="${'Unidade: ' + nomeUnidade}">Unidade</div>
                 <div class="topbar-sub"
                      th:text="${'Painel operacional · ' + totalFlanges + ' flange(s) cadastrada(s) · estados demonstrativos'}">
                     Painel operacional · estados demonstrativos
@@ -661,7 +819,7 @@
                         <text x="691" y="340" text-anchor="middle" font-size="8.5" fill="#ef4444" font-weight="700" class="blink" font-family="monospace">VAZAMENTO</text>
                     </g>
 
-                    <text x="430" y="333" text-anchor="middle" font-size="7.5" fill="#4e596b" font-family="monospace">clique em uma flange para simular acionamento do sensor</text>
+                    <text x="430" y="333" text-anchor="middle" font-size="7.5" fill="#8aa4c8" font-family="monospace">As posições representam somente flanges cadastradas nesta unidade</text>
 
                 </svg>
             </div>
@@ -672,35 +830,85 @@
                     <div style="display:flex;align-items:center;gap:8px;">
                         <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
                         <span class="flange-panel-count"
-                              th:text="${totalFlanges > 6 ? '6 posições · ' + totalFlanges + ' cadastradas' : totalFlanges + ' flange(s) cadastrada(s)'}">0 flanges</span>
+                              th:text="${'Cadastradas: ' + totalFlanges}">0 flanges</span>
                     </div>
                 </div>
-                <!-- O painel lateral gerado dinamicamente via JS e Thymeleaf -->
                 <div class="flange-list" id="dynamic-flange-list">
+                    <article class="fc dashboard-flange-card"
+                             th:each="flange : ${flanges}"
+                             th:id="${flange.posicao > 0 ? 'fc' + flange.posicao : 'fc-extra-' + flange.id}"
+                             th:attr="data-flange-id=${flange.id},data-posicao=${flange.posicao},data-status=${flange.status}">
+                        <div class="fc-dot"
+                             th:id="${flange.posicao > 0 ? 'fcdot' + flange.posicao : 'fcdot-extra-' + flange.id}"></div>
+                        <div class="fc-info">
+                            <div class="fc-code"
+                                 th:text="${flange.nomeFlange}">Nome da flange</div>
+                            <div class="fc-loc"
+                                 th:text="${flange.localizacao}"
+                                 th:title="${flange.localizacao}">Localização</div>
+                            <div class="fc-details">
+                                <span th:text="${'ID #' + flange.id}">ID</span>
+                                <span th:text="${flange.temperaturaAmbiente != null ? #numbers.formatDecimal(flange.temperaturaAmbiente, 1, 1) + ' °C' : 'Temperatura não informada'}">Temperatura</span>
+                                <span th:text="${'Entrada: ' + flange.dataEntrada}">Data de entrada</span>
+                            </div>
+                        </div>
+                        <div class="fc-pill"
+                             th:id="${flange.posicao > 0 ? 'fcpill' + flange.posicao : 'fcpill-extra-' + flange.id}"
+                             th:classappend="${flange.status == 'CRITICO' ? ' fc-status-critical' : (flange.status == 'ATENCAO' ? ' fc-status-warning' : (flange.status == 'MANUTENCAO' ? ' fc-status-maintenance' : ' fc-status-normal'))}"
+                             th:text="${flange.status == 'CRITICO' ? 'Crítico' : (flange.status == 'ATENCAO' ? 'Atenção' : (flange.status == 'MANUTENCAO' ? 'Manutenção' : 'Normal'))}">Normal</div>
+                    </article>
+                    <div class="fc-empty" th:if="${#lists.isEmpty(flanges)}">
+                        <strong>Nenhuma flange cadastrada nesta unidade.</strong>
+                        <span>Cadastre uma flange para que ela apareça neste painel.</span>
+                    </div>
+                    <div class="fc-overflow-note" th:if="${totalFlanges > 6}">
+                        O mapa mostra as seis primeiras posições. As demais flanges continuam listadas acima.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="sc"><div class="sv" id="ok-c" th:text="${totalFlanges > 6 ? 6 : totalFlanges}">0</div><div class="sl">Posições sem alerta simulado</div></div>
-            <div class="sc"><div class="sv" style="color:var(--alert-red)" id="lk-c">0</div><div class="sl">Simulações em alerta</div></div>
-            <div class="sc"><div class="sv" id="ev-c">0</div><div class="sl">Eventos simulados</div></div>
-            <div class="sc"><div class="sv" id="ts-v" style="font-size:clamp(16px,2vw,22px)">--:--</div><div class="sl">Último alerta</div></div>
-        </div>
-
-        <div class="log-box" id="log">
-            <div class="log-row">
-                <span class="lt" id="t0"></span>
-                <span th:text="${'Painel demonstrativo iniciado — ' + totalFlanges + ' flange(s) cadastrada(s).'}">Painel demonstrativo iniciado.</span>
+        <section class="dashboard-status-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <span class="topbar-eyebrow">DADOS SALVOS NO BANCO</span>
+                    <h2>Status das flanges</h2>
+                </div>
+                <span class="dashboard-data-source">Atualizado a cada carregamento</span>
             </div>
-        </div>
+            <div class="stats">
+                <div class="sc"><div class="sv" th:text="${totalFlanges}">0</div><div class="sl">Total cadastradas</div></div>
+                <div class="sc"><div class="sv status-normal-number" th:text="${totalNormais}">0</div><div class="sl">Normais</div></div>
+                <div class="sc"><div class="sv status-warning-number" th:text="${totalAtencao}">0</div><div class="sl">Em atenção</div></div>
+                <div class="sc"><div class="sv status-critical-number" th:text="${totalCriticas}">0</div><div class="sl">Críticas</div></div>
+                <div class="sc"><div class="sv status-maintenance-number" th:text="${totalManutencao}">0</div><div class="sl">Em manutenção</div></div>
+            </div>
+        </section>
 
-        <div class="btns" th:if="${ehAdmin}">
-            <button class="btn" onclick="simLeak()">Simular vazamento</button>
-            <button class="btn btn-danger" onclick="resetAll()">Resetar simulações</button>
+        <section class="dashboard-log-section">
+            <div class="dashboard-section-heading">
+                <div>
+                    <span class="topbar-eyebrow">SESSÃO ATUAL</span>
+                    <h2>Atividade de simulação</h2>
+                </div>
+                <span class="dashboard-data-source">Não altera os registros do banco</span>
+            </div>
+            <div class="log-box" id="log">
+                <div class="log-row">
+                    <span class="lt" id="t0"></span>
+                    <span th:text="${'Dashboard carregado com ' + totalFlanges + ' flange(s) cadastrada(s) nesta unidade.'}">Dashboard carregado.</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="btns dashboard-simulation-controls" th:if="${ehAdmin}">
+            <span class="simulation-label">Ferramentas demonstrativas (somente navegador):</span>
+            <button class="btn" type="button" onclick="simLeak()" th:disabled="${#lists.isEmpty(flangesMapa)}">Simular alerta</button>
+            <button class="btn btn-danger" type="button" onclick="resetAll()">Limpar simulações</button>
+            <span class="simulation-counter">Alertas simulados: <strong id="lk-c">0</strong></span>
         </div>
         <p class="dashboard-readonly-note" th:unless="${ehAdmin}">
-            Modo de consulta: os controles de simulação estão disponíveis somente para ADMIN.
+            Modo de consulta: os status acima são os valores salvos no banco. Os controles demonstrativos ficam disponíveis somente para ADMIN.
         </p>
 
     </div>
@@ -737,227 +945,192 @@
 <div th:replace="~{/fragments/footer.html :: footer}"></div>
 
 <script th:inline="javascript">
-    /* ── Arquitetura de Dados: Integração com Backend (Spring Boot/Thymeleaf) ─────────────── */
-    // O Thymeleaf irá injetar a lista de flanges que você cadastrou no BD diretamente aqui.
-    /*<![CDATA[*/
-    const flangesDB = /*[[${flanges}]]*/ [];
-    const podeSimular = /*[[${ehAdmin}]]*/ false;
+    const flangesMapa = /*[[${flangesMapa}]]*/ [];
+    const podeSimular = /*[[\${ehAdmin}]]*/ false;
 
-    // Função para puxar o dado do BD (caso exista) ou usar um valor padrão (caso aquele slot não tenha sido cadastrado ainda)
-    function getFlangeData(index) {
-        if (!Array.isArray(flangesDB) || !flangesDB[index]) {
-            return null;
-        }
+    // Somente DTOs simples são enviados ao navegador. Nenhuma entidade JPA é serializada.
+    const FLANGE_CONFIG = Array.isArray(flangesMapa)
+        ? flangesMapa.map(function (flange) {
+            return {
+                id: Number(flange.posicao),
+                databaseId: flange.id,
+                name: flange.nomeFlange,
+                location: flange.localizacao,
+                temperature: flange.temperaturaAmbiente,
+                entryDate: flange.dataEntrada,
+                status: flange.status || 'NORMAL'
+            };
+        }).filter(function (flange) {
+            return Number.isInteger(flange.id) && flange.id >= 1 && flange.id <= 6;
+        })
+        : [];
 
-        return {
-            // A numeração identifica a posição fixa no SVG, não substitui o ID real do banco.
-            id: index + 1,
-            databaseId: flangesDB[index].id,
-            name: flangesDB[index].nome_flange || 'Flange sem nome',
-            location: flangesDB[index].localizacao || 'Localização não informada'
-        };
+    const STATUS_STYLE = {
+        NORMAL: { color: '#22c55e', stroke: '#16a34a', label: 'Normal' },
+        ATENCAO: { color: '#f59e0b', stroke: '#d97706', label: 'Atenção' },
+        CRITICO: { color: '#ef4444', stroke: '#b91c1c', label: 'Crítico' },
+        MANUTENCAO: { color: '#60a5fa', stroke: '#2563eb', label: 'Manutenção' }
+    };
+    const alertasSimulados = new Set();
+
+    function toggleLegend(show) {
+        const modal = document.getElementById('legendModal');
+        if (modal) modal.style.display = show ? 'flex' : 'none';
     }
 
-    // O painel físico possui seis posições. Somente registros reais são exibidos.
-    const FLANGE_CONFIG = [
-        getFlangeData(0),
-        getFlangeData(1),
-        getFlangeData(2),
-        getFlangeData(3),
-        getFlangeData(4),
-        getFlangeData(5)
-    ].filter(Boolean);
-    /*]]>*/
+    function statusDaFlange(flange) {
+        return STATUS_STYLE[flange.status] || STATUS_STYLE.NORMAL;
+    }
 
-    /* ── Renderização Dinâmica Inicial ──────────────────────────────── */
+    function atualizarVisualDaFlange(flange) {
+        const status = statusDaFlange(flange);
+        const simulado = alertasSimulados.has(flange.id);
+        const led = document.getElementById('led' + flange.id);
+        const drop = document.getElementById('drop' + flange.id);
+        const dot = document.getElementById('fcdot' + flange.id);
+        const pill = document.getElementById('fcpill' + flange.id);
+        const card = document.getElementById('fc' + flange.id);
+
+        const cor = simulado ? '#ef4444' : status.color;
+        const borda = simulado ? '#b91c1c' : status.stroke;
+
+        if (led) {
+            led.setAttribute('fill', cor);
+            led.setAttribute('stroke', borda);
+        }
+        if (drop) drop.setAttribute('opacity', simulado ? '1' : '0');
+        if (dot) {
+            dot.style.background = cor;
+            dot.style.boxShadow = '0 0 0 3px ' + (simulado ? 'rgba(239,68,68,.2)' : 'rgba(34,197,94,.15)');
+        }
+        if (pill) {
+            pill.textContent = simulado ? 'Alerta simulado' : status.label;
+            pill.classList.toggle('fc-status-simulated', simulado);
+        }
+        if (card) card.classList.toggle('fc-simulated-alert', simulado);
+    }
+
     function initializeFlangeData() {
-        const listContainer = document.getElementById('dynamic-flange-list');
-        listContainer.innerHTML = '';
+        const porPosicao = new Map(FLANGE_CONFIG.map(function (flange) {
+            return [flange.id, flange];
+        }));
 
-        const idsDisponiveis = new Set(FLANGE_CONFIG.map(flange => flange.id));
-
-        // Oculta posições do desenho que não possuem flange cadastrada.
         for (let i = 1; i <= 6; i++) {
             const grupo = document.getElementById('fg' + i);
+            const flange = porPosicao.get(i);
             if (!grupo) continue;
 
-            if (!idsDisponiveis.has(i)) {
+            if (!flange) {
                 grupo.style.display = 'none';
                 grupo.removeAttribute('onclick');
-            } else if (!podeSimular) {
+                continue;
+            }
+
+            grupo.style.display = '';
+            const titulo = document.getElementById('svg-title-' + i);
+            const local = document.getElementById('svg-loc-' + i);
+            if (titulo) titulo.textContent = flange.name;
+            if (local) local.textContent = flange.location;
+
+            if (podeSimular) {
+                grupo.style.cursor = 'pointer';
+            } else {
                 grupo.removeAttribute('onclick');
                 grupo.style.cursor = 'default';
             }
-        }
 
-        if (FLANGE_CONFIG.length === 0) {
-            const vazio = document.createElement('div');
-            vazio.className = 'fc-empty';
-            vazio.textContent = 'Nenhuma flange cadastrada para esta unidade.';
-            listContainer.appendChild(vazio);
-        }
+            atualizarVisualDaFlange(flange);
 
-        FLANGE_CONFIG.forEach(flange => {
-            const svgTitle = document.getElementById('svg-title-' + flange.id);
-            const svgLoc = document.getElementById('svg-loc-' + flange.id);
-            if (svgTitle) svgTitle.textContent = flange.name;
-            if (svgLoc) svgLoc.textContent = flange.location;
-
-            const card = document.createElement('div');
-            card.className = 'fc';
-            card.id = 'fc' + flange.id;
-
-            if (podeSimular) {
+            const card = document.getElementById('fc' + i);
+            if (card && podeSimular) {
                 card.addEventListener('click', function () {
-                    toggleLeak(flange.id);
+                    toggleLeak(i);
                 });
                 card.style.cursor = 'pointer';
-            } else {
-                card.style.cursor = 'default';
             }
-
-            const dot = document.createElement('div');
-            dot.className = 'fc-dot';
-            dot.id = 'fcdot' + flange.id;
-
-            const info = document.createElement('div');
-            info.className = 'fc-info';
-
-            const code = document.createElement('div');
-            code.className = 'fc-code';
-            code.textContent = flange.name;
-
-            const location = document.createElement('div');
-            location.className = 'fc-loc';
-            location.title = flange.location;
-            location.textContent = flange.location;
-
-            info.appendChild(code);
-            info.appendChild(location);
-
-            const pill = document.createElement('div');
-            pill.className = 'fc-pill';
-            pill.id = 'fcpill' + flange.id;
-            pill.textContent = 'Normal';
-
-            card.appendChild(dot);
-            card.appendChild(info);
-            card.appendChild(pill);
-            listContainer.appendChild(card);
-        });
-    }
-
-    /* ── Legend ─────────────────────────────────────────────────────── */
-    function toggleLegend(show) {
-        document.getElementById('legendModal').style.display = show ? 'flex' : 'none';
-    }
-
-    /* ── Monitoring logic ───────────────────────────────────────────── */
-    let eventCount = 0;
-
-    function toggleLeak(n) {
-        if (!podeSimular || !FLANGE_CONFIG.some(flange => flange.id === n)) return;
-
-        const led  = document.getElementById('led'  + n);
-        const drop = document.getElementById('drop' + n);
-        const isCurrentlyNormal = led.getAttribute('fill') === '#22c55e';
-
-        // Busca o nome do flange na configuração central para os Logs
-        const flangeData = FLANGE_CONFIG.find(f => f.id === n);
-        const flangeName = flangeData ? flangeData.name : `F-0${n}`;
-
-        if (isCurrentlyNormal) {
-            led.setAttribute('fill', '#ef4444');
-            led.setAttribute('stroke', '#b91c1c');
-            if (drop) drop.setAttribute('opacity', '1');
-            addLog(`SIMULAÇÃO: Alerta de vazamento na Flange ${flangeName}`, true);
-            eventCount++;
-            syncCard(n, true);
-        } else {
-            led.setAttribute('fill', '#22c55e');
-            led.setAttribute('stroke', '#16a34a');
-            if (drop) drop.setAttribute('opacity', '0');
-            addLog(`INFO: Flange ${flangeName} normalizada.`);
-            syncCard(n, false);
         }
+
         updateStats();
     }
 
-    function syncCard(n, isAlert) {
-        const card = document.getElementById('fc'     + n);
-        const dot  = document.getElementById('fcdot'  + n);
-        const pill = document.getElementById('fcpill' + n);
-        if (!card) return;
-        if (isAlert) {
-            card.classList.add('fc-alert');
-            dot.classList.add('alert');
-            pill.classList.add('alert');
-            pill.textContent = 'Vazamento';
+    function toggleLeak(position) {
+        if (!podeSimular) return;
+        const flange = FLANGE_CONFIG.find(function (item) {
+            return item.id === Number(position);
+        });
+        if (!flange) return;
+
+        if (alertasSimulados.has(flange.id)) {
+            alertasSimulados.delete(flange.id);
+            addLog('Simulação encerrada na flange ' + flange.name + '.');
         } else {
-            card.classList.remove('fc-alert');
-            dot.classList.remove('alert');
-            pill.classList.remove('alert');
-            pill.textContent = 'Normal';
+            alertasSimulados.add(flange.id);
+            addLog('ALERTA SIMULADO na flange ' + flange.name + '.', true);
         }
+
+        atualizarVisualDaFlange(flange);
+        updateStats();
     }
 
     function updateStats() {
-        let leaks = 0;
-        FLANGE_CONFIG.forEach(flange => {
-            const led = document.getElementById('led' + flange.id);
-            if (led && led.getAttribute('fill') === '#ef4444') leaks++;
-        });
-        document.getElementById('ok-c').textContent = FLANGE_CONFIG.length - leaks;
-        document.getElementById('lk-c').textContent = leaks;
-        document.getElementById('ev-c').textContent = eventCount;
-        const badge = document.getElementById('badge');
-        if (leaks > 0) {
-            badge.className = 'badge al-b';
-            badge.textContent = 'Simulação: alerta';
-            document.getElementById('ts-v').textContent =
-                new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-        } else {
-            badge.className = 'badge ok-b';
-            badge.textContent = 'Simulação sem alerta';
-        }
+        const contador = document.getElementById('lk-c');
+        if (contador) contador.textContent = String(alertasSimulados.size);
     }
 
-    function addLog(msg, isAlert = false) {
+    function addLog(message, isAlert) {
         const logBox = document.getElementById('log');
-        const now = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        if (!logBox) return;
+
         const row = document.createElement('div');
         row.className = 'log-row';
-        row.innerHTML = `<span class="lt">${now}</span><span class="${isAlert ? 'la' : ''}">${msg}</span>`;
+        const time = document.createElement('span');
+        time.className = 'lt';
+        time.textContent = new Date().toLocaleTimeString('pt-BR', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+
+        const text = document.createElement('span');
+        if (isAlert) text.className = 'la';
+        text.textContent = message;
+
+        row.appendChild(time);
+        row.appendChild(text);
         logBox.prepend(row);
     }
 
     function simLeak() {
-        if (!podeSimular) return;
-
-        if (FLANGE_CONFIG.length === 0) return;
-        const indice = Math.floor(Math.random() * FLANGE_CONFIG.length);
-        toggleLeak(FLANGE_CONFIG[indice].id);
+        if (!podeSimular || FLANGE_CONFIG.length === 0) return;
+        const disponiveis = FLANGE_CONFIG.filter(function (flange) {
+            return !alertasSimulados.has(flange.id);
+        });
+        const opcoes = disponiveis.length > 0 ? disponiveis : FLANGE_CONFIG;
+        const flange = opcoes[Math.floor(Math.random() * opcoes.length)];
+        toggleLeak(flange.id);
     }
 
     function resetAll() {
         if (!podeSimular) return;
-
-        FLANGE_CONFIG.forEach(flange => {
-            const led = document.getElementById('led' + flange.id);
-            if (led && led.getAttribute('fill') === '#ef4444') {
-                toggleLeak(flange.id);
+        Array.from(alertasSimulados).forEach(function (id) {
+            const flange = FLANGE_CONFIG.find(function (item) {
+                return item.id === id;
+            });
+            if (flange) {
+                alertasSimulados.delete(id);
+                atualizarVisualDaFlange(flange);
             }
         });
-        addLog('Comando: Todos os alertas foram resetados manualmente.');
+        updateStats();
+        addLog('Todas as simulações locais foram limpas.');
     }
 
-    window.addEventListener('load', function () {
-        // Agora inicializa a UI lendo direto da lista preenchida pelo backend
+    window.addEventListener('DOMContentLoaded', function () {
+        const horaInicial = document.getElementById('t0');
+        if (horaInicial) {
+            horaInicial.textContent = new Date().toLocaleTimeString('pt-BR', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
         initializeFlangeData();
-
-        const t = document.getElementById('t0');
-        if (t) t.textContent = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-        updateStats();
     });
 </script>
 
