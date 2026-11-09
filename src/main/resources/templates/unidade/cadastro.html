@@ -1,129 +1,78 @@
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Nova Unidade | Soda Cáustica Flanges</title>
-
-    <link rel="stylesheet"
-          th:href="@{/style.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/menu.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/unidade.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova unidade | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/unidade.css}">
 </head>
-
 <body>
-
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main>
+<main class="unidades-main unidade-create-main">
+    <header class="unidade-form-header">
+        <a th:href="@{/unidades}" class="unidade-back-link">← Todas as unidades</a>
+        <span class="unidade-label">GESTÃO MULTIUNIDADE</span>
+        <h1>Nova unidade industrial</h1>
+        <p>Cadastre uma planta para organizar colaboradores, ativos e operações.</p>
+    </header>
 
-    <div class="unidade-form-header">
-
-        <span class="unidade-label">
-            ADMINISTRAÇÃO
-        </span>
-
-        <h1>
-            Criar Unidade
-        </h1>
-
-        <p>
-            Cadastre uma nova unidade para organizar
-            usuários e operações do sistema.
-        </p>
-
-    </div>
-
-    <section class="unidade-form-card">
-
-        <form
-                th:action="@{/unidades/salvar}"
-                th:object="${unidade}"
-                method="post">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label for="nome">
-                        Nome da unidade
-                    </label>
-
-                    <input
-                            type="text"
-                            id="nome"
-                            th:field="*{nome}"
-                            placeholder="Ex.: Unidade Industrial"
-                            required>
-
-                    <div
-                            class="unidade-error"
-                            th:if="${#fields.hasErrors('nome')}"
-                            th:errors="*{nome}">
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="localizacao">
-                        Localização
-                    </label>
-
-                    <input
-                            type="text"
-                            id="localizacao"
-                            th:field="*{localizacao}"
-                            placeholder="Ex.: São Paulo - SP"
-                            required>
-
-                    <div
-                            class="unidade-error"
-                            th:if="${#fields.hasErrors('localizacao')}"
-                            th:errors="*{localizacao}">
-                    </div>
-
-                </div>
-
+    <section class="unidade-panel">
+        <div class="unidade-panel-heading">
+            <div>
+                <span class="unidade-panel-kicker">IDENTIFICAÇÃO DA PLANTA</span>
+                <h2>Dados iniciais</h2>
+                <p>Os campos com * são obrigatórios. As demais informações podem ser completadas depois.</p>
             </div>
+        </div>
 
-            <div class="unidade-form-acoes">
-
-                <a th:href="@{/unidades}"
-                   class="unidade-btn unidade-btn-secondary">
-                    Voltar
-                </a>
-
-                <button
-                        type="submit"
-                        class="unidade-btn unidade-btn-primary">
-                    Criar Unidade
-                </button>
-
+        <form th:action="@{/unidades/salvar}" th:object="${unidade}" method="post" class="unidade-form">
+            <div th:if="${erroSalvar != null}" class="unidade-feedback unidade-feedback-error" th:text="${erroSalvar}"></div>
+            <div class="unidade-form-grid">
+                <div class="unidade-form-field">
+                    <label for="nome">Nome da unidade *</label>
+                    <input id="nome" type="text" th:field="*{nome}" maxlength="100" required placeholder="Ex.: Unidade Alumínio — Sorocaba">
+                    <small th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+                </div>
+                <div class="unidade-form-field">
+                    <label for="codigo">Código interno</label>
+                    <input id="codigo" type="text" th:field="*{codigo}" maxlength="30" placeholder="Ex.: PLT-SP-01">
+                    <small th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></small>
+                </div>
+                <div class="unidade-form-field unidade-field-wide">
+                    <label for="localizacao">Localização *</label>
+                    <input id="localizacao" type="text" th:field="*{localizacao}" maxlength="150" required placeholder="Cidade, estado e endereço da planta">
+                    <small th:if="${#fields.hasErrors('localizacao')}" th:errors="*{localizacao}"></small>
+                </div>
+                <div class="unidade-form-field">
+                    <label for="responsavel">Responsável pela unidade</label>
+                    <input id="responsavel" type="text" th:field="*{responsavel}" maxlength="100" placeholder="Nome do responsável">
+                </div>
+                <div class="unidade-form-field">
+                    <label for="telefoneContato">Telefone de contato</label>
+                    <input id="telefoneContato" type="tel" th:field="*{telefoneContato}" maxlength="25" placeholder="(11) 4000-0000">
+                </div>
+                <div class="unidade-form-field unidade-field-wide">
+                    <label for="emailContato">E-mail operacional</label>
+                    <input id="emailContato" type="email" th:field="*{emailContato}" maxlength="120" placeholder="manutencao@empresa.com.br">
+                    <small th:if="${#fields.hasErrors('emailContato')}" th:errors="*{emailContato}"></small>
+                </div>
+                <div class="unidade-form-field unidade-field-wide">
+                    <label for="descricao">Descrição / observações operacionais</label>
+                    <textarea id="descricao" th:field="*{descricao}" rows="4" maxlength="600" placeholder="Informações úteis sobre a planta, processo ou operação..."></textarea>
+                </div>
             </div>
-
+            <div class="unidade-form-actions">
+                <a th:href="@{/unidades}" class="unidade-btn unidade-btn-secondary">Cancelar</a>
+                <button type="submit" class="unidade-btn unidade-btn-primary">Criar unidade</button>
+            </div>
         </form>
-
     </section>
-
 </main>
 
-<footer>
-    <p>
-        © 2026 Sistema de Monitoramento de Flanges.
-        Todos os direitos reservados.
-    </p>
-</footer>
-
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
 <script th:src="@{/menu.js}"></script>
-
 </body>
 </html>
