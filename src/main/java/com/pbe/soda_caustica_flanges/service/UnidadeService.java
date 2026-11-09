@@ -40,14 +40,36 @@ public class UnidadeService {
     public List<UnidadeResumoDTO> listarResumos() {
         return repository.findAll(Sort.by(Sort.Direction.ASC, "nome"))
                 .stream()
-                .map(unidade -> new UnidadeResumoDTO(
-                        unidade,
-                        usuarioRepository.countByUnidadeId(unidade.getId()),
-                        usuarioRepository.countByUnidadeIdAndAtivoTrue(unidade.getId()),
-                        funcionarioRepository.countByUnidadeId(unidade.getId()),
-                        flangeRepository.countByUnidadeId(unidade.getId()),
-                        manutencaoRepository.countByFlange_Unidade_Id(unidade.getId())
-                ))
+                .map(unidade -> {
+                    // Novas unidades guardam o nome como fotografia histórica do autor.
+                    // Para unidades antigas, recuperamos o e-mail do evento original de auditoria.
+                    var eventoCriacao = auditoriaService.buscarEventoCriacao(unidade.getId())
+                            .orElse(null);
+
+                    String emailCriador = unidade.getCriadoPorEmail();
+                    if (emailCriador == null && eventoCriacao != null) {
+                        emailCriador = eventoCriacao.getAtorEmail();
+                    }
+
+                    String nomeCriador = unidade.getCriadoPorNome();
+                    if ((nomeCriador == null || nomeCriador.isBlank())
+                            && emailCriador != null && !emailCriador.isBlank()) {
+                        nomeCriador = usuarioRepository.findByEmail(emailCriador)
+                                .map(Usuario::getNome)
+                                .orElse(emailCriador);
+                    }
+
+                    return new UnidadeResumoDTO(
+                            unidade,
+                            usuarioRepository.countByUnidadeId(unidade.getId()),
+                            usuarioRepository.countByUnidadeIdAndAtivoTrue(unidade.getId()),
+                            funcionarioRepository.countByUnidadeId(unidade.getId()),
+                            flangeRepository.countByUnidadeId(unidade.getId()),
+                            manutencaoRepository.countByFlange_Unidade_Id(unidade.getId()),
+                            nomeCriador,
+                            emailCriador
+                    );
+                })
                 .toList();
     }
 
@@ -101,6 +123,12 @@ public class UnidadeService {
         if (novaUnidade) {
             unidade = new Unidade();
             unidade.setAtivo(true);
+
+            Usuario criador = usuarioRepository.findByEmail(atorEmail).orElse(null);
+            unidade.setCriadoPorNome(criador == null
+                    ? normalizarCampo(atorEmail)
+                    : criador.getNome());
+            unidade.setCriadoPorEmail(normalizarEmail(atorEmail));
         } else {
             unidade = buscarPorId(dados.getId());
         }
