@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ManutencaoRepository extends JpaRepository<Manutencao, Long> {
 
+    long countByFlange_Unidade_Id(Long unidadeId);
 }
