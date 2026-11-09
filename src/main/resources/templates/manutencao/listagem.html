@@ -1,91 +1,83 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Listagem de Manutenções</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenções | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
 </head>
 <body>
-
-<!-- Menu -->
-<div th:replace="~{/fragments/menu.html :: menu}"></div>
-
+<div th:replace="~{fragments/menu :: menu}"></div>
 <main>
-
-    <header>
-        <h1>Listagem de Manutenções</h1>
+    <header class="listagem-topbar">
+        <div class="listagem-meta">
+            <div class="topbar-eyebrow">OPERAÇÃO INDUSTRIAL · HISTÓRICO TÉCNICO</div>
+            <div class="topbar-title">Manutenções</div>
+            <p th:if="${!ehAdmin and usuarioLogado.unidade != null}"
+               th:text="${'Registros da unidade ' + usuarioLogado.unidade.nome}">Unidade</p>
+            <p th:if="${ehAdmin}">Visão administrativa de todas as unidades.</p>
+            <p>O autor do lançamento e o funcionário executor são identificados separadamente.</p>
+        </div>
+        <a th:href="@{/manutencao/cadastro}" class="btn btn-primary">+ Registrar manutenção</a>
     </header>
 
     <section class="card">
-
         <div class="topo-card">
-            <h2>Manutenções Cadastradas</h2>
-
-            <a th:href="@{/manutencao/cadastro}" class="btn btn-primary">
-                Nova Manutenção
-            </a>
+            <div>
+                <h2>Histórico de manutenções</h2>
+                <p th:text="${#lists.size(manutencoes) + ' registro(s) encontrado(s).'}">0 registros</p>
+            </div>
         </div>
 
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Ocorrência</th>
-                <th>Número de Série</th>
-                <th>Data</th>
-                <th>Flange</th>
-                <th>Funcionário</th>
-                <th>Ações</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="manutencao : ${manutencoes}">
-
-                <td th:text="${manutencao.id}"></td>
-
-                <td th:text="${manutencao.ocorrencia}"></td>
-
-                <td th:text="${manutencao.num_serie}"></td>
-
-                <!-- DATA FORMATADA -->
-                <td th:text="${#dates.format(manutencao.data, 'dd/MM/yyyy')}"></td>
-
-                <!-- FLANGE -->
-                <td th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}"></td>
-
-                <!-- FUNCIONÁRIO -->
-                <td th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}"></td>
-
-                <td class="acoes">
-                    <a th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}" class="btn btn-edit">
-                        Editar
-                    </a>
-
-                    <form th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
-                          method="post"
-                          style="display: inline; margin: 0;">
-                        <button type="submit"
-                                class="btn btn-delete"
-                                onclick="return confirm('Tem certeza que deseja excluir esta manutenção?')">
-                            Excluir
-                        </button>
-                    </form>
-                </td>
-
-            </tr>
-            </tbody>
-        </table>
-
-        <div th:if="${#lists.isEmpty(manutencoes)}">
-            <p>Nenhuma manutenção cadastrada.</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ocorrência</th>
+                    <th>Número de série</th>
+                    <th>Data</th>
+                    <th>Flange</th>
+                    <th>Funcionário</th>
+                    <th>Unidade</th>
+                    <th>Registrado por</th>
+                    <th>Lançado em</th>
+                    <th th:if="${ehAdmin}">Ações administrativas</th>
+                    <th th:unless="${ehAdmin}">Registro</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="manutencao : ${manutencoes}">
+                    <td th:text="${manutencao.id}"></td>
+                    <td th:text="${manutencao.ocorrencia}"></td>
+                    <td th:text="${manutencao.num_serie}"></td>
+                    <td th:text="${manutencao.data != null ? #dates.format(manutencao.data, 'dd/MM/yyyy') : '—'}"></td>
+                    <td th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}"></td>
+                    <td th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}"></td>
+                    <td th:text="${manutencao.flange != null and manutencao.flange.unidade != null ? manutencao.flange.unidade.nome : 'Sem unidade'}"></td>
+                    <td th:text="${manutencao.registradoPorEmail != null ? manutencao.registradoPorEmail : 'Registro legado'}">Registro legado</td>
+                    <td th:text="${manutencao.registradoEm != null ? #temporals.format(manutencao.registradoEm, 'dd/MM/yyyy HH:mm') : 'Não registrado'}">Não registrado</td>
+                    <td th:if="${ehAdmin}" class="acoes">
+                        <a th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}" class="btn btn-edit">Editar</a>
+                        <form th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-delete"
+                                    onclick="return confirm('Excluir definitivamente este registro de manutenção?')">Excluir</button>
+                        </form>
+                    </td>
+                    <td th:unless="${ehAdmin}"><span class="badge">Somente leitura</span></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(manutencoes)}">
+                    <td colspan="10" style="text-align:center;padding:28px">Nenhuma manutenção encontrada para esta unidade.</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-
+        <p class="maintenance-permission-note" th:if="${!ehAdmin}">
+            Seus registros são adicionados ao histórico da unidade. Para corrigir ou remover um lançamento, solicite a um administrador.
+        </p>
     </section>
-
 </main>
-
 <script th:src="@{/menu.js}"></script>
 </body>
 </html>

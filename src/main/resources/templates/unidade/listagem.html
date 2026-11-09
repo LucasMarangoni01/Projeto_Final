@@ -1,148 +1,249 @@
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Unidades | Soda Cáustica Flanges</title>
-
-    <link rel="stylesheet"
-          th:href="@{/style.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/menu.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/unidade.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidades industriais | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/unidade.css}">
 </head>
-
 <body>
-
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main>
-
-    <div class="unidade-topo">
-
+<main class="unidades-main">
+    <header class="unidade-topo">
         <div>
-            <span class="unidade-label">
-                ADMINISTRAÇÃO
-            </span>
-
-            <h1>
-                Unidades
-            </h1>
-
-            <p>
-                Gerencie as unidades industriais
-                cadastradas no sistema.
-            </p>
+            <span class="unidade-label">GESTÃO MULTIUNIDADE</span>
+            <h1>Unidades industriais</h1>
+            <p>Centralize equipes, ativos, manutenções e informações de cada planta.</p>
         </div>
+        <a th:href="@{/unidades/cadastro}" class="unidade-btn unidade-btn-primary">+ Nova unidade</a>
+    </header>
 
-        <a th:href="@{/unidades/cadastro}"
-           class="unidade-btn unidade-btn-primary">
-            Nova Unidade
-        </a>
-
+    <div class="unidade-feedback unidade-feedback-success" th:if="${sucesso != null}">
+        <span>✓</span>
+        <span th:text="${sucesso == 'excluida' ? 'Unidade removida.' : 'Operação concluída com sucesso.'}">Operação concluída.</span>
+    </div>
+    <div class="unidade-feedback unidade-feedback-error" th:if="${erro != null}">
+        <span>!</span>
+        <span>Não foi possível concluir a operação solicitada.</span>
     </div>
 
-    <div class="unidade-grid">
+    <section class="unidade-overview">
+        <div class="unidade-overview-card">
+            <span>UNIDADES CADASTRADAS</span>
+            <strong th:text="${#lists.size(unidadesResumo)}">0</strong>
+            <small>Plantas registradas no sistema</small>
+        </div>
+        <div class="unidade-overview-card">
+            <span>UNIDADES ATIVAS</span>
+            <strong th:text="${totalUnidadesAtivas}">0</strong>
+            <small>Unidades liberadas para operação</small>
+        </div>
+        <div class="unidade-overview-card">
+            <span>CONTAS DE ACESSO</span>
+            <strong th:text="${totalUsuariosCadastrados}">0</strong>
+            <small>Contas associadas às unidades</small>
+        </div>
+        <div class="unidade-overview-card">
+            <span>FUNCIONÁRIOS OPERACIONAIS</span>
+            <strong th:text="${totalFuncionariosCadastrados}">0</strong>
+            <small>Cadastros vinculados às plantas</small>
+        </div>
+    </section>
 
-        <article
-                class="unidade-card"
-                th:each="unidade : ${unidades}">
-
-            <div class="unidade-card-top">
-
-                <div class="unidade-icon">
-                    <span>U</span>
+    <div class="unidade-workspace">
+        <section class="unidade-plants-column">
+            <div class="unidade-list-toolbar">
+                <div>
+                    <h2>Plantas cadastradas
+                        <span class="unidade-result-count"
+                              th:text="${#lists.size(unidadesResumo) + (#lists.size(unidadesResumo) == 1 ? ' resultado' : ' resultados')}">0 resultados</span>
+                    </h2>
+                    <p>Consulte e gerencie as plantas localizadas pelo filtro ao lado.</p>
                 </div>
+            </div>
 
-                <span
-                        class="unidade-status"
-                        th:classappend="${unidade.ativo}
-                            ? ' status-ativo'
-                            : ' status-inativo'">
-
+    <section class="unidade-grid">
+        <article class="unidade-card unidade-card-modern"
+                 th:each="resumo : ${unidadesResumo}"
+                 data-unidade-card>
+            <div class="unidade-card-top">
+                <div class="unidade-icon"><span>⌂</span></div>
+                <span class="unidade-status"
+                      th:classappend="${resumo.unidade.ativo} ? ' status-ativo' : ' status-inativo'">
                     <span class="unidade-status-dot"></span>
-
-                    <span
-                            th:text="${unidade.ativo
-                            ? 'ATIVA'
-                            : 'INATIVA'}">
-                        ATIVA
-                    </span>
-
+                    <span th:text="${resumo.unidade.ativo ? 'ATIVA' : 'ARQUIVADA'}">ATIVA</span>
                 </span>
-
             </div>
 
             <div class="unidade-info">
-
                 <span class="unidade-id"
-                      th:text="'UNIDADE #' + ${unidade.id}">
-                    UNIDADE #1
-                </span>
+                      th:text="${'UNIDADE #' + resumo.unidade.id + (resumo.unidade.codigo != null ? ' · ' + resumo.unidade.codigo : '')}">UNIDADE #1</span>
+                <h3 th:text="${resumo.unidade.nome}">Unidade Industrial</h3>
+                <p class="unidade-location" th:text="${resumo.unidade.localizacao}">Localização</p>
+                <p class="unidade-manager"
+                   th:if="${resumo.unidade.responsavel != null}"
+                   th:text="${'Responsável pela planta: ' + resumo.unidade.responsavel}">Responsável</p>
 
-                <h2 th:text="${unidade.nome}">
-                    Unidade Industrial
-                </h2>
+                <div class="unidade-created-meta">
+                    <p>
+                        <span>Cadastrada por</span>
+                        <strong th:text="${resumo.criadoPorNome != null ? resumo.criadoPorNome : 'Autor não identificado'}">Nome do usuário</strong>
+                    </p>
+                    <p th:if="${resumo.criadoPorEmail != null}">
+                        <span>Conta responsável</span>
+                        <strong th:text="${resumo.criadoPorEmail}">usuario@empresa.com</strong>
+                    </p>
+                    <p th:if="${resumo.unidade.criadoEm != null}">
+                        <span>Data do cadastro</span>
+                        <strong th:text="${#temporals.format(resumo.unidade.criadoEm, 'dd/MM/yyyy HH:mm')}">Data</strong>
+                    </p>
+                </div>
 
-                <p th:text="${unidade.localizacao}">
-                    Localização
-                </p>
-
+                <div class="unidade-card-data"
+                     th:if="${(resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)) or (resumo.unidade.telefoneContato != null and !#strings.isEmpty(resumo.unidade.telefoneContato)) or (resumo.unidade.emailContato != null and !#strings.isEmpty(resumo.unidade.emailContato)) or (resumo.unidade.descricao != null and !#strings.isEmpty(resumo.unidade.descricao))}">
+                    <p th:if="${resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)}">
+                        <span>Código interno</span>
+                        <strong th:text="${resumo.unidade.codigo}">Código</strong>
+                    </p>
+                    <p th:if="${resumo.unidade.telefoneContato != null and !#strings.isEmpty(resumo.unidade.telefoneContato)}">
+                        <span>Telefone</span>
+                        <strong th:text="${resumo.unidade.telefoneContato}">Telefone</strong>
+                    </p>
+                    <p th:if="${resumo.unidade.emailContato != null and !#strings.isEmpty(resumo.unidade.emailContato)}">
+                        <span>E-mail operacional</span>
+                        <strong th:text="${resumo.unidade.emailContato}">E-mail</strong>
+                    </p>
+                    <p th:if="${resumo.unidade.descricao != null and !#strings.isEmpty(resumo.unidade.descricao)}">
+                        <span>Observações</span>
+                        <strong th:text="${resumo.unidade.descricao}">Descrição</strong>
+                    </p>
+                </div>
+                <!-- Futuro: anexar aqui o relatório de cadastro da unidade, quando os requisitos forem definidos. -->
             </div>
 
-            <div class="unidade-acoes">
+            <div class="unidade-metrics">
+                <div><strong th:text="${resumo.totalUsuarios}">0</strong><span>contas</span></div>
+                <div><strong th:text="${resumo.totalFuncionarios}">0</strong><span>funcionários</span></div>
+                <div><strong th:text="${resumo.totalFlanges}">0</strong><span>flanges</span></div>
+                <div><strong th:text="${resumo.totalManutencoes}">0</strong><span>manutenções</span></div>
+            </div>
 
-                <form
-                        th:action="@{/unidades/alterar-status}"
-                        method="post">
-
-                    <input
-                            type="hidden"
-                            name="id"
-                            th:value="${unidade.id}">
-
-                    <button
-                            type="submit"
-                            class="unidade-btn unidade-btn-status"
-                            th:text="${unidade.ativo
-                            ? 'Desativar'
-                            : 'Ativar'}">
-                        Desativar
-                    </button>
-
+            <div class="unidade-card-actions">
+                <a th:href="@{/unidades/editar/{id}(id=${resumo.unidade.id})}"
+                   class="unidade-btn unidade-btn-primary">Gerenciar unidade</a>
+                <form th:action="@{/unidades/alterar-status}" method="post">
+                    <input type="hidden" name="id" th:value="${resumo.unidade.id}">
+                    <button type="submit" class="unidade-btn unidade-btn-secondary"
+                            th:text="${resumo.unidade.ativo ? 'Arquivar' : 'Reativar'}">Arquivar</button>
                 </form>
-
             </div>
-
         </article>
 
-        <div
-                class="unidade-vazia"
-                th:if="${#lists.isEmpty(unidades)}">
-
-            Nenhuma unidade cadastrada.
-
+        <div class="unidade-vazia" th:if="${#lists.isEmpty(unidadesResumo) and (busca == null or #strings.isEmpty(busca))}">
+            <strong>Nenhuma unidade cadastrada.</strong>
+            <p>Crie a primeira planta para começar a organizar a operação.</p>
+            <a th:href="@{/unidades/cadastro}" class="unidade-btn unidade-btn-primary">Cadastrar unidade</a>
         </div>
+        <div class="unidade-vazia" th:if="${#lists.isEmpty(unidadesResumo) and busca != null and !#strings.isEmpty(busca)}">
+            <strong>Nenhuma unidade encontrada.</strong>
+            <p th:text="${'Não encontramos resultados para: ' + busca}">Nenhum resultado.</p>
+            <a th:href="@{/unidades}" class="unidade-btn unidade-btn-secondary">Limpar pesquisa</a>
+        </div>
+    </section>
+        </section>
 
+        <aside class="unidade-sidebar">
+        <section class="unidade-sidebar-panel unidade-sidebar-search-panel">
+            <span class="unidade-panel-kicker">PESQUISA GERAL</span>
+            <h2>Encontrar informação</h2>
+            <p>Pesquise sem precisar percorrer todos os cartões. A busca considera os dados da unidade e quem realizou o cadastro.</p>
+
+            <form class="unidade-sidebar-search-form" th:action="@{/unidades}" method="get" role="search">
+                <label class="unidade-sidebar-search-field" for="filtroUnidades">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="m16 16 5 5"></path>
+                    </svg>
+                    <input id="filtroUnidades"
+                           name="busca"
+                           type="search"
+                           th:value="${busca}"
+                           placeholder="Nome, código, pessoa, e-mail..."
+                           autocomplete="off">
+                </label>
+                <button type="submit" class="unidade-btn unidade-btn-primary">Buscar</button>
+                <a th:if="${busca != null and !#strings.isEmpty(busca)}"
+                   th:href="@{/unidades}"
+                   class="unidade-btn unidade-btn-secondary">Limpar filtro</a>
+            </form>
+
+            <div class="unidade-sidebar-search-result">
+                <strong th:text="${#lists.size(unidadesResumo)}">0</strong>
+                <span th:text="${#lists.size(unidadesResumo) == 1 ? 'unidade encontrada' : 'unidades encontradas'}">unidades encontradas</span>
+                <span th:if="${busca != null and !#strings.isEmpty(busca)}"
+                      th:text="${'para “' + busca + '”'}">termo pesquisado</span>
+            </div>
+        </section>
+
+        <section class="unidade-sidebar-panel unidade-registration-panel">
+            <div class="unidade-sidebar-heading">
+                <div>
+                    <span class="unidade-panel-kicker">RASTREABILIDADE</span>
+                    <h2>Quem cadastrou</h2>
+                    <p>Responsável e informações de cada planta encontrada.</p>
+                </div>
+                <span class="unidade-sidebar-total" th:text="${#lists.size(registrosCadastro)}">0</span>
+            </div>
+
+            <div class="unidade-registration-list">
+                <article class="unidade-registration-card" th:each="resumo : ${registrosCadastro}">
+                    <div class="unidade-registration-user">
+                        <span class="unidade-registration-avatar"
+                              th:text="${resumo.criadoPorNome != null and !#strings.isEmpty(resumo.criadoPorNome) ? #strings.substring(resumo.criadoPorNome, 0, 1).toUpperCase() : 'U'}">U</span>
+                        <div>
+                            <strong th:text="${resumo.criadoPorNome != null ? resumo.criadoPorNome : 'Autor não identificado'}">Nome do usuário</strong>
+                            <span th:text="${resumo.criadoPorEmail != null ? resumo.criadoPorEmail : 'Conta não identificada'}">E-mail do usuário</span>
+                        </div>
+                    </div>
+
+                    <div class="unidade-registration-details">
+                        <span class="unidade-registration-label">UNIDADE CADASTRADA</span>
+                        <strong th:text="${resumo.unidade.nome}">Nome da unidade</strong>
+                        <p th:text="${resumo.unidade.localizacao}">Localização da unidade</p>
+                        <p th:if="${resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)}"
+                           th:text="${'Código: ' + resumo.unidade.codigo}">Código interno</p>
+                        <p th:if="${resumo.unidade.responsavel != null and !#strings.isEmpty(resumo.unidade.responsavel)}"
+                           th:text="${'Responsável: ' + resumo.unidade.responsavel}">Responsável pela planta</p>
+                        <p th:if="${resumo.unidade.criadoEm != null}"
+                           th:text="${'Cadastro: ' + #temporals.format(resumo.unidade.criadoEm, 'dd/MM/yyyy HH:mm')}">Data do cadastro</p>
+                        <p th:if="${resumo.unidade.descricao != null and !#strings.isEmpty(resumo.unidade.descricao)}"
+                           th:text="${resumo.unidade.descricao}">Descrição da unidade</p>
+                    </div>
+
+                    <div class="unidade-registration-report">
+                        <span>RELATÓRIO DA UNIDADE</span>
+                        <p>Espaço reservado para o relatório de cadastro. A funcionalidade será definida em uma próxima etapa.</p>
+                    </div>
+
+                    <a th:href="@{/unidades/editar/{id}(id=${resumo.unidade.id})}"
+                       class="unidade-registration-link">Abrir cadastro da unidade <span>→</span></a>
+                </article>
+
+                <div class="unidade-registration-empty" th:if="${#lists.isEmpty(registrosCadastro)}">
+                    <strong>Nenhum cadastro para exibir.</strong>
+                    <p th:text="${busca != null and !#strings.isEmpty(busca) ? 'Tente outro termo de pesquisa.' : 'As unidades cadastradas aparecerão aqui.'}">Nenhum cadastro.</p>
+                </div>
+            </div>
+        </section>
+        </aside>
     </div>
-
 </main>
 
-<footer>
-    <p>
-        © 2026 Sistema de Monitoramento de Flanges.
-        Todos os direitos reservados.
-    </p>
-</footer>
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
 
 <script th:src="@{/menu.js}"></script>
-
 </body>
 </html>

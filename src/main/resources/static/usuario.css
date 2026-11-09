@@ -1014,3 +1014,124 @@
         transition: none;
     }
 }
+
+
+/* Foto, acesso e rastreabilidade na administração */
+.usuario-avatar { overflow: hidden; }
+.usuario-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.usuario-avatar img[src$="avatar-default.svg"] { padding: 3px; }
+.usuario-last-access { display: inline-block; color: #a9bddb; font-size: 10px; white-space: nowrap; }
+.usuario-alert-success { border-color: rgba(34,197,94,.25) !important; background: rgba(34,197,94,.09) !important; color: #a7f3c2 !important; }
+.usuarios-identity-photo { width: 64px; height: 64px; flex: 0 0 64px; overflow: hidden; border: 1px solid rgba(96,165,250,.28); border-radius: 15px; background: #17366f; }
+.usuarios-identity-photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.usuarios-account-metadata { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.usuarios-account-metadata > div { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 9px; background: rgba(255,255,255,.025); }
+.usuarios-account-metadata span { display: block; margin-bottom: 5px; color: #8198b8; font-size: 9px; }
+.usuarios-account-metadata strong { display: block; overflow-wrap: anywhere; color: #e6f0ff; font-size: 10px; }
+.usuarios-audit-panel { margin-top: 16px; padding: 20px; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: var(--bg-card); }
+.usuarios-audit-panel h2 { margin: 0 0 6px; color: #fff; font-size: 16px; }
+.usuarios-audit-panel > p { margin-bottom: 14px; color: #91a5c2; font-size: 10px; }
+.usuarios-audit-table-wrap { overflow-x: auto; }
+.usuarios-audit-table { width: 100%; min-width: 620px; border-collapse: collapse; }
+.usuarios-audit-table th { padding: 9px; background: rgba(255,255,255,.035); color: #91a8cc; text-align: left; font-size: 9px; }
+.usuarios-audit-table td { padding: 10px 9px; border-bottom: 1px solid var(--border); color: #c7d5e9; font-size: 10px; }
+.usuarios-audit-empty { padding: 20px !important; color: #91a5c2 !important; text-align: center; }
+@media (max-width: 700px) { .usuarios-account-metadata { grid-template-columns: 1fr; } }
+
+
+/* Dados profissionais — edição exclusiva da administração */
+.usuarios-edit-professional-card {
+    grid-column: 1 / -1;
+}
+.usuarios-edit-professional-icon {
+    border-color: rgba(96,165,250,.24);
+    background: rgba(59,130,246,.09);
+    color: #a9ccff;
+}
+.usuarios-professional-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 17px;
+    padding: 12px 14px;
+    border: 1px solid rgba(96,165,250,.17);
+    border-radius: 9px;
+    background: rgba(59,130,246,.06);
+}
+.usuarios-professional-notice strong {
+    color: #d7e8ff;
+    font-size: 10px;
+}
+.usuarios-professional-notice span {
+    color: #91a8ca;
+    font-size: 9px;
+    line-height: 1.55;
+}
+.usuarios-professional-fields {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 13px;
+}
+.usuarios-professional-fields .form-group {
+    min-width: 0;
+    margin-bottom: 0;
+}
+.usuarios-professional-fields label {
+    display: block;
+    margin-bottom: 7px;
+    color: #dce9fc;
+    font-size: 11px;
+    font-weight: 800;
+}
+.usuarios-professional-fields input {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    outline: none;
+    background: #101d38;
+    color: #eef5ff;
+    font: inherit;
+    font-size: 11px;
+}
+.usuarios-professional-fields input:focus {
+    border-color: #659cf0;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+}
+.usuarios-professional-fields input::placeholder {
+    color: #7187a8;
+}
+.usuarios-validation-error {
+    display: block;
+    margin-top: 6px;
+    color: #fca5a5;
+    font-size: 9px;
+    line-height: 1.45;
+}
+.usuarios-professional-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 17px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+.usuarios-professional-actions > span {
+    color: #8da4c4;
+    font-size: 9px;
+}
+.usuarios-professional-actions .usuarios-submit-button {
+    width: auto;
+    min-width: 210px;
+    margin-top: 0;
+}
+@media (max-width: 900px) {
+    .usuarios-professional-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+    .usuarios-edit-professional-card { grid-column: auto; }
+    .usuarios-professional-actions { align-items: stretch; flex-direction: column; }
+    .usuarios-professional-actions .usuarios-submit-button { width: 100%; }
+}

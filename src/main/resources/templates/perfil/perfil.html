@@ -1,116 +1,386 @@
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil | Soda Cáustica Flanges</title>
-
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
     <link rel="stylesheet" th:href="@{/perfil.css}">
 </head>
-
 <body>
-
 <div th:replace="~{fragments/menu :: menu}"></div>
 
 <main class="perfil-main">
+    <header class="perfil-header">
+        <span class="perfil-label">CENTRAL DA CONTA</span>
+        <h1>Meu perfil</h1>
+        <p>Gerencie seus dados de identificação, segurança e informações profissionais.</p>
+    </header>
 
-    <div class="perfil-header">
-        <span class="perfil-label">CONTA DO SISTEMA</span>
-        <h1>Meu Perfil</h1>
-        <p>Visualize as informações da sua conta de acesso.</p>
+    <div class="perfil-feedback perfil-feedback-success" th:if="${statusPerfil == 'atualizado'}">
+        <strong>Perfil atualizado.</strong> Suas informações foram salvas.
     </div>
+    <div class="perfil-feedback perfil-feedback-success" th:if="${statusSenha == 'alterada'}">
+        <strong>Senha alterada.</strong> Sua próxima entrada deverá usar a nova senha.
+    </div>
+    <div class="perfil-feedback perfil-feedback-error" th:if="${erroPerfil != null}" th:text="${erroPerfil}"></div>
+    <div class="perfil-feedback perfil-feedback-error" th:if="${erroSenha != null}" th:text="${erroSenha}"></div>
 
-    <section class="perfil-card">
-
-        <div class="perfil-topo">
-
-            <div class="perfil-avatar">
-                👤
-            </div>
-
-            <div class="perfil-identidade">
-                <h2 th:text="${usuarioLogado.nome}">
-                    Usuário
-                </h2>
-
-                <p th:text="${usuarioLogado.email}">
-                    email@gmail.com
-                </p>
-            </div>
-
-            <span class="perfil-role"
-                  th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' perfil-admin' : ' perfil-user'"
-                  th:text="${usuarioLogado.role}">
-                USER
-            </span>
-
+    <section class="perfil-hero">
+        <div class="perfil-avatar-wrap">
+            <img class="perfil-avatar-image"
+                 th:if="${usuarioLogado.fotoPerfil != null}"
+                 th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                 alt="Foto de perfil">
+            <img class="perfil-avatar-image"
+                 th:unless="${usuarioLogado.fotoPerfil != null}"
+                 th:src="@{/img/avatar-default.svg}"
+                 alt="Ícone padrão de perfil">
         </div>
-
-        <div class="perfil-divider"></div>
-
-        <div class="perfil-grid">
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">NOME COMPLETO</span>
-                <strong th:text="${usuarioLogado.nome}">
-                    Usuário
-                </strong>
+        <div class="perfil-hero-copy">
+            <span class="perfil-eyebrow">CONTA AUTENTICADA</span>
+            <h2 th:text="${usuarioLogado.nome}">Nome do usuário</h2>
+            <p th:text="${usuarioLogado.email}">email@empresa.com.br</p>
+            <div class="perfil-hero-tags">
+                <span class="perfil-role"
+                      th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' perfil-admin' : ' perfil-user'"
+                      th:text="${usuarioLogado.role}">USER</span>
+                <span class="perfil-account-status"
+                      th:classappend="${usuarioLogado.ativo} ? ' account-active' : ' account-inactive'"
+                      th:text="${usuarioLogado.ativo ? 'Conta ativa' : 'Conta inativa'}">Conta ativa</span>
             </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">E-MAIL</span>
-                <strong th:text="${usuarioLogado.email}">
-                    email@gmail.com
-                </strong>
-            </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">NÍVEL DE ACESSO</span>
-                <strong th:text="${usuarioLogado.role}">
-                    USER
-                </strong>
-            </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">STATUS DA CONTA</span>
-                <strong class="perfil-status">
-                    <span></span>
-                    <span th:text="${usuarioLogado.ativo ? 'ATIVA' : 'INATIVA'}">
-                        ATIVA
-                    </span>
-                </strong>
-            </div>
-
         </div>
-
-        <div class="perfil-acoes">
-
-            <a th:href="@{/}"
-               class="perfil-btn perfil-voltar">
-                Voltar ao Sistema
-            </a>
-
-            <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-               th:href="@{/usuarios}"
-               class="perfil-btn perfil-admin-btn">
-                Gerenciar Usuários
-            </a>
-
-        </div>
-
+        <a class="perfil-back-link" th:href="@{/}">Voltar ao sistema</a>
     </section>
 
+    <div class="perfil-content-grid">
+        <section class="perfil-panel">
+            <div class="perfil-panel-heading">
+                <div>
+                    <span class="perfil-panel-kicker">IDENTIFICAÇÃO</span>
+                    <h2>Dados do perfil</h2>
+                    <p>Mantenha seus dados profissionais atualizados.</p>
+                </div>
+            </div>
+
+            <form th:action="@{/perfil/atualizar}" th:object="${perfilDTO}" method="post" enctype="multipart/form-data" class="perfil-form">
+                <div class="perfil-photo-editor">
+                    <div class="perfil-photo-preview">
+                        <img id="previewFotoPerfil"
+                             th:if="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                             th:data-default-src="@{/img/avatar-default.svg}"
+                             alt="Pré-visualização da foto">
+                        <img id="previewFotoPerfil"
+                             th:unless="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/img/avatar-default.svg}"
+                             th:data-default-src="@{/img/avatar-default.svg}"
+                             alt="Ícone padrão">
+                    </div>
+                    <div class="perfil-photo-controls">
+                        <strong>Foto de perfil</strong>
+                        <p>Imagem JPEG ou PNG, até 2 MB. A foto aparece no menu e no seu perfil.</p>
+                        <label class="perfil-file-button" for="fotoPerfil">Escolher imagem</label>
+                        <input id="fotoPerfil" name="fotoPerfil" type="file" accept="image/jpeg,image/png" hidden>
+                        <label class="perfil-remove-photo" th:if="${usuarioLogado.fotoPerfil != null}">
+                            <input id="removerFoto" type="checkbox" name="removerFoto" value="true">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7h16"></path>
+                                <path d="M10 11v6M14 11v6"></path>
+                                <path d="m5 7 1 13h12l1-13M9 7V4h6v3"></path>
+                            </svg>
+                            <span>Remover foto</span>
+                        </label>
+                        <small class="perfil-remove-hint" th:if="${usuarioLogado.fotoPerfil != null}">
+                            A remoção será aplicada ao salvar as alterações.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="perfil-fields-grid">
+                    <div class="perfil-field perfil-field-wide">
+                        <label for="nome">Nome completo</label>
+                        <input id="nome" type="text" th:field="*{nome}" maxlength="100" autocomplete="name" required>
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+                    </div>
+
+                    <div class="perfil-field perfil-field-wide">
+                        <label for="emailPerfil">E-mail de acesso</label>
+                        <input id="emailPerfil" type="email" th:value="${usuarioLogado.email}" disabled>
+                        <small>O e-mail é o identificador de login. Para alterá-lo, solicite ao administrador.</small>
+                    </div>
+
+                    <div class="perfil-field">
+                        <label for="telefone">Telefone de contato</label>
+                        <input id="telefone"
+                               type="tel"
+                               th:field="*{telefone}"
+                               maxlength="15"
+                               inputmode="numeric"
+                               autocomplete="tel"
+                               placeholder="(11) 99999-9999"
+                               aria-describedby="telefoneAjuda telefoneErro">
+                        <small id="telefoneAjuda">Digite apenas os números. A formatação será aplicada automaticamente.</small>
+                        <small id="telefoneErro" class="perfil-field-error" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
+                    </div>
+
+                    <div class="perfil-field perfil-field-company">
+                        <label for="matriculaPerfil">Matrícula <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="matriculaPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.matricula != null ? usuarioLogado.matricula : 'Não definida'}"
+                               disabled
+                               readonly>
+                        <small>Identificação interna definida pela administração.</small>
+                    </div>
+
+                    <div class="perfil-field perfil-field-company">
+                        <label for="cargoPerfil">Cargo <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="cargoPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.cargo != null ? usuarioLogado.cargo : 'Não definido'}"
+                               disabled
+                               readonly>
+                        <small>Alterações devem ser solicitadas ao administrador.</small>
+                    </div>
+
+                    <div class="perfil-field perfil-field-company">
+                        <label for="setorPerfil">Setor <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="setorPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.setor != null ? usuarioLogado.setor : 'Não definido'}"
+                               disabled
+                               readonly>
+                        <small>O setor é controlado pela administração da unidade.</small>
+                    </div>
+                </div>
+
+                <div class="perfil-form-actions">
+                    <span>As informações são vinculadas à sua conta individual.</span>
+                    <button class="perfil-primary-button" type="submit">Salvar alterações</button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="perfil-side-column">
+            <section class="perfil-panel perfil-account-panel">
+                <span class="perfil-panel-kicker">ACESSO E VÍNCULO</span>
+                <h2>Informações da conta</h2>
+                <dl class="perfil-account-data">
+                    <div><dt>Identificador</dt><dd th:text="${'USR-' + usuarioLogado.id}">USR-1</dd></div>
+                    <div><dt>Perfil de acesso</dt><dd th:text="${usuarioLogado.role}">USER</dd></div>
+                    <div><dt>Unidade industrial</dt><dd th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.nome : 'Aguardando vínculo'}">Unidade</dd></div>
+                    <div><dt>Conta criada em</dt><dd th:text="${usuarioLogado.criadoEm != null ? #temporals.format(usuarioLogado.criadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</dd></div>
+                    <div><dt>Último acesso</dt><dd th:text="${usuarioLogado.ultimoAcesso != null ? #temporals.format(usuarioLogado.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Primeiro acesso'}">-</dd></div>
+                </dl>
+                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}" th:href="@{/usuarios}" class="perfil-secondary-button">Administrar usuários</a>
+            </section>
+
+            <section class="perfil-panel perfil-security-panel">
+                <span class="perfil-panel-kicker">SEGURANÇA</span>
+                <h2>Alterar senha</h2>
+                <p class="perfil-panel-description">Use uma senha exclusiva, com pelo menos 12 caracteres.</p>
+                <form th:action="@{/perfil/alterar-senha}" th:object="${alterarSenhaDTO}" method="post" class="perfil-form perfil-password-form">
+                    <div class="perfil-field">
+                        <label for="senhaAtual">Senha atual</label>
+                        <input id="senhaAtual" type="password" th:field="*{senhaAtual}" autocomplete="current-password" required>
+                    </div>
+                    <div class="perfil-field">
+                        <label for="novaSenha">Nova senha</label>
+                        <input id="novaSenha" type="password" th:field="*{novaSenha}" minlength="12" maxlength="72" autocomplete="new-password" required>
+                    </div>
+                    <div class="perfil-field">
+                        <label for="confirmarSenha">Confirmar nova senha</label>
+                        <input id="confirmarSenha" type="password" th:field="*{confirmarSenha}" minlength="12" maxlength="72" autocomplete="new-password" required>
+                    </div>
+                    <button class="perfil-primary-button perfil-full-button" type="submit">Atualizar senha</button>
+                </form>
+            </section>
+        </aside>
+    </div>
+
+    <section class="perfil-panel perfil-admin-panel"
+             th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+        <div class="perfil-panel-heading">
+            <div>
+                <span class="perfil-panel-kicker">ACESSO RESTRITO · ADMINISTRADOR</span>
+                <h2>Informações administrativas</h2>
+                <p>Dados de controle da conta, disponíveis somente para administradores.</p>
+            </div>
+            <span class="perfil-admin-lock" aria-label="Área administrativa restrita">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                ADMIN
+            </span>
+        </div>
+
+        <div class="perfil-admin-grid">
+            <article class="perfil-admin-item">
+                <span>IDENTIFICADOR INTERNO</span>
+                <strong th:text="${'USR-' + usuarioLogado.id}">USR-1</strong>
+                <small>Referência única desta conta no sistema.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>NÍVEL DE PERMISSÃO</span>
+                <strong th:text="${usuarioLogado.role}">ADMIN</strong>
+                <small>Define quais áreas administrativas podem ser acessadas.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>STATUS DA CONTA</span>
+                <strong th:text="${usuarioLogado.ativo ? 'ATIVA' : 'INATIVA'}"
+                        th:classappend="${usuarioLogado.ativo ? ' admin-value-active' : ' admin-value-inactive'}">ATIVA</strong>
+                <small>Contas inativas não conseguem autenticar.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>UNIDADE VINCULADA</span>
+                <strong th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.nome : 'Sem unidade vinculada'}">Unidade</strong>
+                <small th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.localizacao : 'Conta administrativa sem unidade específica.'}">Localização</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>STATUS DA UNIDADE</span>
+                <strong th:text="${usuarioLogado.unidade == null ? 'NÃO SE APLICA' : (usuarioLogado.unidade.ativo ? 'ATIVA' : 'INATIVA')}">ATIVA</strong>
+                <small>Indica se a unidade vinculada está habilitada no sistema.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>CRIADA EM</span>
+                <strong th:text="${usuarioLogado.criadoEm != null ? #temporals.format(usuarioLogado.criadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</strong>
+                <small>Data de criação do registro.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>ÚLTIMA ATUALIZAÇÃO</span>
+                <strong th:text="${usuarioLogado.atualizadoEm != null ? #temporals.format(usuarioLogado.atualizadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</strong>
+                <small>Última alteração dos dados da conta.</small>
+            </article>
+            <article class="perfil-admin-item">
+                <span>ÚLTIMO ACESSO</span>
+                <strong th:text="${usuarioLogado.ultimoAcesso != null ? #temporals.format(usuarioLogado.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Ainda não registrado'}">-</strong>
+                <small>Último login concluído com sucesso.</small>
+            </article>
+        </div>
+
+        <div class="perfil-admin-notice">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 21 20H3L12 3Z"></path>
+                <path d="M12 9v5M12 17h.01"></path>
+            </svg>
+            <p><strong>Campos protegidos:</strong> permissão, unidade e status não podem ser modificados nesta página. Essas alterações devem ser realizadas na administração de usuários, com registro no histórico da conta.</p>
+        </div>
+
+        <div class="perfil-admin-actions">
+            <a th:href="@{/usuarios}" class="perfil-secondary-button">Gerenciar usuários</a>
+            <a th:href="@{/unidades}" class="perfil-secondary-button">Gerenciar unidades</a>
+        </div>
+    </section>
+
+    <section class="perfil-panel perfil-audit-panel">
+        <div class="perfil-panel-heading">
+            <div>
+                <span class="perfil-panel-kicker">RASTREABILIDADE</span>
+                <h2>Atividade recente da conta</h2>
+                <p>Histórico das principais ações relacionadas ao seu usuário.</p>
+            </div>
+            <span class="perfil-audit-count" th:text="${#lists.size(historicoUsuario)}">0</span>
+        </div>
+
+        <div class="perfil-audit-table-wrap">
+            <table class="perfil-audit-table">
+                <thead><tr><th>Data e hora</th><th>Evento</th><th>Responsável</th><th>Detalhes</th></tr></thead>
+                <tbody>
+                <tr th:each="evento : ${historicoUsuario}">
+                    <td th:text="${#temporals.format(evento.dataEvento, 'dd/MM/yyyy HH:mm:ss')}">-</td>
+                    <td><span class="perfil-event-badge" th:text="${evento.acao}">LOGIN</span></td>
+                    <td th:text="${evento.atorEmail}">admin</td>
+                    <td th:text="${evento.detalhes}">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(historicoUsuario)}">
+                    <td colspan="4" class="perfil-audit-empty">Ainda não há atividades registradas para esta conta.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>
 
-<footer>
-    <p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p>
-</footer>
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("fotoPerfil");
+        const preview = document.getElementById("previewFotoPerfil");
+        const fileLabel = document.querySelector(".perfil-file-button");
+        const removePhoto = document.getElementById("removerFoto");
+        const defaultPhoto = preview ? preview.dataset.defaultSrc : null;
+        const telefone = document.getElementById("telefone");
+
+        function formatarTelefone(valor) {
+            const numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+            if (numeros.length === 0) return "";
+            if (numeros.length <= 2) return "(" + numeros;
+
+            const ddd = numeros.slice(0, 2);
+            const numero = numeros.slice(2);
+
+            if (numero.length <= 5) {
+                return "(" + ddd + ") " + numero;
+            }
+
+            const tamanhoPrefixo = numero.length === 9 ? 5 : 4;
+            return "(" + ddd + ") "
+                + numero.slice(0, tamanhoPrefixo)
+                + "-"
+                + numero.slice(tamanhoPrefixo, tamanhoPrefixo + 4);
+        }
+
+        if (telefone) {
+            telefone.value = formatarTelefone(telefone.value);
+            telefone.addEventListener("input", function () {
+                const posicaoAnterior = telefone.selectionStart;
+                const tamanhoAnterior = telefone.value.length;
+                telefone.value = formatarTelefone(telefone.value);
+                const diferenca = telefone.value.length - tamanhoAnterior;
+                const novaPosicao = Math.max(0, (posicaoAnterior || 0) + diferenca);
+                telefone.setSelectionRange(novaPosicao, novaPosicao);
+            });
+            telefone.addEventListener("blur", function () {
+                telefone.value = formatarTelefone(telefone.value);
+            });
+        }
+
+        if (!input || !preview) return;
+
+        input.addEventListener("change", function () {
+            const arquivo = input.files && input.files[0];
+            if (!arquivo) return;
+
+            if (!["image/jpeg", "image/png"].includes(arquivo.type) || arquivo.size > 2 * 1024 * 1024) {
+                input.value = "";
+                alert("Selecione uma imagem JPEG ou PNG de até 2 MB.");
+                return;
+            }
+
+            if (removePhoto) removePhoto.checked = false;
+
+            const url = URL.createObjectURL(arquivo);
+            preview.src = url;
+            preview.onload = function () { URL.revokeObjectURL(url); };
+            if (fileLabel) fileLabel.textContent = arquivo.name;
+        });
+
+        if (removePhoto) {
+            removePhoto.addEventListener("change", function () {
+                if (removePhoto.checked) {
+                    input.value = "";
+                    preview.src = defaultPhoto;
+                    if (fileLabel) fileLabel.textContent = "Escolher imagem";
+                }
+            });
+        }
+    });
+</script>
 <script th:src="@{/menu.js}"></script>
-
 </body>
 </html>

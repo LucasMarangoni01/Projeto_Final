@@ -5,6 +5,7 @@ import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,15 +20,18 @@ import java.util.Locale;
 public class SecurityConfig {
 
     private final UsuarioRepository repository;
+    private final LoginSuccessHandler loginSuccessHandler;
 
-    public SecurityConfig(UsuarioRepository repository) {
+    public SecurityConfig(
+            UsuarioRepository repository,
+            LoginSuccessHandler loginSuccessHandler) {
         this.repository = repository;
+        this.loginSuccessHandler = loginSuccessHandler;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> {
-
             String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
 
             Usuario usuario = repository.findByEmail(emailNormalizado)
@@ -41,9 +45,14 @@ public class SecurityConfig {
                     usuario.getRole() == Role.USER
                             && usuario.getUnidade() == null;
 
+            boolean unidadeInativa =
+                    usuario.getUnidade() != null
+                            && !usuario.getUnidade().isAtivo();
+
             boolean usuarioDesabilitado =
                     !usuario.isAtivo()
-                            || usuarioSemUnidade;
+                            || usuarioSemUnidade
+                            || (usuario.getRole() == Role.USER && unidadeInativa);
 
             return User.builder()
                     .username(usuario.getEmail())
@@ -60,18 +69,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF permanece habilitado pelo padrão do Spring Security.
                 .authorizeHttpRequests(auth -> auth
-
+                        // Arquivos estáticos e telas de autenticação.
                         .requestMatchers(
                                 "/login",
                                 "/cadastro",
                                 "/error",
-
                                 "/login.css",
                                 "/cadastro.css",
                                 "/style.css",
@@ -80,65 +85,61 @@ public class SecurityConfig {
                                 "/perfil.css",
                                 "/unidade.css",
                                 "/flange.css",
-
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
-
                                 "/foto_ocorrencia/**",
                                 "/foto_pessoa/**",
                                 "/foto_flange/**"
                         ).permitAll()
 
+                        // Telas de consulta disponíveis para os dois perfis.
                         .requestMatchers(
+                                HttpMethod.GET,
                                 "/",
-                                "/flange/**",
-                                "/funcionario/**",
-                                "/manutencao/**",
-                                "/incidente/**",
+                                "/flange/listagem",
+                                "/funcionario/listagem",
+                                "/manutencao/listagem",
+                                "/manutencao/cadastro",
                                 "/perfil"
-                        ).hasAnyRole(
-                                "ADMIN",
-                                "USER"
-                        )
+                        ).hasAnyRole("ADMIN", "USER")
 
+                        // USER pode apenas criar novo lançamento de manutenção.
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/manutencao/salvar"
+                        ).hasAnyRole("ADMIN", "USER")
+
+                        // API de autocomplete já limita resultados à unidade do USER.
+                        .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
+
+                        // Operações do próprio perfil autenticado.
+                        .requestMatchers("/perfil/**").authenticated()
+
+                        // Gestão de ativos, pessoas, unidades e correções fica com ADMIN.
                         .requestMatchers(
                                 "/usuarios/**",
                                 "/usuario/**",
-                                "/unidades/**"
+                                "/unidades/**",
+                                "/flange/**",
+                                "/funcionario/**",
+                                "/manutencao/**",
+                                "/incidente/**"
                         ).hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
-
                         .loginPage("/login")
-
                         .usernameParameter("email")
-
                         .passwordParameter("senha")
-
-                        .defaultSuccessUrl(
-                                "/",
-                                true
-                        )
-
-                        .failureUrl(
-                                "/login?error=true"
-                        )
-
+                        .successHandler(loginSuccessHandler)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
-
                 .logout(logout -> logout
-
                         .logoutUrl("/logout")
-
-                        .logoutSuccessUrl(
-                                "/login?logout=true"
-                        )
-
+                        .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 );
 

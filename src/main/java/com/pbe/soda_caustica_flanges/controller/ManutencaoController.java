@@ -1,94 +1,185 @@
 package com.pbe.soda_caustica_flanges.controller;
 
-import com.pbe.soda_caustica_flanges.model.Flange;
-import com.pbe.soda_caustica_flanges.model.Funcionario;
-import com.pbe.soda_caustica_flanges.model.Manutencao;
-import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
-import com.pbe.soda_caustica_flanges.repository.FuncionarioRepository;
-import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pbe.soda_caustica_flanges.model.*;
+import com.pbe.soda_caustica_flanges.repository.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+
 @Controller
 public class ManutencaoController {
 
-    @Autowired
-    private ManutencaoRepository manutencaoRepository;
+    private final ManutencaoRepository manutencaoRepository;
+    private final FlangeRepository flangeRepository;
+    private final FuncionarioRepository funcionarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private FlangeRepository flangeRepository;
-
-    @Autowired
-    private FuncionarioRepository funcionarioRepository;
+    public ManutencaoController(
+            ManutencaoRepository manutencaoRepository,
+            FlangeRepository flangeRepository,
+            FuncionarioRepository funcionarioRepository,
+            UsuarioRepository usuarioRepository) {
+        this.manutencaoRepository = manutencaoRepository;
+        this.flangeRepository = flangeRepository;
+        this.funcionarioRepository = funcionarioRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @GetMapping("/manutencao/listagem")
-    public String listagem(Model model) {
-        model.addAttribute("manutencoes", manutencaoRepository.findAll());
+    public String listagem(Model model, Authentication authentication) {
+        Usuario usuario = buscarUsuarioLogado(authentication);
+        boolean admin = usuario.getRole() == Role.ADMIN;
+
+        List<Manutencao> manutencoes;
+        if (admin) {
+            manutencoes = manutencaoRepository.findAllByOrderByDataDesc();
+        } else if (usuario.getUnidade() == null) {
+            manutencoes = Collections.emptyList();
+        } else {
+            manutencoes = manutencaoRepository.findByFlange_Unidade_IdOrderByDataDesc(
+                    usuario.getUnidade().getId()
+            );
+        }
+
+        model.addAttribute("manutencoes", manutencoes);
+        model.addAttribute("ehAdmin", admin);
         return "manutencao/listagem";
     }
 
     @GetMapping("/manutencao/cadastro")
-    public String cadastro(Model model) {
-        model.addAttribute("manutencao", new Manutencao());
+    public String cadastro(Model model, Authentication authentication) {
+        Usuario usuario = buscarUsuarioLogado(authentication);
+        Manutencao manutencao = new Manutencao();
+        manutencao.setData(new java.util.Date());
+        prepararFormulario(model, manutencao, usuario);
         return "manutencao/cadastro";
     }
 
     @PostMapping("/manutencao/salvar")
-    public String salvar(@ModelAttribute("manutencao") Manutencao manutencao,
-                         @RequestParam(value = "flangeId", required = false) Long flangeId,
-                         @RequestParam(value = "funcionarioId", required = false) Long funcionarioId,
-                         Model model) {
+    public String salvar(
+            @ModelAttribute("manutencao") Manutencao manutencao,
+            @RequestParam(value = "flangeId", required = false) Long flangeId,
+            @RequestParam(value = "funcionarioId", required = false) Long funcionarioId,
+            Authentication authentication,
+            Model model) {
 
-        if (flangeId == null) {
-            model.addAttribute("erro", "Informe o ID da flange.");
-            return "manutencao/cadastro";
+        Usuario usuario = buscarUsuarioLogado(authentication);
+        boolean admin = usuario.getRole() == Role.ADMIN;
+
+        if (!admin && manutencao.getId() != null) {
+            return "redirect:/manutencao/listagem?erro=permissao";
         }
-        if (funcionarioId == null) {
-            model.addAttribute("erro", "Informe o ID do funcionário.");
+
+        if (flangeId == null || funcionarioId == null) {
+            model.addAttribute("erro", "Selecione uma flange e um funcionário.");
+            prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
         }
 
         Flange flange = flangeRepository.findById(flangeId).orElse(null);
+        Funcionario funcionario = funcionarioRepository.findById(funcionarioId).orElse(null);
 
-        if (flange == null) {
-            model.addAttribute("erro", "Flange não encontrada. Digite um ID de flange existente.");
+        if (flange == null || funcionario == null) {
+            model.addAttribute("erro", "A flange ou o funcionário selecionado não existe.");
+            prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
         }
 
-        Funcionario funcionario = funcionarioRepository.findById(funcionarioId).orElse(null);
-
-        if (funcionario == null) {
-            model.addAttribute("erro", "Funcionário não encontrado. Digite um ID de funcionário existente.");
+        if (flange.getUnidade() == null || funcionario.getUnidade() == null
+                || !flange.getUnidade().getId().equals(funcionario.getUnidade().getId())) {
+            model.addAttribute("erro", "A flange e o funcionário precisam pertencer à mesma unidade.");
+            prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
+        }
+
+        if (!admin) {
+            if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
+                    || !flange.getUnidade().getId().equals(usuario.getUnidade().getId())) {
+                model.addAttribute("erro", "Você só pode registrar manutenções em ativos da sua unidade.");
+                prepararFormulario(model, manutencao, usuario);
+                return "manutencao/cadastro";
+            }
+        } else if (!flange.getUnidade().isAtivo() && manutencao.getId() == null) {
+            model.addAttribute("erro", "Não é possível registrar uma nova manutenção em uma unidade arquivada.");
+            prepararFormulario(model, manutencao, usuario);
+            return "manutencao/cadastro";
+        }
+
+        if (manutencao.getId() == null) {
+            // Guarda quem realizou o lançamento, independentemente do funcionário executor.
+            manutencao.setRegistradoPorEmail(authentication.getName());
+        } else {
+            // Uma correção administrativa não pode sobrescrever a autoria e a data originais.
+            Manutencao registroExistente = manutencaoRepository.findById(manutencao.getId())
+                    .orElse(null);
+
+            if (registroExistente == null) {
+                return "redirect:/manutencao/listagem";
+            }
+
+            manutencao.setRegistradoPorEmail(registroExistente.getRegistradoPorEmail());
+            manutencao.setRegistradoEm(registroExistente.getRegistradoEm());
         }
 
         manutencao.setFlange(flange);
         manutencao.setFuncionario(funcionario);
-
         manutencaoRepository.save(manutencao);
 
         return "redirect:/manutencao/listagem";
     }
 
     @GetMapping("/manutencao/alterar/{id}")
-    public String alterar(@PathVariable Long id, Model model) {
-
+    public String alterar(
+            @PathVariable Long id,
+            Model model,
+            Authentication authentication) {
+        Usuario usuario = buscarUsuarioLogado(authentication);
         Manutencao manutencao = manutencaoRepository.findById(id).orElse(null);
 
         if (manutencao == null) {
             return "redirect:/manutencao/listagem";
         }
 
-        model.addAttribute("manutencao", manutencao);
-
+        prepararFormulario(model, manutencao, usuario);
         return "manutencao/cadastro";
     }
 
     @PostMapping("/manutencao/excluir/{id}")
     public String excluir(@PathVariable Long id) {
-        manutencaoRepository.deleteById(id);
+        manutencaoRepository.findById(id).ifPresent(manutencaoRepository::delete);
         return "redirect:/manutencao/listagem";
+    }
+
+    private Usuario buscarUsuarioLogado(Authentication authentication) {
+        return usuarioRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário autenticado não encontrado."));
+    }
+
+    private void prepararFormulario(Model model, Manutencao manutencao, Usuario usuario) {
+        boolean admin = usuario.getRole() == Role.ADMIN;
+        List<Flange> flanges;
+        List<Funcionario> funcionarios;
+
+        if (admin) {
+            flanges = flangeRepository.findAll();
+            funcionarios = funcionarioRepository.findAll();
+        } else if (usuario.getUnidade() == null) {
+            flanges = Collections.emptyList();
+            funcionarios = Collections.emptyList();
+        } else {
+            Long unidadeId = usuario.getUnidade().getId();
+            flanges = flangeRepository.findByUnidadeId(unidadeId);
+            funcionarios = funcionarioRepository.findByUnidadeIdOrderByIdAsc(unidadeId);
+        }
+
+        model.addAttribute("manutencao", manutencao);
+        model.addAttribute("flanges", flanges);
+        model.addAttribute("funcionarios", funcionarios);
+        model.addAttribute("ehAdmin", admin);
+        model.addAttribute("unidadeUsuario", usuario.getUnidade());
     }
 }

@@ -4,4 +4,8 @@ import com.pbe.soda_caustica_flanges.model.Unidade;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UnidadeRepository extends JpaRepository<Unidade, Long> {
+
+    boolean existsByCodigoIgnoreCase(String codigo);
+
+    boolean existsByCodigoIgnoreCaseAndIdNot(String codigo, Long id);
 }

@@ -1,104 +1,73 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Manutenção</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar manutenção | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
 </head>
 <body>
-
-<div th:replace="~{/fragments/menu.html :: menu}"></div>
-
+<div th:replace="~{fragments/menu :: menu}"></div>
 <main>
-
     <header>
-        <h1>Cadastro de Manutenção</h1>
+        <div class="topbar-eyebrow">REGISTRO OPERACIONAL</div>
+        <h1 th:text="${manutencao.id != null ? 'Editar manutenção' : 'Registrar manutenção'}">Registrar manutenção</h1>
+        <p th:if="${!ehAdmin and unidadeUsuario != null}"
+           th:text="${'O registro será vinculado à unidade ' + unidadeUsuario.nome + '.'}">Unidade</p>
     </header>
 
     <section class="card">
-
-        <h2>Dados da Manutenção</h2>
-
-        <div th:if="${erro}" class="alerta-erro">
-            <p th:text="${erro}"></p>
-        </div>
+        <h2>Dados da manutenção</h2>
+        <div th:if="${erro}" class="alerta-erro"><p th:text="${erro}"></p></div>
 
         <form th:action="@{/manutencao/salvar}" th:object="${manutencao}" method="post">
-
             <input type="hidden" th:field="*{id}">
-
             <div class="form-grid">
-
                 <div class="form-group">
-                    <label for="ocorrencia">Ocorrência</label>
-                    <input
-                            type="text"
-                            id="ocorrencia"
-                            th:field="*{ocorrencia}"
-                            placeholder="Digite a ocorrência"
-                            required>
+                    <label for="ocorrencia">Descrição da ocorrência *</label>
+                    <input id="ocorrencia" type="text" th:field="*{ocorrencia}" maxlength="255" required placeholder="Descreva o serviço ou ocorrência">
                 </div>
-
                 <div class="form-group">
-                    <label for="num_serie">Número de Série</label>
-                    <input
-                            type="text"
-                            id="num_serie"
-                            th:field="*{num_serie}"
-                            placeholder="Digite o número de série"
-                            required>
+                    <label for="num_serie">Número de série / ordem *</label>
+                    <input id="num_serie" type="text" th:field="*{num_serie}" maxlength="100" required placeholder="Ordem ou número de série">
                 </div>
-
                 <div class="form-group">
-                    <label for="data">Data</label>
-                    <input
-                            type="date"
-                            id="data"
-                            th:field="*{data}"
-                            required>
+                    <label for="data">Data da manutenção *</label>
+                    <input id="data" type="date" th:field="*{data}" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="flangeId">ID da Flange</label>
-                    <input
-                            type="number"
-                            id="flangeId"
-                            name="flangeId"
-                            th:value="${manutencao.flange != null ? manutencao.flange.id : ''}"
-                            placeholder="Digite o ID da flange"
-                            required>
+                    <label for="flangeId">Flange *</label>
+                    <select id="flangeId" name="flangeId" required>
+                        <option value="">Selecione a flange</option>
+                        <option th:each="flange : ${flanges}"
+                                th:value="${flange.id}"
+                                th:text="${flange.nome_flange + ' · ID #' + flange.id}"
+                                th:selected="${manutencao.flange != null and manutencao.flange.id == flange.id}">
+                        </option>
+                    </select>
                 </div>
-
                 <div class="form-group">
-                    <label for="funcionarioId">ID do Funcionário</label>
-                    <input
-                            type="number"
-                            id="funcionarioId"
-                            name="funcionarioId"
-                            th:value="${manutencao.funcionario != null ? manutencao.funcionario.id : ''}"
-                            placeholder="Digite o ID do funcionário"
-                            required>
+                    <label for="funcionarioId">Funcionário responsável *</label>
+                    <select id="funcionarioId" name="funcionarioId" required>
+                        <option value="">Selecione o funcionário</option>
+                        <option th:each="funcionario : ${funcionarios}"
+                                th:value="${funcionario.id}"
+                                th:text="${funcionario.nome_funcionario + ' · ID #' + funcionario.id}"
+                                th:selected="${manutencao.funcionario != null and manutencao.funcionario.id == funcionario.id}">
+                        </option>
+                    </select>
                 </div>
-
             </div>
 
             <div class="botoes">
-                <button type="submit" class="btn btn-primary">
-                    Salvar
-                </button>
-
-                <a th:href="@{/manutencao/listagem}" class="btn btn-cancel">
-                    Voltar
-                </a>
+                <button type="submit" class="btn btn-primary"
+                        th:text="${manutencao.id != null ? 'Salvar alterações' : 'Registrar manutenção'}">Salvar</button>
+                <a th:href="@{/manutencao/listagem}" class="btn btn-cancel">Voltar</a>
             </div>
-
         </form>
-
     </section>
-
 </main>
-
 <script th:src="@{/menu.js}"></script>
 </body>
 </html>

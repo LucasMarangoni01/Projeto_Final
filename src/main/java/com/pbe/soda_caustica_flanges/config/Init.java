@@ -8,6 +8,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+
 @Component
 public class Init implements CommandLineRunner {
 
@@ -19,8 +21,8 @@ public class Init implements CommandLineRunner {
     public Init(
             UsuarioRepository repository,
             PasswordEncoder passwordEncoder,
-            @Value("${app.admin.email:}") String adminEmail,
-            @Value("${app.admin.password:}") String adminPassword
+            @Value("${ADMIN_EMAIL:${app.admin.email:}}") String adminEmail,
+            @Value("${ADMIN_PASSWORD:${app.admin.password:}}") String adminPassword
     ) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
@@ -52,7 +54,7 @@ public class Init implements CommandLineRunner {
             );
         }
 
-        String emailNormalizado = adminEmail.trim().toLowerCase();
+        String emailNormalizado = adminEmail.trim().toLowerCase(Locale.ROOT);
 
         if (repository.findByEmail(emailNormalizado).isPresent()) {
             System.out.println("A conta ADMIN configurada já existe. Nenhuma senha foi alterada.");

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "manutencao")
@@ -27,6 +28,19 @@ public class Manutencao {
     @ManyToOne
     @JoinColumn(name = "funcionario_id")
     private Funcionario funcionario;
+
+    @Column(name = "registrado_por_email", length = 100)
+    private String registradoPorEmail;
+
+    @Column(name = "registrado_em")
+    private LocalDateTime registradoEm;
+
+    @PrePersist
+    public void antesDeCriar() {
+        if (registradoEm == null) {
+            registradoEm = LocalDateTime.now();
+        }
+    }
 
     // GETTERS E SETTERS
 
@@ -76,5 +90,21 @@ public class Manutencao {
 
     public void setFuncionario(Funcionario funcionario) {
         this.funcionario = funcionario;
+    }
+
+    public String getRegistradoPorEmail() {
+        return registradoPorEmail;
+    }
+
+    public void setRegistradoPorEmail(String registradoPorEmail) {
+        this.registradoPorEmail = registradoPorEmail;
+    }
+
+    public LocalDateTime getRegistradoEm() {
+        return registradoEm;
+    }
+
+    public void setRegistradoEm(LocalDateTime registradoEm) {
+        this.registradoEm = registradoEm;
     }
 }
