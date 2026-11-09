@@ -651,7 +651,7 @@
                     <span class="flange-panel-title">Flanges</span>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
-                        <span class="flange-panel-count">6 ativos</span>
+                        <span class="flange-panel-count" th:text="${totalFlanges + ' flange(s) cadastrada(s)'}">0 flanges</span>
                     </div>
                 </div>
                 <!-- O painel lateral gerado dinamicamente via JS e Thymeleaf -->
@@ -661,9 +661,9 @@
         </div>
 
         <div class="stats">
-            <div class="sc"><div class="sv" id="ok-c">6</div><div class="sl">Flanges normais</div></div>
-            <div class="sc"><div class="sv" style="color:var(--alert-red)" id="lk-c">0</div><div class="sl">Vazamentos ativos</div></div>
-            <div class="sc"><div class="sv" id="ev-c">0</div><div class="sl">Eventos totais</div></div>
+            <div class="sc"><div class="sv" id="ok-c" th:text="${totalFlanges}">0</div><div class="sl">Flanges cadastradas</div></div>
+            <div class="sc"><div class="sv" style="color:var(--alert-red)" id="lk-c">0</div><div class="sl">Simulações em alerta</div></div>
+            <div class="sc"><div class="sv" id="ev-c">0</div><div class="sl">Eventos simulados</div></div>
             <div class="sc"><div class="sv" id="ts-v" style="font-size:clamp(16px,2vw,22px)">--:--</div><div class="sl">Último alerta</div></div>
         </div>
 
@@ -674,10 +674,13 @@
             </div>
         </div>
 
-        <div class="btns">
-            <button class="btn" onclick="simLeak()">Simular vazamento aleatório</button>
-            <button class="btn btn-danger" onclick="resetAll()">Resetar todos os alertas</button>
+        <div class="btns" th:if="${ehAdmin}">
+            <button class="btn" onclick="simLeak()">Simular vazamento</button>
+            <button class="btn btn-danger" onclick="resetAll()">Resetar simulações</button>
         </div>
+        <p class="dashboard-readonly-note" th:unless="${ehAdmin}">
+            Modo de consulta: os controles de simulação estão disponíveis somente para ADMIN.
+        </p>
 
     </div>
 </main>
@@ -717,6 +720,7 @@
     // O Thymeleaf irá injetar a lista de flanges que você cadastrou no BD diretamente aqui.
     /*<![CDATA[*/
     const flangesDB = /*[[${flanges}]]*/ [];
+    const podeSimular = /*[[${ehAdmin}]]*/ false;
 
     // Função para puxar o dado do BD (caso exista) ou usar um valor padrão (caso aquele slot não tenha sido cadastrado ainda)
     function getFlangeData(index, defaultName, defaultLoc) {
@@ -757,7 +761,12 @@
             const card = document.createElement('div');
             card.className = 'fc';
             card.id = 'fc' + flange.id;
-            card.setAttribute('onclick', `toggleLeak(${flange.id})`);
+            if (podeSimular) {
+                card.setAttribute('onclick', `toggleLeak(${flange.id})`);
+                card.style.cursor = 'pointer';
+            } else {
+                card.style.cursor = 'default';
+            }
 
             card.innerHTML = `
                 <div class="fc-dot" id="fcdot${flange.id}"></div>
@@ -781,6 +790,8 @@
     let eventCount = 0;
 
     function toggleLeak(n) {
+        if (!podeSimular) return;
+
         const led  = document.getElementById('led'  + n);
         const drop = document.getElementById('drop' + n);
         const isCurrentlyNormal = led.getAttribute('fill') === '#22c55e';
@@ -855,11 +866,15 @@
     }
 
     function simLeak() {
+        if (!podeSimular) return;
+
         const r = Math.floor(Math.random() * 6) + 1;
         toggleLeak(r);
     }
 
     function resetAll() {
+        if (!podeSimular) return;
+
         for (let i = 1; i <= 6; i++) {
             const led = document.getElementById('led' + i);
             if (led && led.getAttribute('fill') === '#ef4444') toggleLeak(i);
