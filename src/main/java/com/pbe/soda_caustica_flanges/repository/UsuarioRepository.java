@@ -13,5 +13,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findByUnidadeId(Long unidadeId);
 
+    List<Usuario> findByUnidadeIdOrderByNomeAsc(Long unidadeId);
+
+    List<Usuario> findByUnidadeIsNullOrderByNomeAsc();
+
+    List<Usuario> findByNomeIgnoreCase(String nome);
+
+    long countByUnidadeId(Long unidadeId);
+
+    long countByUnidadeIdAndAtivoTrue(Long unidadeId);
+
     long countByRoleAndAtivoTrue(Role role);
 }
