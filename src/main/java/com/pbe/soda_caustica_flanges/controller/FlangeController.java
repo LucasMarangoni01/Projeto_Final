@@ -6,6 +6,7 @@ import com.pbe.soda_caustica_flanges.model.StatusFlange;
 import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
+import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
 import com.pbe.soda_caustica_flanges.repository.UnidadeRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import jakarta.validation.Valid;
@@ -34,6 +35,9 @@ public class FlangeController {
 
     @Autowired
     private UnidadeRepository unidadeRepository;
+
+    @Autowired
+    private ManutencaoRepository manutencaoRepository;
 
     private final String uploadDir =
             "src/main/resources/static/foto_flange/";
@@ -420,8 +424,12 @@ public class FlangeController {
             }
         }
 
+        if (manutencaoRepository.countByFlangeId(id) > 0) {
+            return "redirect:/flange/listagem?erro=historico";
+        }
+
         flangeRepository.delete(flange);
 
-        return "redirect:/flange/listagem";
+        return "redirect:/flange/listagem?sucesso=excluida";
     }
 }
