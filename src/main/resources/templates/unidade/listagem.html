@@ -38,12 +38,12 @@
         </div>
         <div class="unidade-overview-card">
             <span>UNIDADES ATIVAS</span>
-            <strong th:text="${#lists.size(unidadesResumo.?[unidade.ativo])}">0</strong>
+            <strong th:text="${totalUnidadesAtivas}">0</strong>
             <small>Unidades liberadas para operação</small>
         </div>
         <div class="unidade-overview-card">
             <span>COLABORADORES VINCULADOS</span>
-            <strong th:text="${#aggregates.sum(unidadesResumo.![totalUsuarios])}">0</strong>
+            <strong th:text="${totalUsuariosCadastrados}">0</strong>
             <small>Contas associadas às unidades</small>
         </div>
     </section>
