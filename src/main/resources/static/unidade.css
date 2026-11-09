@@ -1035,3 +1035,119 @@
     .unidade-registration-panel .unidade-registration-list { grid-template-columns: 1fr; }
     .unidade-sidebar-panel { padding: 13px; }
 }
+
+/* =========================================================
+   CARDS DE UNIDADE — VERSÃO COMPACTA
+========================================================= */
+.unidade-plants-column .unidade-grid {
+    align-items: start;
+    grid-auto-rows: max-content;
+    gap: 12px;
+}
+.unidade-plants-column .unidade-card-modern {
+    align-self: start;
+    height: auto;
+    min-height: 0;
+    padding: 14px;
+    border-radius: 12px;
+}
+.unidade-plants-column .unidade-card-top {
+    gap: 8px;
+}
+.unidade-plants-column .unidade-icon {
+    width: 34px;
+    height: 34px;
+}
+.unidade-plants-column .unidade-icon span {
+    font-size: 11px;
+}
+.unidade-plants-column .unidade-status {
+    padding: 5px 8px;
+    font-size: 8px;
+}
+.unidade-plants-column .unidade-info {
+    flex: 0 0 auto;
+    margin-top: 11px;
+}
+.unidade-plants-column .unidade-id {
+    margin-bottom: 5px;
+    font-size: 8px;
+}
+.unidade-plants-column .unidade-card-modern .unidade-info h3 {
+    margin-bottom: 4px;
+    font-size: 16px;
+    line-height: 1.3;
+}
+.unidade-plants-column .unidade-location {
+    font-size: 10px;
+    line-height: 1.4;
+}
+.unidade-plants-column .unidade-manager {
+    margin-top: 5px;
+    font-size: 9px;
+    line-height: 1.4;
+}
+.unidade-plants-column .unidade-created-meta,
+.unidade-plants-column .unidade-card-data {
+    gap: 4px;
+    margin-top: 8px;
+    padding: 8px 9px;
+    border-radius: 7px;
+}
+.unidade-plants-column .unidade-created-meta p,
+.unidade-plants-column .unidade-card-data p {
+    gap: 8px;
+}
+.unidade-plants-column .unidade-created-meta span,
+.unidade-plants-column .unidade-card-data span {
+    font-size: 7px;
+}
+.unidade-plants-column .unidade-created-meta strong,
+.unidade-plants-column .unidade-card-data strong {
+    font-size: 8px;
+    line-height: 1.35;
+}
+.unidade-plants-column .unidade-metrics {
+    gap: 5px;
+    margin-top: 10px;
+}
+.unidade-plants-column .unidade-metrics > div {
+    padding: 7px 5px;
+    border-radius: 6px;
+}
+.unidade-plants-column .unidade-metrics strong {
+    font-size: 14px;
+}
+.unidade-plants-column .unidade-metrics span {
+    margin-top: 1px;
+    font-size: 7px;
+}
+.unidade-plants-column .unidade-card-actions {
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+}
+.unidade-plants-column .unidade-card-actions .unidade-btn {
+    min-height: 33px;
+    padding: 7px 10px;
+    font-size: 9px;
+}
+.unidade-plants-column .unidade-card-actions .unidade-btn-primary {
+    flex: 1 1 auto;
+}
+.unidade-plants-column .unidade-card-actions form {
+    width: auto;
+    flex: 0 0 auto;
+}
+@media (max-width: 650px) {
+    .unidade-plants-column .unidade-card-modern {
+        padding: 13px;
+    }
+    .unidade-plants-column .unidade-card-actions {
+        align-items: stretch;
+        flex-direction: row;
+    }
+    .unidade-plants-column .unidade-card-actions form {
+        width: auto;
+    }
+}
