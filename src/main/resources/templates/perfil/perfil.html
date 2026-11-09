@@ -316,7 +316,7 @@
         const telefone = document.getElementById("telefone");
 
         function formatarTelefone(valor) {
-            const numeros = valor.replace(/\\D/g, "").slice(0, 11);
+            const numeros = valor.replace(/\D/g, "").slice(0, 11);
 
             if (numeros.length === 0) return "";
             if (numeros.length <= 2) return "(" + numeros;
