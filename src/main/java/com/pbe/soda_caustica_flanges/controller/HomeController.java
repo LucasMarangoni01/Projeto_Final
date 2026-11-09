@@ -1,6 +1,7 @@
 package com.pbe.soda_caustica_flanges.controller;
 
 import com.pbe.soda_caustica_flanges.model.Role;
+import com.pbe.soda_caustica_flanges.model.Flange;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -38,16 +40,19 @@ public class HomeController {
         Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
                 .orElseThrow();
 
+        List<Flange> flanges;
+
         if (usuario.getRole() == Role.ADMIN) {
-            model.addAttribute("flanges", flangeRepository.findAll());
+            flanges = flangeRepository.findAll();
         } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
-            model.addAttribute("flanges", Collections.emptyList());
+            flanges = Collections.emptyList();
         } else {
-            model.addAttribute(
-                    "flanges",
-                    flangeRepository.findByUnidadeId(usuario.getUnidade().getId())
-            );
+            flanges = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
         }
+
+        model.addAttribute("flanges", flanges);
+        model.addAttribute("totalFlanges", flanges.size());
+        model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
 
         return "home/index";
     }
