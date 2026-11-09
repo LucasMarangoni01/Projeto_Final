@@ -39,6 +39,9 @@ public class UnidadeController {
                         .toList();
 
         model.addAttribute("unidadesResumo", unidadesFiltradas);
+        // O painel lateral compartilha o mesmo filtro para localizar autores e unidades.
+        model.addAttribute("registrosCadastro", unidadesFiltradas);
+        model.addAttribute("totalUnidadesGeral", todasUnidades.size());
         model.addAttribute("busca", busca == null ? "" : busca);
         model.addAttribute("totalUnidadesAtivas", todasUnidades.stream()
                 .filter(resumo -> resumo.unidade().isAtivo())
@@ -68,6 +71,7 @@ public class UnidadeController {
                 valorBusca(unidade.getTelefoneContato()),
                 valorBusca(unidade.getEmailContato()),
                 valorBusca(unidade.getDescricao()),
+                valorBusca(unidade.getCriadoEm()),
                 valorBusca(resumo.criadoPorNome()),
                 valorBusca(resumo.criadoPorEmail()),
                 valorBusca(resumo.totalUsuarios()),
