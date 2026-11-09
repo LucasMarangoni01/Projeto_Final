@@ -135,8 +135,7 @@
                         <input type="hidden" name="unidadeId" th:value="${unidade.id}">
                         <input type="hidden" name="usuarioId" th:value="${pessoa.id}">
                         <button type="submit" class="unidade-member-remove"
-                                onclick="return confirm('Desvincular esta pessoa da unidade? A conta não será excluída.')"
-                                th:disabled="${!unidade.ativo}">Desvincular</button>
+                                onclick="return confirm('Desvincular esta pessoa da unidade? A conta não será excluída.')">Desvincular</button>
                     </form>
                 </article>
                 <div class="unidade-members-empty" th:if="${#lists.isEmpty(usuariosVinculados)}">
@@ -175,7 +174,7 @@
         <div>
             <span>CONTROLE DA UNIDADE</span>
             <h2>Arquivamento e remoção</h2>
-            <p>Arquivar bloqueia novos vínculos e mantém os registros históricos. A remoção definitiva só é permitida quando não existem pessoas ou flanges vinculadas.</p>
+            <p>Arquivar bloqueia novos vínculos e mantém os registros históricos. A remoção definitiva só é permitida quando não existem contas, funcionários operacionais ou flanges vinculadas.</p>
         </div>
         <div class="unidade-danger-actions">
             <form th:action="@{/unidades/alterar-status}" method="post">
