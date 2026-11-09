@@ -31,6 +31,9 @@ public class UnidadeController {
         model.addAttribute("totalUsuariosCadastrados", resumos.stream()
                 .mapToLong(resumo -> resumo.totalUsuarios())
                 .sum());
+        model.addAttribute("totalFuncionariosCadastrados", resumos.stream()
+                .mapToLong(resumo -> resumo.totalFuncionarios())
+                .sum());
         model.addAttribute("sucesso", sucesso);
         model.addAttribute("erro", erro);
         return "unidade/listagem";
