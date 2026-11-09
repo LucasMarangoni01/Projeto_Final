@@ -20,6 +20,8 @@
                 Informações Pessoais
             </h3>
 
+            <div th:if="${#fields.hasGlobalErrors()}" class="msg-erro" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></div>
+
             <div class="form-grid">
                 <div class="form-group" style="grid-column: 1 / -1;">
                     <label>Nome Completo</label>
