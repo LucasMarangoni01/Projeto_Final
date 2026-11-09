@@ -83,6 +83,10 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ---
 
+### Governança dos dados do usuário
+
+O titular da conta pode atualizar o nome, a foto e o telefone de contato. O telefone é formatado automaticamente com DDD (por exemplo, `(11) 99999-9999`; telefones fixos usam `(11) 9999-9999`). Matrícula, cargo e setor são dados corporativos: somente um ADMIN pode alterá-los na tela de edição administrativa do usuário. As mudanças são registradas na trilha de auditoria.
+
 ### Funcionalidades do módulo de usuários
 
 O módulo de contas oferece recursos de identificação, controle de acesso e rastreabilidade:
