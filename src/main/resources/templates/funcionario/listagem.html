@@ -44,6 +44,12 @@
         <a th:if="${ehAdmin}" th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
     </div>
 
+    <div th:if="${erro == 'historico'}" class="alerta-erro" style="margin-bottom: 20px;">
+        Este funcionário possui manutenções registradas. O cadastro foi preservado para manter a rastreabilidade.
+    </div>
+    <div th:if="${sucesso == 'excluido'}" class="badge ok-b" style="margin-bottom: 20px;">
+        Funcionário removido.
+    </div>
     <div th:if="${mensagem}" class="badge ok-b" style="margin-bottom: 24px;" th:text="${mensagem}"></div>
 
     <div class="table-container">
