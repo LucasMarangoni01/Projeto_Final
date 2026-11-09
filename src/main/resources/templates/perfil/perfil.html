@@ -112,27 +112,47 @@
                     </div>
 
                     <div class="perfil-field">
-                        <label for="telefone">Telefone</label>
-                        <input id="telefone" type="tel" th:field="*{telefone}" maxlength="25" placeholder="(15) 99999-9999" autocomplete="tel">
-                        <small class="perfil-field-error" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
+                        <label for="telefone">Telefone de contato</label>
+                        <input id="telefone"
+                               type="tel"
+                               th:field="*{telefone}"
+                               maxlength="15"
+                               inputmode="numeric"
+                               autocomplete="tel"
+                               placeholder="(11) 99999-9999"
+                               aria-describedby="telefoneAjuda telefoneErro">
+                        <small id="telefoneAjuda">Digite apenas os números. A formatação será aplicada automaticamente.</small>
+                        <small id="telefoneErro" class="perfil-field-error" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
                     </div>
 
-                    <div class="perfil-field">
-                        <label for="matricula">Matrícula</label>
-                        <input id="matricula" type="text" th:field="*{matricula}" maxlength="30" placeholder="Identificação interna">
-                        <small class="perfil-field-error" th:if="${#fields.hasErrors('matricula')}" th:errors="*{matricula}"></small>
+                    <div class="perfil-field perfil-field-company">
+                        <label for="matriculaPerfil">Matrícula <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="matriculaPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.matricula != null ? usuarioLogado.matricula : 'Não definida'}"
+                               disabled
+                               readonly>
+                        <small>Identificação interna definida pela administração.</small>
                     </div>
 
-                    <div class="perfil-field">
-                        <label for="cargo">Cargo</label>
-                        <input id="cargo" type="text" th:field="*{cargo}" maxlength="100" placeholder="Ex.: Técnico de manutenção">
-                        <small class="perfil-field-error" th:if="${#fields.hasErrors('cargo')}" th:errors="*{cargo}"></small>
+                    <div class="perfil-field perfil-field-company">
+                        <label for="cargoPerfil">Cargo <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="cargoPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.cargo != null ? usuarioLogado.cargo : 'Não definido'}"
+                               disabled
+                               readonly>
+                        <small>Alterações devem ser solicitadas ao administrador.</small>
                     </div>
 
-                    <div class="perfil-field">
-                        <label for="setor">Setor</label>
-                        <input id="setor" type="text" th:field="*{setor}" maxlength="100" placeholder="Ex.: Segurança industrial">
-                        <small class="perfil-field-error" th:if="${#fields.hasErrors('setor')}" th:errors="*{setor}"></small>
+                    <div class="perfil-field perfil-field-company">
+                        <label for="setorPerfil">Setor <span class="perfil-admin-managed-tag">ADMIN</span></label>
+                        <input id="setorPerfil"
+                               type="text"
+                               th:value="${usuarioLogado.setor != null ? usuarioLogado.setor : 'Não definido'}"
+                               disabled
+                               readonly>
+                        <small>O setor é controlado pela administração da unidade.</small>
                     </div>
                 </div>
 
@@ -293,6 +313,42 @@
         const fileLabel = document.querySelector(".perfil-file-button");
         const removePhoto = document.getElementById("removerFoto");
         const defaultPhoto = preview ? preview.dataset.defaultSrc : null;
+        const telefone = document.getElementById("telefone");
+
+        function formatarTelefone(valor) {
+            const numeros = valor.replace(/\\D/g, "").slice(0, 11);
+
+            if (numeros.length === 0) return "";
+            if (numeros.length <= 2) return "(" + numeros;
+
+            const ddd = numeros.slice(0, 2);
+            const numero = numeros.slice(2);
+
+            if (numero.length <= 5) {
+                return "(" + ddd + ") " + numero;
+            }
+
+            const tamanhoPrefixo = numero.length === 9 ? 5 : 4;
+            return "(" + ddd + ") "
+                + numero.slice(0, tamanhoPrefixo)
+                + "-"
+                + numero.slice(tamanhoPrefixo, tamanhoPrefixo + 4);
+        }
+
+        if (telefone) {
+            telefone.value = formatarTelefone(telefone.value);
+            telefone.addEventListener("input", function () {
+                const posicaoAnterior = telefone.selectionStart;
+                const tamanhoAnterior = telefone.value.length;
+                telefone.value = formatarTelefone(telefone.value);
+                const diferenca = telefone.value.length - tamanhoAnterior;
+                const novaPosicao = Math.max(0, (posicaoAnterior || 0) + diferenca);
+                telefone.setSelectionRange(novaPosicao, novaPosicao);
+            });
+            telefone.addEventListener("blur", function () {
+                telefone.value = formatarTelefone(telefone.value);
+            });
+        }
 
         if (!input || !preview) return;
 
