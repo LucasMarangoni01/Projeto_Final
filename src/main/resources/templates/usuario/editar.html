@@ -36,8 +36,14 @@
     </header>
 
     <section class="usuarios-identity-card">
-        <div class="usuarios-identity-avatar"
-             th:text="${#strings.substring(usuario.nome, 0, 1).toUpperCase()}">U</div>
+        <div class="usuarios-identity-photo">
+            <img th:if="${usuario.fotoPerfil != null}"
+                 th:src="@{/perfil/foto/{arquivo}(arquivo=${usuario.fotoPerfil})}"
+                 alt="Foto de perfil do usuário">
+            <img th:unless="${usuario.fotoPerfil != null}"
+                 th:src="@{/img/avatar-default.svg}"
+                 alt="Ícone padrão de perfil">
+        </div>
 
         <div class="usuarios-identity-copy">
             <span class="usuarios-identity-label">CONTA SELECIONADA</span>
@@ -54,6 +60,12 @@
                 USER
             </span>
         </div>
+    </section>
+
+    <section class="usuarios-account-metadata">
+        <div><span>IDENTIFICADOR</span><strong th:text="${'USR-' + usuario.id}">USR-1</strong></div>
+        <div><span>CONTA CRIADA EM</span><strong th:text="${usuario.criadoEm != null ? #temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</strong></div>
+        <div><span>ÚLTIMO ACESSO</span><strong th:text="${usuario.ultimoAcesso != null ? #temporals.format(usuario.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Nunca acessou'}">-</strong></div>
     </section>
 
     <section class="usuarios-edit-grid">
@@ -188,6 +200,27 @@
             </form>
         </article>
 
+    </section>
+
+    <section class="usuarios-audit-panel">
+        <h2>Histórico de atividades</h2>
+        <p>Últimos eventos relacionados a esta conta para fins de acompanhamento e auditoria.</p>
+        <div class="usuarios-audit-table-wrap">
+            <table class="usuarios-audit-table">
+                <thead><tr><th>Data e hora</th><th>Evento</th><th>Responsável</th><th>Detalhes</th></tr></thead>
+                <tbody>
+                <tr th:each="evento : ${historicoUsuario}">
+                    <td th:text="${#temporals.format(evento.dataEvento, 'dd/MM/yyyy HH:mm:ss')}">-</td>
+                    <td th:text="${evento.acao}">LOGIN</td>
+                    <td th:text="${evento.atorEmail}">admin</td>
+                    <td th:text="${evento.detalhes}">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(historicoUsuario)}">
+                    <td colspan="4" class="usuarios-audit-empty">Nenhum evento registrado.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 
     <div class="usuarios-security-note">
