@@ -527,3 +527,15 @@
 @media (max-width: 520px) {
     .unidade-overview { grid-template-columns: 1fr; }
 }
+
+
+.unidade-staff-note {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(96,165,250,.15);
+    border-radius: 8px;
+    background: rgba(59,130,246,.055);
+    color: #91a8c8;
+    font-size: 9px;
+    line-height: 1.5;
+}
