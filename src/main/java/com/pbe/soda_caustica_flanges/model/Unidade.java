@@ -38,7 +38,7 @@ public class Unidade {
     private String telefoneContato;
 
     @Size(max = 120, message = "O e-mail deve ter no máximo 120 caracteres.")
-    @Pattern(regexp = "^$|^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$",
+    @Pattern(regexp = "^$|^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
             message = "Informe um e-mail de contato válido.")
     @Column(name = "email_contato", length = 120)
     private String emailContato;
@@ -55,6 +55,13 @@ public class Unidade {
 
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
+
+    // Identificação de quem realizou o cadastro original da unidade.
+    @Column(name = "criado_por_nome", length = 100)
+    private String criadoPorNome;
+
+    @Column(name = "criado_por_email", length = 100)
+    private String criadoPorEmail;
 
     public Unidade() {
     }
@@ -108,4 +115,9 @@ public class Unidade {
 
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public LocalDateTime getAtualizadoEm() { return atualizadoEm; }
+    public String getCriadoPorNome() { return criadoPorNome; }
+    public void setCriadoPorNome(String criadoPorNome) { this.criadoPorNome = criadoPorNome; }
+
+    public String getCriadoPorEmail() { return criadoPorEmail; }
+    public void setCriadoPorEmail(String criadoPorEmail) { this.criadoPorEmail = criadoPorEmail; }
 }
