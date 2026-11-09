@@ -23,7 +23,14 @@ public class UnidadeController {
     public String listar(Model model,
                          @RequestParam(required = false) String sucesso,
                          @RequestParam(required = false) String erro) {
-        model.addAttribute("unidadesResumo", unidadeService.listarResumos());
+        var resumos = unidadeService.listarResumos();
+        model.addAttribute("unidadesResumo", resumos);
+        model.addAttribute("totalUnidadesAtivas", resumos.stream()
+                .filter(resumo -> resumo.unidade().isAtivo())
+                .count());
+        model.addAttribute("totalUsuariosCadastrados", resumos.stream()
+                .mapToLong(resumo -> resumo.totalUsuarios())
+                .sum());
         model.addAttribute("sucesso", sucesso);
         model.addAttribute("erro", erro);
         return "unidade/listagem";
