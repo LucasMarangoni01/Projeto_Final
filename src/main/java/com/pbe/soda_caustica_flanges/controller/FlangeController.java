@@ -424,7 +424,7 @@ public class FlangeController {
             }
         }
 
-        if (manutencaoRepository.countByFlangeId(id) > 0) {
+        if (manutencaoRepository.countByFlange_Id(id) > 0) {
             return "redirect:/flange/listagem?erro=historico";
         }
 
