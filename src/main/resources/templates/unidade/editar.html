@@ -37,8 +37,8 @@
     <div class="unidade-feedback unidade-feedback-error" th:if="${erroSalvar != null}" th:text="${erroSalvar}"></div>
 
     <section class="unidade-detail-metrics">
-        <article><span>COLABORADORES</span><strong th:text="${#lists.size(usuariosVinculados)}">0</strong><small>Contas vinculadas à unidade</small></article>
-        <article><span>CONTAS ATIVAS</span><strong th:text="${#lists.size(usuariosVinculados.?[ativo])}">0</strong><small>Usuários habilitados</small></article>
+        <article><span>CONTAS DE ACESSO</span><strong th:text="${#lists.size(usuariosVinculados)}">0</strong><small>Usuários associados à unidade</small></article>
+        <article><span>FUNCIONÁRIOS</span><strong th:text="${totalFuncionarios}">0</strong><small>Cadastros operacionais da planta</small></article>
         <article><span>FLANGES</span><strong th:text="${totalFlanges}">0</strong><small>Ativos cadastrados na planta</small></article>
         <article><span>MANUTENÇÕES</span><strong th:text="${totalManutencoes}">0</strong><small>Registros associados às flanges</small></article>
     </section>
@@ -183,7 +183,7 @@
                 <button type="submit" class="unidade-btn unidade-btn-secondary"
                         th:text="${unidade.ativo ? 'Arquivar unidade' : 'Reativar unidade'}">Arquivar</button>
             </form>
-            <form th:if="${#lists.isEmpty(usuariosVinculados) and totalFlanges == 0}"
+            <form th:if="${#lists.isEmpty(usuariosVinculados) and totalFuncionarios == 0 and totalFlanges == 0}"
                   th:action="@{/unidades/excluir}" method="post">
                 <input type="hidden" name="id" th:value="${unidade.id}">
                 <button type="submit" class="unidade-btn unidade-btn-danger"
