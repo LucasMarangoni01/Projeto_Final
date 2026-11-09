@@ -5,6 +5,7 @@ import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.FuncionarioRepository;
+import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
 import com.pbe.soda_caustica_flanges.repository.UnidadeRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import jakarta.validation.Valid;
@@ -23,14 +24,17 @@ public class FuncionarioController {
     private final FuncionarioRepository funcionarioRepository;
     private final UnidadeRepository unidadeRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ManutencaoRepository manutencaoRepository;
 
     public FuncionarioController(
             FuncionarioRepository funcionarioRepository,
             UnidadeRepository unidadeRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            ManutencaoRepository manutencaoRepository) {
         this.funcionarioRepository = funcionarioRepository;
         this.unidadeRepository = unidadeRepository;
         this.usuarioRepository = usuarioRepository;
+        this.manutencaoRepository = manutencaoRepository;
     }
 
     @GetMapping("/funcionario/listagem")
@@ -103,8 +107,12 @@ public class FuncionarioController {
 
     @PostMapping("/funcionario/excluir/{id}")
     public String excluir(@PathVariable Long id) {
+        if (manutencaoRepository.countByFuncionarioId(id) > 0) {
+            return "redirect:/funcionario/listagem?erro=historico";
+        }
+
         funcionarioRepository.deleteById(id);
-        return "redirect:/funcionario/listagem";
+        return "redirect:/funcionario/listagem?sucesso=excluido";
     }
 
     private Usuario buscarUsuarioLogado(Authentication authentication) {
