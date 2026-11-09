@@ -66,6 +66,10 @@ public class FotoPerfilService {
 
         BufferedImage imagem;
         try (ImageInputStream entrada = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
+            if (entrada == null) {
+                throw new IllegalArgumentException("Não foi possível ler a imagem enviada.");
+            }
+
             Iterator<ImageReader> leitores = ImageIO.getImageReaders(entrada);
             if (!leitores.hasNext()) {
                 throw new IllegalArgumentException("O arquivo enviado não é uma imagem compatível.");
