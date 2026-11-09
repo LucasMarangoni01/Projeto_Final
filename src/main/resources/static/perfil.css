@@ -518,3 +518,27 @@
     .perfil-admin-actions .perfil-secondary-button { width: 100%; }
     .perfil-admin-lock { margin-left: 0; }
 }
+
+
+/* Campos corporativos: leitura no perfil do próprio usuário */
+.perfil-field-company input:disabled {
+    border-color: rgba(148,163,184,.16);
+    background: rgba(8,20,43,.72);
+    color: #9eb2d0;
+    opacity: 1;
+    cursor: not-allowed;
+}
+.perfil-admin-managed-tag {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    padding: 3px 6px;
+    border: 1px solid rgba(96,165,250,.2);
+    border-radius: 5px;
+    background: rgba(59,130,246,.08);
+    color: #9fc5ff;
+    font-family: var(--font-mono);
+    font-size: 7px;
+    font-weight: 800;
+    vertical-align: middle;
+}
