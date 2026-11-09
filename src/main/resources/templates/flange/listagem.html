@@ -23,7 +23,8 @@
 
         <h2>Listagem de Flanges</h2>
 
-        <a th:href="@{/flange/cadastro}"
+        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+           th:href="@{/flange/cadastro}"
            class="btn btn-success">
             Cadastrar Novo
         </a>
@@ -42,6 +43,7 @@
                 <th>Localização</th>
                 <th>Temperatura Ambiente</th>
                 <th>Data de entrada</th>
+                <th>Unidade</th>
                 <th>Ações</th>
             </tr>
             </thead>
@@ -50,7 +52,7 @@
 
             <!-- Caso não tenha registros -->
             <tr th:if="${flanges.empty}">
-                <td colspan="6" style="text-align: center;">
+                <td colspan="7" style="text-align: center;">
                     Nenhum registro encontrado.
                 </td>
             </tr>
@@ -82,18 +84,17 @@
 
                 <!-- DATA DE ENTRADA -->
                 <td th:text="${#temporals.format(p.data_entrada, 'dd/MM/yyyy')}"></td>
+                <td th:text="${p.unidade != null ? p.unidade.nome : 'Sem unidade'}"></td>
 
                 <!-- AÇÕES -->
-                <td style="white-space: nowrap;">
+                <td style="white-space: nowrap;" th:if="${usuarioLogado.role.name() == 'ADMIN'}">
 
-                    <!-- ALTERAR -->
                     <a th:href="@{'/flange/alterar/' + ${p.id}}"
                        class="btn btn-alter"
                        style="margin-right: 8px;">
                         Alterar
                     </a>
 
-                    <!-- EXCLUIR -->
                     <form th:action="@{'/flange/excluir/' + ${p.id}}"
                           method="post"
                           style="display: inline; margin: 0;">
@@ -104,6 +105,9 @@
                         </button>
                     </form>
 
+                </td>
+                <td th:unless="${usuarioLogado.role.name() == 'ADMIN'}">
+                    <span class="badge">Somente leitura</span>
                 </td>
 
             </tr>
