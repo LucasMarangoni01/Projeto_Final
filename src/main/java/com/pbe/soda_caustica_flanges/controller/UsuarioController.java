@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -34,7 +36,15 @@ public class UsuarioController {
             @RequestParam(required = false) String erro,
             @RequestParam(required = false) String sucesso) {
 
-        model.addAttribute("usuarios", usuarioService.listarTodos());
+        List<Usuario> usuarios = usuarioService.listarTodos();
+        model.addAttribute("usuarios", usuarios);
+        model.addAttribute("totalAtivos", usuarios.stream().filter(Usuario::isAtivo).count());
+        model.addAttribute("totalAdministradores", usuarios.stream()
+                .filter(usuario -> usuario.getRole() == Role.ADMIN && usuario.isAtivo())
+                .count());
+        model.addAttribute("contasSemUnidade", usuarios.stream()
+                .filter(usuario -> usuario.getRole() == Role.USER && usuario.getUnidade() == null)
+                .count());
         model.addAttribute("erro", erro);
         model.addAttribute("sucesso", sucesso);
         return "usuario/listagem";
