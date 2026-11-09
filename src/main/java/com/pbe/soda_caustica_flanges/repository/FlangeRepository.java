@@ -13,6 +13,10 @@ public interface FlangeRepository
 
     List<Flange> findByUnidadeId(Long unidadeId);
 
+    List<Flange> findByUnidadeIdOrderByIdAsc(Long unidadeId);
+
+    List<Flange> findByUnidadeIsNullOrderByIdAsc();
+
     long countByUnidadeId(Long unidadeId);
 
     @Query("""
