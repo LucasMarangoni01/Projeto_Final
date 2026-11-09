@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,8 +28,8 @@ import java.util.Locale;
  * Login instantâneo ADMIN exclusivamente para testes locais.
  *
  * Requer simultaneamente:
- * - perfil Spring "dev";
- * - app.experimental.admin-shortcut.enabled=true;
+ * - execução em localhost/loopback;
+ * - app.experimental.admin-shortcut.enabled=true (padrão experimental);
  * - requisição originada de loopback e host local;
  * - conta ADMIN ativa, única ou explicitamente configurada.
  *
@@ -39,7 +38,6 @@ import java.util.Locale;
 @Controller
 public class ExperimentalAdminLoginController {
 
-    private static final String PROFILE_DEV = "dev";
     private static final String AUDIT_REQUEST_ATTRIBUTE = "experimentalAdminShortcut";
 
     private final UsuarioRepository usuarioRepository;
@@ -56,7 +54,7 @@ public class ExperimentalAdminLoginController {
             UserDetailsService userDetailsService,
             LoginSuccessHandler loginSuccessHandler,
             Environment environment,
-            @Value("${app.experimental.admin-shortcut.enabled:false}") boolean shortcutEnabled,
+            @Value("${app.experimental.admin-shortcut.enabled:true}") boolean shortcutEnabled,
             @Value("${app.experimental.admin-shortcut.email:}") String configuredAdminEmail) {
         this.usuarioRepository = usuarioRepository;
         this.userDetailsService = userDetailsService;
@@ -128,7 +126,7 @@ public class ExperimentalAdminLoginController {
     }
 
     private boolean atalhoPermitido(HttpServletRequest request) {
-        if (!shortcutEnabled || !environment.acceptsProfiles(Profiles.of(PROFILE_DEV))) {
+        if (!shortcutEnabled) {
             return false;
         }
 
