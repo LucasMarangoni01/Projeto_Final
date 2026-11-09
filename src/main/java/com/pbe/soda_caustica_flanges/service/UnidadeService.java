@@ -356,6 +356,90 @@ public class UnidadeService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<Flange> listarFlangesVinculadas(Long unidadeId) {
+        return flangeRepository.findByUnidadeIdOrderByIdAsc(unidadeId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Flange> listarFlangesDisponiveis() {
+        return flangeRepository.findByUnidadeIsNullOrderByIdAsc();
+    }
+
+    @Transactional
+    public Flange adicionarFlange(Long unidadeId, String identificador, String atorEmail) {
+        Unidade unidade = buscarPorId(unidadeId);
+
+        if (!unidade.isAtivo()) {
+            throw new IllegalArgumentException("Ative a unidade antes de vincular flanges.");
+        }
+
+        Flange flange = resolverFlange(identificador);
+
+        if (flange.getUnidade() != null) {
+            if (flange.getUnidade().getId().equals(unidadeId)) {
+                throw new IllegalArgumentException("Essa flange já está vinculada a esta unidade.");
+            }
+
+            throw new IllegalArgumentException(
+                    "Essa flange já pertence à unidade " + flange.getUnidade().getNome()
+                            + ". Para transferi-la, abra a edição da flange e selecione a nova unidade."
+            );
+        }
+
+        flange.setUnidade(unidade);
+        Flange salva = flangeRepository.save(flange);
+
+        auditoriaService.registrar(
+                unidade,
+                atorEmail,
+                "FLANGE_ADICIONADA",
+                "Flange " + salva.getNome_flange() + " (ID #" + salva.getId()
+                        + ") vinculada à unidade."
+        );
+
+        return salva;
+    }
+
+    private Flange resolverFlange(String identificador) {
+        if (identificador == null || identificador.isBlank()) {
+            throw new IllegalArgumentException("Informe o ID ou o nome exato da flange.");
+        }
+
+        String termo = identificador.trim();
+        String idInformado = termo.startsWith("#") ? termo.substring(1).trim() : termo;
+
+        if (idInformado.matches("\\d+")) {
+            try {
+                return flangeRepository.findById(Long.parseLong(idInformado))
+                        .orElseThrow(() ->
+                                new IllegalArgumentException("Não existe flange com o ID informado.")
+                        );
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("O ID informado é inválido.");
+            }
+        }
+
+        List<Flange> encontrados = flangeRepository.findAll().stream()
+                .filter(flange -> flange.getNome_flange() != null
+                        && flange.getNome_flange().equalsIgnoreCase(termo))
+                .toList();
+
+        if (encontrados.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Não encontramos uma flange com esse nome. Confira a grafia ou informe o ID."
+            );
+        }
+
+        if (encontrados.size() > 1) {
+            throw new IllegalArgumentException(
+                    "Há mais de uma flange com esse nome. Informe o ID para identificar o cadastro correto."
+            );
+        }
+
+        return encontrados.get(0);
+    }
+
     private Funcionario resolverFuncionario(String identificador) {
         if (identificador == null || identificador.isBlank()) {
             throw new IllegalArgumentException(
