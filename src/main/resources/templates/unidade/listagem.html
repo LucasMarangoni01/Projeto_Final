@@ -102,7 +102,8 @@
                     </p>
                 </div>
 
-                <div class="unidade-card-data">
+                <div class="unidade-card-data"
+                     th:if="${(resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)) or (resumo.unidade.telefoneContato != null and !#strings.isEmpty(resumo.unidade.telefoneContato)) or (resumo.unidade.emailContato != null and !#strings.isEmpty(resumo.unidade.emailContato)) or (resumo.unidade.descricao != null and !#strings.isEmpty(resumo.unidade.descricao))}">
                     <p th:if="${resumo.unidade.codigo != null and !#strings.isEmpty(resumo.unidade.codigo)}">
                         <span>Código interno</span>
                         <strong th:text="${resumo.unidade.codigo}">Código</strong>
