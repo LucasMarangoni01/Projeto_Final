@@ -5,6 +5,7 @@ import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,9 +45,14 @@ public class SecurityConfig {
                     usuario.getRole() == Role.USER
                             && usuario.getUnidade() == null;
 
+            boolean unidadeInativa =
+                    usuario.getUnidade() != null
+                            && !usuario.getUnidade().isAtivo();
+
             boolean usuarioDesabilitado =
                     !usuario.isAtivo()
-                            || usuarioSemUnidade;
+                            || usuarioSemUnidade
+                            || (usuario.getRole() == Role.USER && unidadeInativa);
 
             return User.builder()
                     .username(usuario.getEmail())
@@ -66,6 +72,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        // Arquivos estáticos e telas de autenticação.
                         .requestMatchers(
                                 "/login",
                                 "/cadastro",
@@ -85,19 +92,41 @@ public class SecurityConfig {
                                 "/foto_pessoa/**",
                                 "/foto_flange/**"
                         ).permitAll()
+
+                        // Telas de consulta disponíveis para os dois perfis.
                         .requestMatchers(
+                                HttpMethod.GET,
                                 "/",
-                                "/flange/**",
-                                "/funcionario/**",
-                                "/manutencao/**",
-                                "/incidente/**",
+                                "/flange/listagem",
+                                "/funcionario/listagem",
+                                "/manutencao/listagem",
+                                "/manutencao/cadastro",
                                 "/perfil"
                         ).hasAnyRole("ADMIN", "USER")
+
+                        // USER pode apenas criar novo lançamento de manutenção.
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/manutencao/salvar"
+                        ).hasAnyRole("ADMIN", "USER")
+
+                        // API de autocomplete já limita resultados à unidade do USER.
+                        .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
+
+                        // Operações do próprio perfil autenticado.
+                        .requestMatchers("/perfil/**").authenticated()
+
+                        // Gestão de ativos, pessoas, unidades e correções fica com ADMIN.
                         .requestMatchers(
                                 "/usuarios/**",
                                 "/usuario/**",
-                                "/unidades/**"
+                                "/unidades/**",
+                                "/flange/**",
+                                "/funcionario/**",
+                                "/manutencao/**",
+                                "/incidente/**"
                         ).hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
