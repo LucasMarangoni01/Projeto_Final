@@ -55,13 +55,28 @@
 
     <div class="unidade-list-toolbar">
         <div>
-            <h2>Plantas cadastradas <span id="unidadesResultado" class="unidade-result-count">0</span></h2>
-            <p>Consulte os dados da planta e identifique quem realizou o cadastro.</p>
+            <h2>Plantas cadastradas
+                <span class="unidade-result-count"
+                      th:text="${#lists.size(unidadesResumo) + (#lists.size(unidadesResumo) == 1 ? ' resultado' : ' resultados')}">0 resultados</span>
+            </h2>
+            <p>Pesquise por nome, código, localização, responsável, autor do cadastro ou outros dados da planta.</p>
         </div>
-        <label class="unidade-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 5 5"></path></svg>
-            <input id="filtroUnidades" type="search" placeholder="Buscar unidade, código ou local...">
-        </label>
+
+        <form class="unidade-search-form" th:action="@{/unidades}" method="get" role="search">
+            <label class="unidade-search" for="filtroUnidades">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 5 5"></path></svg>
+                <input id="filtroUnidades"
+                       name="busca"
+                       type="search"
+                       th:value="${busca}"
+                       placeholder="Buscar unidade, código, responsável..."
+                       autocomplete="off">
+            </label>
+            <button type="submit" class="unidade-btn unidade-btn-primary unidade-search-submit">Buscar</button>
+            <a th:if="${busca != null and !#strings.isEmpty(busca)}"
+               th:href="@{/unidades}"
+               class="unidade-btn unidade-btn-secondary unidade-search-clear">Limpar</a>
+        </form>
     </div>
 
     <section class="unidade-grid">
@@ -140,53 +155,21 @@
             </div>
         </article>
 
-        <div class="unidade-vazia" th:if="${#lists.isEmpty(unidadesResumo)}">
+        <div class="unidade-vazia" th:if="${#lists.isEmpty(unidadesResumo) and (busca == null or #strings.isEmpty(busca))}">
             <strong>Nenhuma unidade cadastrada.</strong>
             <p>Crie a primeira planta para começar a organizar a operação.</p>
             <a th:href="@{/unidades/cadastro}" class="unidade-btn unidade-btn-primary">Cadastrar unidade</a>
         </div>
-        <div class="unidade-vazia" id="unidadesSemResultado" hidden>
-            Nenhuma unidade corresponde à pesquisa.
+        <div class="unidade-vazia" th:if="${#lists.isEmpty(unidadesResumo) and busca != null and !#strings.isEmpty(busca)}">
+            <strong>Nenhuma unidade encontrada.</strong>
+            <p th:text="${'Não encontramos resultados para: ' + busca}">Nenhum resultado.</p>
+            <a th:href="@{/unidades}" class="unidade-btn unidade-btn-secondary">Limpar pesquisa</a>
         </div>
     </section>
 </main>
 
 <footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const input = document.getElementById("filtroUnidades");
-    const cards = Array.from(document.querySelectorAll("[data-unidade-card]"));
-    const empty = document.getElementById("unidadesSemResultado");
-    const count = document.getElementById("unidadesResultado");
 
-    if (!input || !empty) return;
-
-    function normalizar(valor) {
-        return (valor || "")
-            .toLocaleLowerCase("pt-BR")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-    }
-
-    function filtrarUnidades() {
-        const termo = normalizar(input.value.trim());
-        let visiveis = 0;
-
-        cards.forEach(function (card) {
-            const conteudo = normalizar(card.innerText || card.textContent || "");
-            const corresponde = termo === "" || conteudo.includes(termo);
-            card.hidden = !corresponde;
-            if (corresponde) visiveis++;
-        });
-
-        if (count) count.textContent = visiveis + (visiveis === 1 ? " planta" : " plantas");
-        empty.hidden = visiveis !== 0 || cards.length === 0;
-    }
-
-    input.addEventListener("input", filtrarUnidades);
-    filtrarUnidades();
-});
-</script>
 <script th:src="@{/menu.js}"></script>
 </body>
 </html>
