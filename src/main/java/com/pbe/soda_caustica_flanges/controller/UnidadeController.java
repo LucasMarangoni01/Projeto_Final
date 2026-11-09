@@ -208,7 +208,7 @@ public class UnidadeController {
         model.addAttribute("totalFuncionarios", unidadeService.contarFuncionarios(unidade.getId()));
         model.addAttribute("totalFlanges", unidadeService.contarFlanges(unidade.getId()));
         model.addAttribute("flangesVinculadas", unidadeService.listarFlangesVinculadas(unidade.getId()));
-        model.addAttribute("flangesDisponiveis", unidadeService.listarFlangesDisponiveis());
+        model.addAttribute("flangesDisponiveis", unidadeService.listarFlangesDisponiveis(unidade.getId()));
         model.addAttribute("totalManutencoes", unidadeService.contarManutencoes(unidade.getId()));
         model.addAttribute("historicoUnidade", unidadeService.buscarHistorico(unidade.getId()));
     }
