@@ -8,6 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.util.Iterator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,11 +64,31 @@ public class FotoPerfilService {
             throw new IllegalArgumentException("O conteúdo enviado não corresponde ao formato da imagem.");
         }
 
-        BufferedImage imagem = ImageIO.read(new ByteArrayInputStream(bytes));
-        if (imagem == null || imagem.getWidth() < 1 || imagem.getHeight() < 1
-                || imagem.getWidth() > 6000 || imagem.getHeight() > 6000
-                || (long) imagem.getWidth() * imagem.getHeight() > PIXELS_MAXIMOS) {
-            throw new IllegalArgumentException("A imagem é inválida ou possui dimensões muito grandes.");
+        BufferedImage imagem;
+        try (ImageInputStream entrada = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
+            Iterator<ImageReader> leitores = ImageIO.getImageReaders(entrada);
+            if (!leitores.hasNext()) {
+                throw new IllegalArgumentException("O arquivo enviado não é uma imagem compatível.");
+            }
+
+            ImageReader leitor = leitores.next();
+            try {
+                leitor.setInput(entrada, true, true);
+                int largura = leitor.getWidth(0);
+                int altura = leitor.getHeight(0);
+
+                if (largura < 1 || altura < 1 || largura > 6000 || altura > 6000
+                        || (long) largura * altura > PIXELS_MAXIMOS) {
+                    throw new IllegalArgumentException("A imagem possui dimensões muito grandes.");
+                }
+
+                imagem = leitor.read(0);
+                if (imagem == null) {
+                    throw new IllegalArgumentException("Não foi possível decodificar a imagem enviada.");
+                }
+            } finally {
+                leitor.dispose();
+            }
         }
 
         Files.createDirectories(diretorio);
