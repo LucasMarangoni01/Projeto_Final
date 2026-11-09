@@ -9,6 +9,10 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, Long> {
 
     long countByFlange_Unidade_Id(Long unidadeId);
 
+    long countByFlangeId(Long flangeId);
+
+    long countByFuncionarioId(Long funcionarioId);
+
     List<Manutencao> findByFlange_Unidade_IdOrderByDataDesc(Long unidadeId);
 
     List<Manutencao> findAllByOrderByDataDesc();
