@@ -116,6 +116,40 @@ public class UnidadeController {
         }
     }
 
+    @PostMapping("/adicionar-funcionario")
+    public String adicionarFuncionario(
+            @RequestParam Long unidadeId,
+            @RequestParam String identificador,
+            Authentication authentication) {
+        try {
+            unidadeService.adicionarFuncionario(
+                    unidadeId,
+                    identificador,
+                    authentication.getName()
+            );
+            return "redirect:/unidades/editar/" + unidadeId + "?sucesso=funcionario-adicionado";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/unidades/editar/" + unidadeId + "?erro=funcionario";
+        }
+    }
+
+    @PostMapping("/remover-funcionario")
+    public String removerFuncionario(
+            @RequestParam Long unidadeId,
+            @RequestParam Long funcionarioId,
+            Authentication authentication) {
+        try {
+            unidadeService.removerFuncionario(
+                    unidadeId,
+                    funcionarioId,
+                    authentication.getName()
+            );
+            return "redirect:/unidades/editar/" + unidadeId + "?sucesso=funcionario-removido";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/unidades/editar/" + unidadeId + "?erro=funcionario";
+        }
+    }
+
     @PostMapping("/alterar-status")
     public String alterarStatus(
             @RequestParam Long id,
@@ -145,6 +179,14 @@ public class UnidadeController {
         model.addAttribute(
                 "usuariosDisponiveis",
                 unidadeService.listarUsuariosDisponiveis()
+        );
+        model.addAttribute(
+                "funcionariosVinculados",
+                unidadeService.listarFuncionariosVinculados(unidade.getId())
+        );
+        model.addAttribute(
+                "funcionariosDisponiveis",
+                unidadeService.listarFuncionariosDisponiveis()
         );
         model.addAttribute("totalFuncionarios", unidadeService.contarFuncionarios(unidade.getId()));
         model.addAttribute("totalFlanges", unidadeService.contarFlanges(unidade.getId()));
