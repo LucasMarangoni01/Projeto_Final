@@ -4,6 +4,7 @@ public record UnidadeResumoDTO(
         Unidade unidade,
         long totalUsuarios,
         long usuariosAtivos,
+        long totalFuncionarios,
         long totalFlanges,
         long totalManutencoes) {
 }
