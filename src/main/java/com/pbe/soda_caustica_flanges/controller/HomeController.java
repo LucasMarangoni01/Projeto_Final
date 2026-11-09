@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class HomeController {
         if (usuario.getRole() == Role.ADMIN) {
             registros = flangeRepository.findAll();
         } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
-            registros = Collections.emptyList();
+            registros = new ArrayList<>();
         } else {
             registros = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
         }
