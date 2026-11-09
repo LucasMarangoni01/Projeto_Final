@@ -8,4 +8,8 @@ import java.util.List;
 public interface UnidadeAuditoriaRepository extends JpaRepository<UnidadeAuditoria, Long> {
 
     List<UnidadeAuditoria> findTop30ByUnidadeIdOrderByDataEventoDesc(Long unidadeId);
+    java.util.Optional<UnidadeAuditoria> findFirstByUnidadeIdAndAcaoOrderByDataEventoAsc(
+            Long unidadeId,
+            String acao
+    );
 }
