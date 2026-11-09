@@ -315,3 +315,206 @@
 .perfil-audit-empty { padding: 22px !important; color: #91a5c2 !important; text-align: center; }
 @media (max-width: 900px) { .perfil-content-grid { grid-template-columns: 1fr; } .perfil-side-column { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 650px) { .perfil-main { padding: 22px 12px 55px; } .perfil-hero { align-items: flex-start; flex-wrap: wrap; padding: 16px; } .perfil-avatar-wrap { width: 64px; height: 64px; flex-basis: 64px; } .perfil-hero-copy h2 { font-size: 18px; } .perfil-back-link { width: 100%; margin-left: 82px; } .perfil-side-column { grid-template-columns: 1fr; } .perfil-panel { padding: 16px; } .perfil-fields-grid { grid-template-columns: 1fr; } .perfil-field-wide { grid-column: auto; } .perfil-form-actions { align-items: stretch; flex-direction: column; } .perfil-primary-button { width: 100%; } .perfil-photo-editor { align-items: flex-start; } }
+
+
+/* =========================================================
+   AÇÕES DA FOTO DE PERFIL
+========================================================= */
+.perfil-remove-photo {
+    min-height: 34px;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 7px;
+    padding: 7px 11px;
+    border: 1px solid rgba(248,113,113,.22);
+    border-radius: 8px;
+    background: rgba(127,29,29,.12);
+    color: #fda4af;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+.perfil-remove-photo:hover {
+    border-color: rgba(248,113,113,.42);
+    background: rgba(127,29,29,.24);
+    color: #fecdd3;
+    transform: translateY(-1px);
+}
+.perfil-remove-photo input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 15px;
+    min-width: 15px;
+    height: 15px;
+    min-height: 15px;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    place-content: center;
+    border: 1px solid rgba(252,165,165,.62);
+    border-radius: 4px;
+    background: rgba(15,23,42,.45);
+    cursor: pointer;
+}
+.perfil-remove-photo input::before {
+    content: "";
+    width: 7px;
+    height: 4px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) scale(0);
+    transition: transform .12s ease-in-out;
+}
+.perfil-remove-photo input:checked {
+    border-color: #ef707b;
+    background: #dc4658;
+}
+.perfil-remove-photo input:checked::before { transform: rotate(-45deg) scale(1); }
+.perfil-remove-photo input:focus-visible {
+    outline: 3px solid rgba(248,113,113,.22);
+    outline-offset: 2px;
+}
+.perfil-remove-photo svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.perfil-remove-photo:has(input:checked) {
+    border-color: rgba(248,113,113,.5);
+    background: rgba(185,28,28,.22);
+    color: #fecaca;
+}
+.perfil-remove-hint {
+    max-width: 280px;
+    color: #8fa5c4;
+    font-size: 9px;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   ÁREA ADMINISTRATIVA — SOMENTE ADMIN
+========================================================= */
+.perfil-admin-panel {
+    margin-top: 16px;
+    border-color: rgba(96,165,250,.28);
+    background: linear-gradient(145deg, rgba(18,43,104,.96), rgba(12,29,72,.98));
+}
+.perfil-admin-lock {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border: 1px solid rgba(96,165,250,.25);
+    border-radius: 7px;
+    background: rgba(59,130,246,.1);
+    color: #bfdbfe;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .06em;
+}
+.perfil-admin-lock svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.perfil-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 10px;
+}
+.perfil-admin-item {
+    min-width: 0;
+    min-height: 102px;
+    padding: 13px;
+    border: 1px solid rgba(148,163,184,.13);
+    border-radius: 9px;
+    background: rgba(5,17,44,.28);
+}
+.perfil-admin-item > span {
+    display: block;
+    margin-bottom: 8px;
+    color: #8faedb;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .045em;
+}
+.perfil-admin-item strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #f1f6ff;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.perfil-admin-item small {
+    display: block;
+    margin-top: 5px;
+    color: #91a6c5;
+    font-size: 9px;
+    line-height: 1.45;
+}
+.perfil-admin-item .admin-value-active { color: #86efac; }
+.perfil-admin-item .admin-value-inactive { color: #fca5a5; }
+.perfil-admin-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 13px;
+    padding: 12px 13px;
+    border: 1px solid rgba(96,165,250,.16);
+    border-radius: 8px;
+    background: rgba(59,130,246,.07);
+}
+.perfil-admin-notice svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    fill: none;
+    stroke: #93c5fd;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.perfil-admin-notice p {
+    color: #a9bfdc;
+    font-size: 10px;
+    line-height: 1.55;
+}
+.perfil-admin-notice strong { color: #dbeafe; }
+.perfil-admin-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 13px;
+}
+.perfil-admin-actions .perfil-secondary-button {
+    width: auto;
+    min-width: 145px;
+    margin-top: 0;
+}
+@media (max-width: 900px) {
+    .perfil-admin-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 650px) {
+    .perfil-remove-photo { min-height: 36px; padding: 8px 10px; }
+    .perfil-admin-grid { grid-template-columns: 1fr; }
+    .perfil-admin-item { min-height: auto; }
+    .perfil-admin-actions { flex-direction: column; }
+    .perfil-admin-actions .perfil-secondary-button { width: 100%; }
+    .perfil-admin-lock { margin-left: 0; }
+}
