@@ -449,6 +449,20 @@
         .leg-box { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
         .leg-circle { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
+        .dashboard-data-note {
+            max-width: 720px;
+            margin-top: 7px;
+            color: #fbbf24;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+        .dashboard-readonly-note {
+            margin-top: 12px;
+            color: #9bb0ce;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
         /* ── Animations ──────────────────────────────────────────────── */
         @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.1} }
         @keyframes pbadge { 0%,100%{opacity:1} 50%{opacity:0.55} }
@@ -477,7 +491,10 @@
             <div class="topbar-meta">
                 <div class="topbar-eyebrow">Sistema de Monitoramento · NaOH 32%</div>
                 <div class="topbar-title">Planta de Flanges — Soda Cáustica</div>
-                <div class="topbar-sub">Linha de processo industrial · 6 flanges · sensor de vazamento ativo</div>
+                <div class="topbar-sub"
+                     th:text="${'Painel operacional · ' + totalFlanges + ' flange(s) cadastrada(s) · estados demonstrativos'}">
+                    Painel operacional · estados demonstrativos
+                </div>
             </div>
             <div class="badge ok-b" id="badge">Sistema normal</div>
         </div>
