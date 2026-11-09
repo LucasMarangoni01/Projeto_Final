@@ -423,3 +423,8 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Foto do usuário no menu */
+.user-avatar { overflow: hidden; }
+.user-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.user-avatar img[src$="avatar-default.svg"] { padding: 3px; }
