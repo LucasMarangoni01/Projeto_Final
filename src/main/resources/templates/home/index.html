@@ -663,6 +663,14 @@
         <div class="body-row">
 
             <div class="map-card">
+                <div class="map-card-heading">
+                    <div>
+                        <span class="topbar-eyebrow">VISÃO DA PLANTA</span>
+                        <strong>Mapa do processo</strong>
+                    </div>
+                    <span class="map-card-hint">Deslize para explorar</span>
+                </div>
+                <div class="map-viewport" tabindex="0" role="region" aria-label="Mapa horizontal da planta de flanges">
                 <svg class="map-svg" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
 
                     <rect x="0" y="0" width="860" height="340" rx="8" fill="#002456" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
@@ -822,6 +830,7 @@
                     <text x="430" y="333" text-anchor="middle" font-size="7.5" fill="#8aa4c8" font-family="monospace">As posições representam somente flanges cadastradas nesta unidade</text>
 
                 </svg>
+                </div>
             </div>
 
             <div class="flange-panel">
@@ -833,6 +842,19 @@
                               th:text="${'Cadastradas: ' + totalFlanges}">0 flanges</span>
                     </div>
                 </div>
+                <label class="flange-search" for="flangeSearch">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 4.5 4.5"></path>
+                    </svg>
+                    <input id="flangeSearch"
+                           type="search"
+                           placeholder="Buscar flange, local ou status..."
+                           autocomplete="off"
+                           aria-label="Buscar flange por nome, local ou status">
+                    <kbd>/</kbd>
+                </label>
+                <div class="flange-search-meta" id="flangeSearchMeta" aria-live="polite"></div>
                 <div class="flange-list" id="dynamic-flange-list">
                     <article class="fc dashboard-flange-card"
                              th:each="flange : ${flanges}"
@@ -861,7 +883,11 @@
                         <strong>Nenhuma flange cadastrada nesta unidade.</strong>
                         <span>Cadastre uma flange para que ela apareça neste painel.</span>
                     </div>
-                    <div class="fc-overflow-note" th:if="${totalFlanges > 6}">
+                    <div class="fc-search-empty" id="flangeSearchEmpty" hidden>
+                        <strong>Nenhuma flange encontrada.</strong>
+                        <span>Tente outro nome, local ou status.</span>
+                    </div>
+                    <div class="fc-overflow-note" data-flange-overflow th:if="${totalFlanges > 6}">
                         O mapa mostra as seis primeiras posições. As demais flanges continuam listadas acima.
                     </div>
                 </div>
@@ -1080,6 +1106,59 @@
         updateStats();
     }
 
+    function normalizarBuscaFlange(valor) {
+        return (valor || '')
+            .normalize('NFD')
+            .replace(/[\\u0300-\\u036f]/g, '')
+            .toLocaleLowerCase('pt-BR');
+    }
+
+    function initializeFlangeSearch() {
+        const input = document.getElementById('flangeSearch');
+        const cards = Array.from(document.querySelectorAll('.dashboard-flange-card'));
+        const empty = document.getElementById('flangeSearchEmpty');
+        const meta = document.getElementById('flangeSearchMeta');
+        const overflow = document.querySelector('[data-flange-overflow]');
+
+        if (!input) return;
+
+        function filtrar() {
+            const termo = normalizarBuscaFlange(input.value.trim());
+            let visiveis = 0;
+
+            cards.forEach(function (card) {
+                const conteudo = normalizarBuscaFlange(card.innerText || card.textContent || '');
+                const corresponde = termo === '' || conteudo.includes(termo);
+                card.hidden = !corresponde;
+                if (corresponde) visiveis++;
+            });
+
+            if (empty) empty.hidden = termo === '' || visiveis > 0;
+            if (overflow) overflow.hidden = termo !== '';
+            if (meta) {
+                meta.textContent = termo === ''
+                    ? cards.length + (cards.length === 1 ? ' flange listada' : ' flanges listadas')
+                    : visiveis + (visiveis === 1 ? ' resultado' : ' resultados');
+            }
+        }
+
+        input.addEventListener('input', filtrar);
+        filtrar();
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === '/' && !event.ctrlKey && !event.metaKey
+                    && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                event.preventDefault();
+                input.focus();
+            }
+            if (event.key === 'Escape' && document.activeElement === input) {
+                input.value = '';
+                filtrar();
+                input.blur();
+            }
+        });
+    }
+
     function updateStats() {
         const contador = document.getElementById('lk-c');
         if (contador) contador.textContent = String(alertasSimulados.size);
@@ -1139,6 +1218,7 @@
             });
         }
         initializeFlangeData();
+        initializeFlangeSearch();
     });
 </script>
 
