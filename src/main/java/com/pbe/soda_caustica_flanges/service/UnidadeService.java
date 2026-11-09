@@ -74,7 +74,7 @@ public class UnidadeService {
     }
 
     public List<Usuario> listarUsuariosDisponiveis() {
-        return usuarioRepository.findByUnidadeIsNullAndAtivoTrueOrderByNomeAsc();
+        return usuarioRepository.findByUnidadeIsNullAndAtivoTrueAndRoleOrderByNomeAsc(Role.USER);
     }
 
     public long contarFuncionarios(Long unidadeId) {
@@ -197,6 +197,12 @@ public class UnidadeService {
         }
 
         Usuario usuario = resolverUsuario(identificador);
+
+        if (usuario.getRole() != Role.USER) {
+            throw new IllegalArgumentException(
+                    "Somente contas USER podem ser vinculadas a uma unidade operacional. Contas ADMIN têm acesso global."
+            );
+        }
 
         if (!usuario.isAtivo()) {
             throw new IllegalArgumentException(
