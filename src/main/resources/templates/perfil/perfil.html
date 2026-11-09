@@ -1,116 +1,231 @@
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil | Soda Cáustica Flanges</title>
-
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
     <link rel="stylesheet" th:href="@{/perfil.css}">
 </head>
-
 <body>
-
 <div th:replace="~{fragments/menu :: menu}"></div>
 
 <main class="perfil-main">
+    <header class="perfil-header">
+        <span class="perfil-label">CENTRAL DA CONTA</span>
+        <h1>Meu perfil</h1>
+        <p>Gerencie seus dados de identificação, segurança e informações profissionais.</p>
+    </header>
 
-    <div class="perfil-header">
-        <span class="perfil-label">CONTA DO SISTEMA</span>
-        <h1>Meu Perfil</h1>
-        <p>Visualize as informações da sua conta de acesso.</p>
+    <div class="perfil-feedback perfil-feedback-success" th:if="${statusPerfil == 'atualizado'}">
+        <strong>Perfil atualizado.</strong> Suas informações foram salvas.
     </div>
+    <div class="perfil-feedback perfil-feedback-success" th:if="${statusSenha == 'alterada'}">
+        <strong>Senha alterada.</strong> Sua próxima entrada deverá usar a nova senha.
+    </div>
+    <div class="perfil-feedback perfil-feedback-error" th:if="${erroPerfil != null}" th:text="${erroPerfil}"></div>
+    <div class="perfil-feedback perfil-feedback-error" th:if="${erroSenha != null}" th:text="${erroSenha}"></div>
 
-    <section class="perfil-card">
-
-        <div class="perfil-topo">
-
-            <div class="perfil-avatar">
-                👤
-            </div>
-
-            <div class="perfil-identidade">
-                <h2 th:text="${usuarioLogado.nome}">
-                    Usuário
-                </h2>
-
-                <p th:text="${usuarioLogado.email}">
-                    email@gmail.com
-                </p>
-            </div>
-
-            <span class="perfil-role"
-                  th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' perfil-admin' : ' perfil-user'"
-                  th:text="${usuarioLogado.role}">
-                USER
-            </span>
-
+    <section class="perfil-hero">
+        <div class="perfil-avatar-wrap">
+            <img class="perfil-avatar-image"
+                 th:if="${usuarioLogado.fotoPerfil != null}"
+                 th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                 alt="Foto de perfil">
+            <img class="perfil-avatar-image"
+                 th:unless="${usuarioLogado.fotoPerfil != null}"
+                 th:src="@{/img/avatar-default.svg}"
+                 alt="Ícone padrão de perfil">
         </div>
-
-        <div class="perfil-divider"></div>
-
-        <div class="perfil-grid">
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">NOME COMPLETO</span>
-                <strong th:text="${usuarioLogado.nome}">
-                    Usuário
-                </strong>
+        <div class="perfil-hero-copy">
+            <span class="perfil-eyebrow">CONTA AUTENTICADA</span>
+            <h2 th:text="${usuarioLogado.nome}">Nome do usuário</h2>
+            <p th:text="${usuarioLogado.email}">email@empresa.com.br</p>
+            <div class="perfil-hero-tags">
+                <span class="perfil-role"
+                      th:classappend="${usuarioLogado.role.name() == 'ADMIN'} ? ' perfil-admin' : ' perfil-user'"
+                      th:text="${usuarioLogado.role}">USER</span>
+                <span class="perfil-account-status"
+                      th:classappend="${usuarioLogado.ativo} ? ' account-active' : ' account-inactive'"
+                      th:text="${usuarioLogado.ativo ? 'Conta ativa' : 'Conta inativa'}">Conta ativa</span>
             </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">E-MAIL</span>
-                <strong th:text="${usuarioLogado.email}">
-                    email@gmail.com
-                </strong>
-            </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">NÍVEL DE ACESSO</span>
-                <strong th:text="${usuarioLogado.role}">
-                    USER
-                </strong>
-            </div>
-
-            <div class="perfil-item">
-                <span class="perfil-item-label">STATUS DA CONTA</span>
-                <strong class="perfil-status">
-                    <span></span>
-                    <span th:text="${usuarioLogado.ativo ? 'ATIVA' : 'INATIVA'}">
-                        ATIVA
-                    </span>
-                </strong>
-            </div>
-
         </div>
-
-        <div class="perfil-acoes">
-
-            <a th:href="@{/}"
-               class="perfil-btn perfil-voltar">
-                Voltar ao Sistema
-            </a>
-
-            <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-               th:href="@{/usuarios}"
-               class="perfil-btn perfil-admin-btn">
-                Gerenciar Usuários
-            </a>
-
-        </div>
-
+        <a class="perfil-back-link" th:href="@{/}">Voltar ao sistema</a>
     </section>
 
+    <div class="perfil-content-grid">
+        <section class="perfil-panel">
+            <div class="perfil-panel-heading">
+                <div>
+                    <span class="perfil-panel-kicker">IDENTIFICAÇÃO</span>
+                    <h2>Dados do perfil</h2>
+                    <p>Mantenha seus dados profissionais atualizados.</p>
+                </div>
+            </div>
+
+            <form th:action="@{/perfil/atualizar}" th:object="${perfilDTO}" method="post" enctype="multipart/form-data" class="perfil-form">
+                <div class="perfil-photo-editor">
+                    <div class="perfil-photo-preview">
+                        <img id="previewFotoPerfil"
+                             th:if="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                             alt="Pré-visualização da foto">
+                        <img id="previewFotoPerfil"
+                             th:unless="${usuarioLogado.fotoPerfil != null}"
+                             th:src="@{/img/avatar-default.svg}"
+                             alt="Ícone padrão">
+                    </div>
+                    <div class="perfil-photo-controls">
+                        <strong>Foto de perfil</strong>
+                        <p>Imagem JPEG ou PNG, até 2 MB. A foto aparece no menu e no seu perfil.</p>
+                        <label class="perfil-file-button" for="fotoPerfil">Escolher imagem</label>
+                        <input id="fotoPerfil" name="fotoPerfil" type="file" accept="image/jpeg,image/png" hidden>
+                        <label class="perfil-remove-photo" th:if="${usuarioLogado.fotoPerfil != null}">
+                            <input type="checkbox" name="removerFoto" value="true">
+                            Remover foto atual
+                        </label>
+                    </div>
+                </div>
+
+                <div class="perfil-fields-grid">
+                    <div class="perfil-field perfil-field-wide">
+                        <label for="nome">Nome completo</label>
+                        <input id="nome" type="text" th:field="*{nome}" maxlength="100" autocomplete="name" required>
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+                    </div>
+
+                    <div class="perfil-field perfil-field-wide">
+                        <label for="emailPerfil">E-mail de acesso</label>
+                        <input id="emailPerfil" type="email" th:value="${usuarioLogado.email}" disabled>
+                        <small>O e-mail é o identificador de login. Para alterá-lo, solicite ao administrador.</small>
+                    </div>
+
+                    <div class="perfil-field">
+                        <label for="telefone">Telefone</label>
+                        <input id="telefone" type="tel" th:field="*{telefone}" maxlength="25" placeholder="(15) 99999-9999" autocomplete="tel">
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
+                    </div>
+
+                    <div class="perfil-field">
+                        <label for="matricula">Matrícula</label>
+                        <input id="matricula" type="text" th:field="*{matricula}" maxlength="30" placeholder="Identificação interna">
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('matricula')}" th:errors="*{matricula}"></small>
+                    </div>
+
+                    <div class="perfil-field">
+                        <label for="cargo">Cargo</label>
+                        <input id="cargo" type="text" th:field="*{cargo}" maxlength="100" placeholder="Ex.: Técnico de manutenção">
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('cargo')}" th:errors="*{cargo}"></small>
+                    </div>
+
+                    <div class="perfil-field">
+                        <label for="setor">Setor</label>
+                        <input id="setor" type="text" th:field="*{setor}" maxlength="100" placeholder="Ex.: Segurança industrial">
+                        <small class="perfil-field-error" th:if="${#fields.hasErrors('setor')}" th:errors="*{setor}"></small>
+                    </div>
+                </div>
+
+                <div class="perfil-form-actions">
+                    <span>As informações são vinculadas à sua conta individual.</span>
+                    <button class="perfil-primary-button" type="submit">Salvar alterações</button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="perfil-side-column">
+            <section class="perfil-panel perfil-account-panel">
+                <span class="perfil-panel-kicker">ACESSO E VÍNCULO</span>
+                <h2>Informações da conta</h2>
+                <dl class="perfil-account-data">
+                    <div><dt>Identificador</dt><dd th:text="${'USR-' + usuarioLogado.id}">USR-1</dd></div>
+                    <div><dt>Perfil de acesso</dt><dd th:text="${usuarioLogado.role}">USER</dd></div>
+                    <div><dt>Unidade industrial</dt><dd th:text="${usuarioLogado.unidade != null ? usuarioLogado.unidade.nome : 'Aguardando vínculo'}">Unidade</dd></div>
+                    <div><dt>Conta criada em</dt><dd th:text="${usuarioLogado.criadoEm != null ? #temporals.format(usuarioLogado.criadoEm, 'dd/MM/yyyy HH:mm') : 'Não disponível'}">-</dd></div>
+                    <div><dt>Último acesso</dt><dd th:text="${usuarioLogado.ultimoAcesso != null ? #temporals.format(usuarioLogado.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Primeiro acesso'}">-</dd></div>
+                </dl>
+                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}" th:href="@{/usuarios}" class="perfil-secondary-button">Administrar usuários</a>
+            </section>
+
+            <section class="perfil-panel perfil-security-panel">
+                <span class="perfil-panel-kicker">SEGURANÇA</span>
+                <h2>Alterar senha</h2>
+                <p class="perfil-panel-description">Use uma senha exclusiva, com pelo menos 12 caracteres.</p>
+                <form th:action="@{/perfil/alterar-senha}" th:object="${alterarSenhaDTO}" method="post" class="perfil-form perfil-password-form">
+                    <div class="perfil-field">
+                        <label for="senhaAtual">Senha atual</label>
+                        <input id="senhaAtual" type="password" th:field="*{senhaAtual}" autocomplete="current-password" required>
+                    </div>
+                    <div class="perfil-field">
+                        <label for="novaSenha">Nova senha</label>
+                        <input id="novaSenha" type="password" th:field="*{novaSenha}" minlength="12" maxlength="72" autocomplete="new-password" required>
+                    </div>
+                    <div class="perfil-field">
+                        <label for="confirmarSenha">Confirmar nova senha</label>
+                        <input id="confirmarSenha" type="password" th:field="*{confirmarSenha}" minlength="12" maxlength="72" autocomplete="new-password" required>
+                    </div>
+                    <button class="perfil-primary-button perfil-full-button" type="submit">Atualizar senha</button>
+                </form>
+            </section>
+        </aside>
+    </div>
+
+    <section class="perfil-panel perfil-audit-panel">
+        <div class="perfil-panel-heading">
+            <div>
+                <span class="perfil-panel-kicker">RASTREABILIDADE</span>
+                <h2>Atividade recente da conta</h2>
+                <p>Histórico das principais ações relacionadas ao seu usuário.</p>
+            </div>
+            <span class="perfil-audit-count" th:text="${#lists.size(historicoUsuario)}">0</span>
+        </div>
+
+        <div class="perfil-audit-table-wrap">
+            <table class="perfil-audit-table">
+                <thead><tr><th>Data e hora</th><th>Evento</th><th>Responsável</th><th>Detalhes</th></tr></thead>
+                <tbody>
+                <tr th:each="evento : ${historicoUsuario}">
+                    <td th:text="${#temporals.format(evento.dataEvento, 'dd/MM/yyyy HH:mm:ss')}">-</td>
+                    <td><span class="perfil-event-badge" th:text="${evento.acao}">LOGIN</span></td>
+                    <td th:text="${evento.atorEmail}">admin</td>
+                    <td th:text="${evento.detalhes}">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(historicoUsuario)}">
+                    <td colspan="4" class="perfil-audit-empty">Ainda não há atividades registradas para esta conta.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>
 
-<footer>
-    <p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p>
-</footer>
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("fotoPerfil");
+        const preview = document.getElementById("previewFotoPerfil");
+        const fileLabel = document.querySelector(".perfil-file-button");
+
+        if (!input || !preview) return;
+
+        input.addEventListener("change", function () {
+            const arquivo = input.files && input.files[0];
+            if (!arquivo) return;
+
+            if (!["image/jpeg", "image/png"].includes(arquivo.type) || arquivo.size > 2 * 1024 * 1024) {
+                input.value = "";
+                alert("Selecione uma imagem JPEG ou PNG de até 2 MB.");
+                return;
+            }
+
+            const url = URL.createObjectURL(arquivo);
+            preview.src = url;
+            preview.onload = function () { URL.revokeObjectURL(url); };
+            if (fileLabel) fileLabel.textContent = arquivo.name;
+        });
+    });
+</script>
 <script th:src="@{/menu.js}"></script>
-
 </body>
 </html>
