@@ -51,32 +51,37 @@
         <span class="usuario-alert-icon">!</span>
         <span>Não foi possível alterar a unidade do usuário.</span>
     </div>
+    <div class="usuario-alert usuario-alert-success"
+         th:if="${sucesso != null}">
+        <span class="usuario-alert-icon">✓</span>
+        <span th:text="${sucesso == 'unidade' ? 'Unidade do usuário atualizada.' : (sucesso == 'role' ? 'Permissão atualizada.' : 'Status da conta atualizado.')}">Alteração concluída.</span>
+    </div>
 
     <section class="usuarios-summary">
         <article class="usuarios-summary-card">
             <span class="usuarios-summary-icon usuarios-icon-total">U</span>
             <div>
-                <span class="usuarios-summary-label">CONTAS CADASTRADAS</span>
-                <strong th:text="${#lists.size(usuarios)}">0</strong>
-                <small>Usuários registrados no sistema</small>
+                <span class="usuarios-summary-label">CONTAS ATIVAS</span>
+                <strong th:text="${totalAtivos}">0</strong>
+                <small>Contas habilitadas para acesso</small>
             </div>
         </article>
 
         <article class="usuarios-summary-card">
             <span class="usuarios-summary-icon usuarios-icon-admin">A</span>
             <div>
-                <span class="usuarios-summary-label">ADMINISTRAÇÃO</span>
-                <strong>ADMIN</strong>
-                <small>Gerencia usuários e unidades</small>
+                <span class="usuarios-summary-label">ADMINISTRADORES ATIVOS</span>
+                <strong th:text="${totalAdministradores}">0</strong>
+                <small>Contas com permissão administrativa</small>
             </div>
         </article>
 
         <article class="usuarios-summary-card">
             <span class="usuarios-summary-icon usuarios-icon-access">✓</span>
             <div>
-                <span class="usuarios-summary-label">CONTROLE DE ACESSO</span>
-                <strong>Ativo</strong>
-                <small>Permissões individuais por conta</small>
+                <span class="usuarios-summary-label">VÍNCULO PENDENTE</span>
+                <strong th:text="${contasSemUnidade}">0</strong>
+                <small>Usuários aguardando unidade industrial</small>
             </div>
         </article>
     </section>
@@ -112,6 +117,7 @@
                 <thead>
                 <tr>
                     <th>Usuário</th>
+                    <th>Último acesso</th>
                     <th>Unidade</th>
                     <th>Permissão</th>
                     <th>Status</th>
@@ -124,14 +130,25 @@
                 <tr data-usuario-row>
                     <td>
                         <div class="usuario-cell">
-                            <span class="usuario-avatar"
-                                  th:text="${#strings.substring(usuario.nome, 0, 1).toUpperCase()}">U</span>
+                            <span class="usuario-avatar">
+                                <img th:if="${usuario.fotoPerfil != null}"
+                                     th:src="@{/perfil/foto/{arquivo}(arquivo=${usuario.fotoPerfil})}"
+                                     alt="Foto do usuário">
+                                <img th:unless="${usuario.fotoPerfil != null}"
+                                     th:src="@{/img/avatar-default.svg}"
+                                     alt="Ícone padrão de perfil">
+                            </span>
                             <span class="usuario-cell-info">
                                 <strong th:text="${usuario.nome}">Usuário</strong>
                                 <small th:text="${usuario.email}">email@gmail.com</small>
                                 <small class="usuario-id" th:text="${'ID: ' + usuario.id}">ID: 1</small>
                             </span>
                         </div>
+                    </td>
+
+                    <td>
+                        <span class="usuario-last-access"
+                              th:text="${usuario.ultimoAcesso != null ? #temporals.format(usuario.ultimoAcesso, 'dd/MM/yyyy HH:mm') : 'Nunca acessou'}">Nunca acessou</span>
                     </td>
 
                     <td>
@@ -210,7 +227,7 @@
                 </th:block>
 
                 <tr th:if="${#lists.isEmpty(usuarios)}">
-                    <td colspan="5" class="usuarios-empty">
+                    <td colspan="6" class="usuarios-empty">
                         <span class="usuarios-empty-icon">U</span>
                         <strong>Nenhum usuário cadastrado</strong>
                         <small>Quando houver contas cadastradas, elas aparecerão aqui.</small>
