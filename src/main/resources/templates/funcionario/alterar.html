@@ -18,6 +18,7 @@
         <form id="form-cadastro" th:action="@{/funcionario/salvar}" th:object="${funcionario}" method="post">
 
             <input type="hidden" th:field="*{id}">
+            <div th:if="${#fields.hasGlobalErrors()}" class="msg-erro" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></div>
 
             <h3 style="font-size: 1.1rem; color: #9ca3af; margin-bottom: 15px; border-bottom: 1px solid #374151; padding-bottom: 5px;">
                 Informações Pessoais
