@@ -62,6 +62,14 @@ public class UsuarioService {
                 );
     }
 
+    public boolean podeVisualizarFoto(String nomeArquivo, String emailSolicitante) {
+        Usuario solicitante = buscarPorEmail(emailSolicitante);
+        if (solicitante.getRole() == Role.ADMIN) {
+            return true;
+        }
+        return nomeArquivo != null && nomeArquivo.equals(solicitante.getFotoPerfil());
+    }
+
     public Usuario buscarPorEmail(String email) {
         return repository.findByEmail(normalizarEmail(email))
                 .orElseThrow(() ->
