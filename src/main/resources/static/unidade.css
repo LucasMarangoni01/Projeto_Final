@@ -280,7 +280,7 @@
 .unidade-feedback > span:first-child { font-weight: 900; }
 .unidade-overview {
     display: grid;
-    grid-template-columns: repeat(3,minmax(0,1fr));
+    grid-template-columns: repeat(4,minmax(0,1fr));
     gap: 12px;
     margin-bottom: 24px;
 }
@@ -519,4 +519,11 @@
     .unidade-card-actions { align-items: stretch; flex-direction: column; }
     .unidade-card-actions .unidade-btn { width: 100%; }
     .unidade-card-actions form { width: 100%; }
+}
+
+@media (max-width: 900px) {
+    .unidade-overview { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 520px) {
+    .unidade-overview { grid-template-columns: 1fr; }
 }
