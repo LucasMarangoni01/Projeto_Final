@@ -277,6 +277,127 @@ public class UnidadeService {
         );
     }
 
+    public List<Funcionario> listarFuncionariosVinculados(Long unidadeId) {
+        return funcionarioRepository.findByUnidadeIdOrderByIdAsc(unidadeId);
+    }
+
+    public List<Funcionario> listarFuncionariosDisponiveis() {
+        return funcionarioRepository.findByUnidadeIsNullOrderByIdAsc();
+    }
+
+    @Transactional
+    public Funcionario adicionarFuncionario(
+            Long unidadeId,
+            String identificador,
+            String atorEmail) {
+
+        Unidade unidade = buscarPorId(unidadeId);
+        if (!unidade.isAtivo()) {
+            throw new IllegalArgumentException(
+                    "Ative a unidade antes de adicionar funcionários."
+            );
+        }
+
+        Funcionario funcionario = resolverFuncionario(identificador);
+
+        if (funcionario.getUnidade() != null) {
+            if (funcionario.getUnidade().getId().equals(unidadeId)) {
+                throw new IllegalArgumentException(
+                        "Esse funcionário já está vinculado a esta unidade."
+                );
+            }
+
+            throw new IllegalArgumentException(
+                    "Esse funcionário já pertence à unidade "
+                            + funcionario.getUnidade().getNome()
+                            + ". Remova o vínculo anterior antes de transferi-lo."
+            );
+        }
+
+        funcionario.setUnidade(unidade);
+        Funcionario salvo = funcionarioRepository.save(funcionario);
+
+        auditoriaService.registrar(
+                unidade,
+                atorEmail,
+                "FUNCIONARIO_ADICIONADO",
+                "Funcionário " + salvo.getNome_funcionario()
+                        + " (ID #" + salvo.getId() + ") vinculado à unidade."
+        );
+
+        return salvo;
+    }
+
+    @Transactional
+    public void removerFuncionario(Long unidadeId, Long funcionarioId, String atorEmail) {
+        Unidade unidade = buscarPorId(unidadeId);
+        Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Funcionário não encontrado.")
+                );
+
+        if (funcionario.getUnidade() == null
+                || !funcionario.getUnidade().getId().equals(unidadeId)) {
+            throw new IllegalArgumentException(
+                    "Esse funcionário não está vinculado a esta unidade."
+            );
+        }
+
+        funcionario.setUnidade(null);
+        Funcionario salvo = funcionarioRepository.save(funcionario);
+
+        auditoriaService.registrar(
+                unidade,
+                atorEmail,
+                "FUNCIONARIO_DESVINCULADO",
+                "Funcionário " + salvo.getNome_funcionario()
+                        + " (ID #" + salvo.getId() + ") desvinculado da unidade. "
+                        + "O cadastro e os registros históricos foram preservados."
+        );
+    }
+
+    private Funcionario resolverFuncionario(String identificador) {
+        if (identificador == null || identificador.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Informe o ID ou o nome completo do funcionário."
+            );
+        }
+
+        String termo = identificador.trim();
+        String idInformado = termo.startsWith("#")
+                ? termo.substring(1).trim()
+                : termo;
+
+        if (idInformado.matches("\\d+")) {
+            try {
+                return funcionarioRepository.findById(Long.parseLong(idInformado))
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Não existe funcionário com o ID informado."
+                                )
+                        );
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("O ID informado é inválido.");
+            }
+        }
+
+        List<Funcionario> encontrados = funcionarioRepository.buscarPorNomeExato(termo);
+
+        if (encontrados.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Não encontramos um funcionário com esse nome. Confira a grafia ou informe o ID."
+            );
+        }
+
+        if (encontrados.size() > 1) {
+            throw new IllegalArgumentException(
+                    "Há mais de um funcionário com esse nome. Informe o ID para identificar o cadastro correto."
+            );
+        }
+
+        return encontrados.get(0);
+    }
+
     private Usuario resolverUsuario(String identificador) {
         if (identificador == null || identificador.isBlank()) {
             throw new IllegalArgumentException("Informe o ID ou o nome completo da pessoa.");
