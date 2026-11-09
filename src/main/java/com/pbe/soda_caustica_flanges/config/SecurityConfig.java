@@ -19,15 +19,18 @@ import java.util.Locale;
 public class SecurityConfig {
 
     private final UsuarioRepository repository;
+    private final LoginSuccessHandler loginSuccessHandler;
 
-    public SecurityConfig(UsuarioRepository repository) {
+    public SecurityConfig(
+            UsuarioRepository repository,
+            LoginSuccessHandler loginSuccessHandler) {
         this.repository = repository;
+        this.loginSuccessHandler = loginSuccessHandler;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> {
-
             String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
 
             Usuario usuario = repository.findByEmail(emailNormalizado)
@@ -60,18 +63,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF permanece habilitado pelo padrão do Spring Security.
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 "/login",
                                 "/cadastro",
                                 "/error",
-
                                 "/login.css",
                                 "/cadastro.css",
                                 "/style.css",
@@ -80,16 +78,13 @@ public class SecurityConfig {
                                 "/perfil.css",
                                 "/unidade.css",
                                 "/flange.css",
-
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
-
                                 "/foto_ocorrencia/**",
                                 "/foto_pessoa/**",
                                 "/foto_flange/**"
                         ).permitAll()
-
                         .requestMatchers(
                                 "/",
                                 "/flange/**",
@@ -97,48 +92,25 @@ public class SecurityConfig {
                                 "/manutencao/**",
                                 "/incidente/**",
                                 "/perfil"
-                        ).hasAnyRole(
-                                "ADMIN",
-                                "USER"
-                        )
-
+                        ).hasAnyRole("ADMIN", "USER")
                         .requestMatchers(
                                 "/usuarios/**",
                                 "/usuario/**",
                                 "/unidades/**"
                         ).hasRole("ADMIN")
-
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
-
                         .loginPage("/login")
-
                         .usernameParameter("email")
-
                         .passwordParameter("senha")
-
-                        .defaultSuccessUrl(
-                                "/",
-                                true
-                        )
-
-                        .failureUrl(
-                                "/login?error=true"
-                        )
-
+                        .successHandler(loginSuccessHandler)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
-
                 .logout(logout -> logout
-
                         .logoutUrl("/logout")
-
-                        .logoutSuccessUrl(
-                                "/login?logout=true"
-                        )
-
+                        .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 );
 
