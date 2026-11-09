@@ -779,9 +779,14 @@
         // Oculta posições do desenho que não possuem flange cadastrada.
         for (let i = 1; i <= 6; i++) {
             const grupo = document.getElementById('fg' + i);
-            if (grupo && !idsDisponiveis.has(i)) {
+            if (!grupo) continue;
+
+            if (!idsDisponiveis.has(i)) {
                 grupo.style.display = 'none';
                 grupo.removeAttribute('onclick');
+            } else if (!podeSimular) {
+                grupo.removeAttribute('onclick');
+                grupo.style.cursor = 'default';
             }
         }
 
