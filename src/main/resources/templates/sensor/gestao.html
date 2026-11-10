@@ -110,7 +110,7 @@
                         <label for="flangeId">Flange monitorada *</label>
                         <select id="flangeId" th:field="*{flangeId}" required>
                             <option value="">Selecione a flange</option>
-                            <option th:each="flange : ${flanges}" th:value="${flange.id}"
+                            <option th:each="flange : ${flangesDisponiveis}" th:value="${flange.id}"
                                     th:text="${flange.nome_flange + ' · ' + (flange.unidade != null ? flange.unidade.nome : 'Sem unidade')}">Flange</option>
                         </select>
                         <small>Um sensor fica vinculado a uma flange. Uma flange pode receber vários sensores.</small>
