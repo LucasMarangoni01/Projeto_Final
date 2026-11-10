@@ -4,13 +4,13 @@ import com.pbe.soda_caustica_flanges.model.*;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
 import com.pbe.soda_caustica_flanges.service.SensorService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -73,9 +73,15 @@ public class SensorController {
             String erro) {
 
         List<Sensor> sensores = sensorService.listarTodos();
-        List<Flange> flanges = flangeRepository.findAll(
-                Sort.by(Sort.Direction.ASC, "nome_flange")
-        );
+
+        // O atributo Java da entidade chama-se "nome_flange".
+        // Evitamos Sort por esse nome porque o Spring Data interpreta "_"
+        // como separador de propriedades aninhadas (nome.flange).
+        List<Flange> flanges = flangeRepository.findAll();
+        flanges.sort(Comparator.comparing(
+                Flange::getNome_flange,
+                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+        ));
 
         Map<Long, List<Sensor>> porFlange = sensores.stream()
                 .filter(sensor -> sensor.getFlange() != null)
