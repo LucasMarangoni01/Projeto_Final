@@ -428,3 +428,62 @@
 .user-avatar { overflow: hidden; }
 .user-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .user-avatar img[src$="avatar-default.svg"] { padding: 3px; }
+
+
+/* =========================================================
+   TROCAR DE CONTA
+========================================================= */
+
+.nav-switch-account {
+    margin-left: 2px;
+}
+
+.btn-trocar-conta {
+    min-height: 38px;
+    padding: 8px 11px;
+    border: 1px solid rgba(96,165,250,0.28);
+    border-radius: var(--menu-radius);
+    background: rgba(59,130,246,0.10);
+    color: #bfdbfe;
+    font-family: var(--menu-font);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .025em;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.btn-trocar-conta:hover {
+    border-color: rgba(96,165,250,0.55);
+    background: rgba(59,130,246,0.20);
+    transform: translateY(-1px);
+}
+
+.mobile-switch-account {
+    width: 100%;
+    display: block;
+    margin-top: 5px;
+    padding: 10px 11px;
+    border: 1px solid rgba(96,165,250,0.28);
+    border-radius: 6px;
+    background: rgba(59,130,246,0.10);
+    color: #bfdbfe;
+    text-align: left;
+    font-family: var(--menu-font);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.mobile-switch-account:hover {
+    border-color: rgba(96,165,250,0.55);
+    background: rgba(59,130,246,0.20);
+}
+
+@media (max-width: 1100px) {
+    .btn-trocar-conta {
+        padding: 7px 8px;
+        font-size: 9px;
+    }
+}
