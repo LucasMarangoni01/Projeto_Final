@@ -4,290 +4,261 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <div th:fragment="menu">
+    <nav class="main-nav" aria-label="Navegação principal">
+        <div class="nav-shell">
 
-    <nav class="main-nav">
+            <a class="nav-brand" th:href="@{/}" aria-label="Soda Flanges - Página inicial">
+                <span class="nav-brand-mark">SF</span>
+                <span class="nav-brand-copy">
+                    <strong>SODA FLANGES</strong>
+                    <small>MONITORAMENTO INDUSTRIAL</small>
+                </span>
+            </a>
 
-        <div class="nav-desktop">
+            <div class="nav-desktop">
+                <ul class="nav-primary">
 
-            <ul>
-                <li>
-                    <a th:href="@{/}">Home</a>
-                </li>
+                    <li>
+                        <a class="nav-link nav-link-home" th:href="@{/}">
+                            <span class="nav-link-icon">⌂</span>
+                            Visão geral
+                        </a>
+                    </li>
 
-                <li>
-                    <a th:href="@{/flange/listagem}">Flanges</a>
-                </li>
+                    <li>
+                        <details class="nav-dropdown">
+                            <summary>
+                                Operação
+                                <span class="nav-chevron"></span>
+                            </summary>
+                            <div class="nav-dropdown-panel">
+                                <span class="nav-dropdown-label">ATIVOS E ROTINA</span>
 
-                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <a th:href="@{/flange/cadastro}">Cadastrar Flange</a>
-                </li>
+                                <a th:href="@{/flange/listagem}">
+                                    <span class="nav-item-icon">▤</span>
+                                    <span>
+                                        <strong>Flanges</strong>
+                                        <small>Visualizar ativos monitorados</small>
+                                    </span>
+                                </a>
 
-                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <a th:href="@{/sensores}">Sensores</a>
-                </li>
+                                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                                   th:href="@{/sensores}">
+                                    <span class="nav-item-icon">⌁</span>
+                                    <span>
+                                        <strong>Sensores</strong>
+                                        <small>Instrumentação e calibração</small>
+                                    </span>
+                                </a>
 
-                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <a th:href="@{/analises}">Análises</a>
-                </li>
+                                <a th:href="@{/funcionario/listagem}">
+                                    <span class="nav-item-icon">♙</span>
+                                    <span>
+                                        <strong>Funcionários</strong>
+                                        <small>Equipe operacional</small>
+                                    </span>
+                                </a>
 
-                <li>
-                    <a th:href="@{/funcionario/listagem}">Funcionários</a>
-                </li>
+                                <span class="nav-dropdown-divider"></span>
+                                <span class="nav-dropdown-label">MANUTENÇÃO</span>
 
-                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <a th:href="@{/funcionario/cadastro}">
-                        Cadastrar Funcionário
-                    </a>
-                </li>
+                                <a th:href="@{/manutencao/listagem}">
+                                    <span class="nav-item-icon">▣</span>
+                                    <span>
+                                        <strong>Histórico de manutenções</strong>
+                                        <small>Consultar atividades registradas</small>
+                                    </span>
+                                </a>
 
-                <li>
-                    <a th:href="@{/manutencao/listagem}">
-                        Manutenção
-                    </a>
-                </li>
+                                <a th:href="@{/manutencao/cadastro}" class="nav-dropdown-action">
+                                    <span class="nav-item-icon">＋</span>
+                                    <span>
+                                        <strong>Registrar manutenção</strong>
+                                        <small>Abrir um novo registro</small>
+                                    </span>
+                                </a>
+                            </div>
+                        </details>
+                    </li>
 
-                <li>
-                    <a th:href="@{/manutencao/cadastro}">
-                        Registrar Manutenção
-                    </a>
-                </li>
+                    <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                        <a class="nav-link nav-link-analytics" th:href="@{/analises}">
+                            Análises
+                        </a>
+                    </li>
 
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a th:href="@{/usuarios}">
-                        Usuários
-                    </a>
-                </li>
+                    <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                        <details class="nav-dropdown">
+                            <summary>
+                                Administração
+                                <span class="nav-chevron"></span>
+                            </summary>
+                            <div class="nav-dropdown-panel nav-dropdown-panel-right">
+                                <span class="nav-dropdown-label">CONFIGURAÇÃO DO SISTEMA</span>
 
-                <li class="nav-user">
+                                <a th:href="@{/flange/cadastro}">
+                                    <span class="nav-item-icon">＋</span>
+                                    <span>
+                                        <strong>Cadastrar flange</strong>
+                                        <small>Adicionar um novo ativo</small>
+                                    </span>
+                                </a>
 
-                    <a th:href="@{/perfil}"
-                       class="user-profile"
-                       th:title="${usuarioLogado.nome}">
+                                <a th:href="@{/funcionario/cadastro}">
+                                    <span class="nav-item-icon">♙</span>
+                                    <span>
+                                        <strong>Cadastrar funcionário</strong>
+                                        <small>Adicionar pessoa à operação</small>
+                                    </span>
+                                </a>
 
-                        <div class="user-avatar">
-                            <img th:if="${usuarioLogado.fotoPerfil != null}"
-                                 th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
-                                 alt="Foto de perfil">
-                            <img th:unless="${usuarioLogado.fotoPerfil != null}"
-                                 th:src="@{/img/avatar-default.svg}"
-                                 alt="Ícone padrão de perfil">
-                        </div>
+                                <a th:href="@{/usuarios}">
+                                    <span class="nav-item-icon">⚙</span>
+                                    <span>
+                                        <strong>Usuários e permissões</strong>
+                                        <small>Contas e níveis de acesso</small>
+                                    </span>
+                                </a>
 
-                        <div class="user-info-text">
+                                <a th:href="@{/unidades}">
+                                    <span class="nav-item-icon">⌖</span>
+                                    <span>
+                                        <strong>Unidades</strong>
+                                        <small>Gerenciar plantas e equipes</small>
+                                    </span>
+                                </a>
+                            </div>
+                        </details>
+                    </li>
 
-                            <strong th:text="${usuarioLogado.nome}">
-                                Usuário
-                            </strong>
+                </ul>
+            </div>
 
-                            <span th:text="${usuarioLogado.role}">
-                                USER
-                            </span>
-
-                        </div>
-
-                    </a>
-
-                </li>
-
-                <li class="nav-switch-account">
-                    <button type="button"
-                            class="btn-trocar-conta"
-                            onclick="trocarConta()">
-                        TROCAR DE CONTA
-                    </button>
-                </li>
-
-                <li class="nav-exit">
-
-                    <button type="button"
-                            class="btn-sair"
-                            onclick="abrirModalLogout()">
-                        Sair
-                    </button>
-
-                </li>
-
-                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <a th:href="@{/unidades}">
-                        Unidades
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-
-
-        <div class="nav-mobile">
-
-            <div class="mobile-top">
-
+            <div class="nav-account">
                 <a th:href="@{/perfil}"
-                   class="mobile-user">
-
-                    <div class="user-avatar">
+                   class="nav-account-profile"
+                   th:title="${usuarioLogado.nome}">
+                    <span class="user-avatar">
                         <img th:if="${usuarioLogado.fotoPerfil != null}"
                              th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
                              alt="Foto de perfil">
                         <img th:unless="${usuarioLogado.fotoPerfil != null}"
                              th:src="@{/img/avatar-default.svg}"
                              alt="Ícone padrão de perfil">
-                    </div>
-
-                    <div class="user-info-text">
-
-                        <strong th:text="${usuarioLogado.nome}">
-                            Usuário
-                        </strong>
-
-                        <span th:text="${usuarioLogado.role}">
-                            USER
-                        </span>
-
-                    </div>
-
+                    </span>
+                    <span class="nav-account-copy">
+                        <strong th:text="${usuarioLogado.nome}">Usuário</strong>
+                        <small th:text="${usuarioLogado.role}">USER</small>
+                    </span>
                 </a>
 
+                <button type="button"
+                        class="btn-trocar-conta"
+                        onclick="trocarConta()"
+                        title="Encerrar esta sessão e entrar com outra conta">
+                    <span class="account-action-icon">⇄</span>
+                    <span>Trocar conta</span>
+                </button>
 
+                <button type="button"
+                        class="btn-sair"
+                        onclick="abrirModalLogout()"
+                        title="Sair do sistema">
+                    Sair
+                </button>
+            </div>
+
+            <div class="nav-mobile">
                 <details class="mobile-menu">
-
                     <summary>
-                        <span class="menu-icon">☰</span>
-                        MENU
+                        <span class="menu-icon"><i></i><i></i><i></i></span>
+                        <span>MENU</span>
                     </summary>
 
                     <div class="mobile-menu-content">
-
-                        <a th:href="@{/}">
-                            Home
+                        <a class="mobile-profile" th:href="@{/perfil}">
+                            <span class="user-avatar">
+                                <img th:if="${usuarioLogado.fotoPerfil != null}"
+                                     th:src="@{/perfil/foto/{arquivo}(arquivo=${usuarioLogado.fotoPerfil})}"
+                                     alt="Foto de perfil">
+                                <img th:unless="${usuarioLogado.fotoPerfil != null}"
+                                     th:src="@{/img/avatar-default.svg}"
+                                     alt="Ícone padrão de perfil">
+                            </span>
+                            <span class="nav-account-copy">
+                                <strong th:text="${usuarioLogado.nome}">Usuário</strong>
+                                <small th:text="${usuarioLogado.role}">USER</small>
+                            </span>
+                            <span class="mobile-profile-arrow">›</span>
                         </a>
 
-                        <a th:href="@{/flange/listagem}">
-                            Listagem de Flanges
-                        </a>
-
+                        <span class="mobile-menu-label">VISÃO GERAL</span>
+                        <a th:href="@{/}" class="mobile-menu-link">Página inicial</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/flange/cadastro}">
-                            Cadastrar Flange
-                        </a>
+                           th:href="@{/analises}" class="mobile-menu-link">Análises e indicadores</a>
 
+                        <span class="mobile-menu-label">OPERAÇÃO</span>
+                        <a th:href="@{/flange/listagem}" class="mobile-menu-link">Flanges</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/sensores}">
-                            Gestão de Sensores
-                        </a>
+                           th:href="@{/sensores}" class="mobile-menu-link">Sensores</a>
+                        <a th:href="@{/funcionario/listagem}" class="mobile-menu-link">Funcionários</a>
+                        <a th:href="@{/manutencao/listagem}" class="mobile-menu-link">Histórico de manutenções</a>
+                        <a th:href="@{/manutencao/cadastro}" class="mobile-menu-link">Registrar manutenção</a>
 
-                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/analises}">
-                            Análises e Indicadores
-                        </a>
+                        <div th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                            <span class="mobile-menu-label">ADMINISTRAÇÃO</span>
+                            <a th:href="@{/flange/cadastro}" class="mobile-menu-link">Cadastrar flange</a>
+                            <a th:href="@{/funcionario/cadastro}" class="mobile-menu-link">Cadastrar funcionário</a>
+                            <a th:href="@{/usuarios}" class="mobile-menu-link">Usuários e permissões</a>
+                            <a th:href="@{/unidades}" class="mobile-menu-link">Unidades</a>
+                        </div>
 
-                        <a th:href="@{/funcionario/listagem}">
-                            Listagem Funcionários
-                        </a>
-
-                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/funcionario/cadastro}">
-                            Cadastrar Funcionário
-                        </a>
-
-                        <a th:href="@{/manutencao/listagem}">
-                            Listagem Manutenção
-                        </a>
-
-                        <a th:href="@{/manutencao/cadastro}">
-                            Registrar Manutenção
-                        </a>
-
-                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/usuarios}">
-                            Usuários
-                        </a>
-
-                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/unidades}">
-                            Unidades
-                        </a>
-
-                        <a th:href="@{/perfil}">
-                            Meu Perfil
-                        </a>
-
-                        <button type="button"
-                                class="mobile-switch-account"
-                                onclick="trocarConta()">
-                            TROCAR DE CONTA
-                        </button>
-
-                        <button type="button"
-                                class="mobile-logout"
-                                onclick="abrirModalLogout()">
-                            Sair do Sistema
-                        </button>
-
+                        <div class="mobile-account-actions">
+                            <button type="button"
+                                    class="mobile-switch-account"
+                                    onclick="trocarConta()">
+                                ⇄ &nbsp; TROCAR DE CONTA
+                            </button>
+                            <button type="button"
+                                    class="mobile-logout"
+                                    onclick="abrirModalLogout()">
+                                Sair do sistema
+                            </button>
+                        </div>
                     </div>
-
                 </details>
-
             </div>
 
         </div>
-
     </nav>
-
 
     <div id="logoutModal"
          class="logout-overlay"
          hidden
          onclick="fecharModalLogout(event)">
 
-        <div class="logout-modal"
-             onclick="event.stopPropagation()">
-
-            <div class="logout-icon">
-                ⏻
-            </div>
-
-            <h2>
-                Deseja sair?
-            </h2>
-
-            <p>
-                Você será desconectado do sistema.
-            </p>
+        <div class="logout-modal" onclick="event.stopPropagation()">
+            <div class="logout-icon">⏻</div>
+            <h2>Deseja sair?</h2>
+            <p>Você será desconectado do sistema.</p>
 
             <div class="logout-botoes">
-
                 <button type="button"
                         class="btn-cancelar"
                         onclick="fecharModalLogout()">
                     Cancelar
                 </button>
-
                 <button type="button"
                         class="btn-desconectar"
                         onclick="confirmarLogout()">
                     Desconectar
                 </button>
-
             </div>
-
         </div>
-
     </div>
 
-
-    <form id="logoutForm"
-          th:action="@{/logout}"
-          method="post"
-          style="display:none;">
-    </form>
-
-    <form id="switchAccountForm"
-          th:action="@{/logout}"
-          method="post"
-          style="display:none;">
-    </form>
-
+    <form id="logoutForm" th:action="@{/logout}" method="post" hidden></form>
+    <form id="switchAccountForm" th:action="@{/logout}" method="post" hidden></form>
 </div>
 
 </html>
