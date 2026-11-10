@@ -2,7 +2,6 @@ package com.pbe.soda_caustica_flanges.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -24,13 +23,17 @@ public class Funcionario {
 
     private Integer idade;
 
-    @NotNull(message = "A data de nascimento é obrigatória.")
+    // Opcional para funcionários gerados automaticamente a partir de contas.
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate data_nascimento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_id")
     private Unidade unidade;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
     public LocalDate getData_nascimento() { return data_nascimento; }
     public void setData_nascimento(LocalDate data_nascimento) { this.data_nascimento = data_nascimento; }
@@ -49,4 +52,7 @@ public class Funcionario {
 
     public Unidade getUnidade() { return unidade; }
     public void setUnidade(Unidade unidade) { this.unidade = unidade; }
+
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }
