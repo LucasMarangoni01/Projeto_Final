@@ -126,7 +126,7 @@ public class HomeController {
                 .filter(sensor -> sensor.getStatus() == StatusSensor.INSTALADO)
                 .count();
         long flangesSemSensor = flanges.stream()
-                .filter(flange -> flange.totalSensores() == 0)
+                .filter(flange -> flange.sensoresInstalados() == 0)
                 .count();
 
         model.addAttribute("flanges", flanges);
