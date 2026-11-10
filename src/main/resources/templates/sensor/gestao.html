@@ -86,7 +86,8 @@
                         <label for="tipo">Tipo de sensor *</label>
                         <select id="tipo" th:field="*{tipo}" required>
                             <option value="">Selecione o tipo</option>
-                            <option th:each="tipo : ${tiposSensor}" th:value="${tipo}" th:text="${tipo.descricao}">Tipo</option>
+                            <option th:each="tipo : ${tiposSensor}" th:value="${tipo}" th:text="${tipo.descricao}"
+                                    th:attr="data-finalidade=${tipo.finalidade}">Tipo</option>
                         </select>
                         <small id="sensorTypeHelp">Selecione a grandeza ou condição acompanhada pelo dispositivo.</small>
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></span>
@@ -210,6 +211,11 @@
             <span class="sensor-inventory-total" th:text="${totalSensores + (totalSensores == 1 ? ' registro' : ' registros')}">0 registros</span>
         </div>
 
+        <div class="sensor-inventory-tools">
+            <label for="sensorSearch">BUSCAR NO INVENTÁRIO</label>
+            <input id="sensorSearch" type="search" placeholder="Código, tipo, flange, fabricante..." autocomplete="off">
+        </div>
+
         <div class="sensor-table-wrap">
             <table class="sensor-table">
                 <thead>
@@ -227,7 +233,7 @@
                 <tr th:if="${#lists.isEmpty(sensores)}">
                     <td colspan="7" class="sensor-table-empty">Nenhum sensor cadastrado. Use o formulário acima para registrar o primeiro equipamento.</td>
                 </tr>
-                <tr th:each="sensor : ${sensores}">
+                <tr th:each="sensor : ${sensores}" data-sensor-row>
                     <td>
                         <strong class="sensor-code" th:text="${sensor.codigoIdentificacao}">SNS-FLG-001</strong>
                         <small th:if="${sensor.numeroSerie != null}" th:text="${'Série: ' + sensor.numeroSerie}">Série</small>
@@ -251,6 +257,9 @@
                         <a class="sensor-edit-link" th:href="@{/sensores/editar/{id}(id=${sensor.id})}">Editar</a>
                     </td>
                 </tr>
+                <tr id="sensorSearchEmpty" hidden>
+                    <td colspan="7" class="sensor-table-empty">Nenhum sensor corresponde à pesquisa.</td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -264,5 +273,6 @@
 
 <footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
 <script th:src="@{/menu.js}"></script>
+<script th:src="@{/sensor.js}"></script>
 </body>
 </html>
