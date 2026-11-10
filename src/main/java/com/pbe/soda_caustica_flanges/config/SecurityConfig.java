@@ -87,6 +87,7 @@ public class SecurityConfig {
                                 "/flange.css",
                                 "/sensor.css",
                                 "/sensor.js",
+                                "/analises.css",
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
@@ -125,6 +126,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/usuarios/**",
                                 "/sensores/**",
+                                "/analises",
+                                "/analises/**",
                                 "/usuario/**",
                                 "/unidades/**",
                                 "/flange/**",
