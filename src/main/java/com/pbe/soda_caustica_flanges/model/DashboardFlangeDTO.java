@@ -16,7 +16,10 @@ public record DashboardFlangeDTO(
         Double temperaturaAmbiente,
         String dataEntrada,
         String status,
-        String foto) {
+        String foto,
+        int totalSensores,
+        int sensoresInstalados,
+        String tiposSensores) {
 
     public int getPosicao() {
         return posicao;
@@ -48,5 +51,17 @@ public record DashboardFlangeDTO(
 
     public String getFoto() {
         return foto;
+    }
+
+    public int getTotalSensores() {
+        return totalSensores;
+    }
+
+    public int getSensoresInstalados() {
+        return sensoresInstalados;
+    }
+
+    public String getTiposSensores() {
+        return tiposSensores;
     }
 }
