@@ -67,7 +67,7 @@ public class CadastroController {
         String email =
                 cadastroDTO.getEmail()
                         .trim()
-                        .toLowerCase();
+                        .toLowerCase(java.util.Locale.ROOT);
 
 
         // ==============================
@@ -79,21 +79,6 @@ public class CadastroController {
             model.addAttribute(
                     "erro",
                     "Digite seu nome completo."
-            );
-
-            return "cadastro/cadastro";
-        }
-
-
-        // ==============================
-        // VERIFICAR GMAIL
-        // ==============================
-
-        if (!email.endsWith("@gmail.com")) {
-
-            model.addAttribute(
-                    "erro",
-                    "Utilize um endereço de e-mail @gmail.com."
             );
 
             return "cadastro/cadastro";
