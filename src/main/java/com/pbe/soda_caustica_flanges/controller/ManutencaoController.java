@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,14 +31,18 @@ public class ManutencaoController {
     }
 
     @GetMapping("/manutencao/listagem")
-    public String listagem(Model model, Authentication authentication) {
+    public String listagem(
+            Model model,
+            Authentication authentication,
+            @RequestParam(value = "erro", required = false) String erro) {
+
         Usuario usuario = buscarUsuarioLogado(authentication);
         boolean admin = usuario.getRole() == Role.ADMIN;
 
         List<Manutencao> manutencoes;
         if (admin) {
             manutencoes = manutencaoRepository.findAllByOrderByDataDesc();
-        } else if (usuario.getUnidade() == null) {
+        } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             manutencoes = Collections.emptyList();
         } else {
             manutencoes = manutencaoRepository.findByFlange_Unidade_IdOrderByDataDesc(
@@ -47,6 +52,7 @@ public class ManutencaoController {
 
         model.addAttribute("manutencoes", manutencoes);
         model.addAttribute("ehAdmin", admin);
+        model.addAttribute("erro", mensagemErroListagem(erro));
         return "manutencao/listagem";
     }
 
@@ -55,6 +61,8 @@ public class ManutencaoController {
         Usuario usuario = buscarUsuarioLogado(authentication);
         Manutencao manutencao = new Manutencao();
         manutencao.setData(new java.util.Date());
+        manutencao.setNivelRisco(NivelRiscoManutencao.MODERADO);
+        manutencao.setStatusAtividade(StatusAtividadeManutencao.REGISTRADA);
         prepararFormulario(model, manutencao, usuario);
         return "manutencao/cadastro";
     }
@@ -69,9 +77,19 @@ public class ManutencaoController {
 
         Usuario usuario = buscarUsuarioLogado(authentication);
         boolean admin = usuario.getRole() == Role.ADMIN;
+        Manutencao registroExistente = null;
 
-        if (!admin && manutencao.getId() != null) {
-            return "redirect:/manutencao/listagem?erro=permissao";
+        // A autorização é feita no servidor: o USER só altera o próprio lançamento.
+        if (manutencao.getId() != null) {
+            registroExistente = manutencaoRepository.findById(manutencao.getId()).orElse(null);
+
+            if (registroExistente == null) {
+                return "redirect:/manutencao/listagem?erro=nao_encontrado";
+            }
+
+            if (!podeEditar(registroExistente, usuario, admin)) {
+                return "redirect:/manutencao/listagem?erro=permissao";
+            }
         }
 
         if (flangeId == null || funcionarioId == null) {
@@ -82,6 +100,14 @@ public class ManutencaoController {
                     : "Selecione uma flange e um funcionário responsável.";
 
             model.addAttribute("erro", mensagem);
+            prepararFormulario(model, manutencao, usuario);
+            return "manutencao/cadastro";
+        }
+
+        if (manutencao.getOcorrencia() == null || manutencao.getOcorrencia().isBlank()
+                || manutencao.getNum_serie() == null || manutencao.getNum_serie().isBlank()
+                || manutencao.getData() == null) {
+            model.addAttribute("erro", "Preencha a descrição, a ordem/número de série e a data da manutenção.");
             prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
         }
@@ -105,7 +131,7 @@ public class ManutencaoController {
         if (!admin) {
             if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
                     || !flange.getUnidade().getId().equals(usuario.getUnidade().getId())) {
-                model.addAttribute("erro", "Você só pode registrar manutenções em ativos da sua unidade.");
+                model.addAttribute("erro", "Você só pode registrar ou editar manutenções em ativos da sua unidade.");
                 prepararFormulario(model, manutencao, usuario);
                 return "manutencao/cadastro";
             }
@@ -115,20 +141,40 @@ public class ManutencaoController {
             return "manutencao/cadastro";
         }
 
-        if (manutencao.getId() == null) {
-            // Guarda quem realizou o lançamento, independentemente do funcionário executor.
+        StatusAtividadeManutencao statusSolicitado = manutencao.getStatusAtividade();
+
+        if (!admin && statusSolicitado == StatusAtividadeManutencao.EM_ANDAMENTO
+                && (registroExistente == null
+                || registroExistente.getStatusAtividade() != StatusAtividadeManutencao.EM_ANDAMENTO)) {
+            manutencao.setStatusAtividade(registroExistente == null
+                    ? StatusAtividadeManutencao.REGISTRADA
+                    : registroExistente.getStatusAtividade());
+            model.addAttribute("erro", "Somente um ADMIN pode colocar uma atividade como Em andamento.");
+            prepararFormulario(model, manutencao, usuario);
+            return "manutencao/cadastro";
+        }
+
+        if (registroExistente == null) {
+            // A autoria é definida pelo servidor e não pode ser enviada pelo formulário.
             manutencao.setRegistradoPorEmail(authentication.getName());
         } else {
-            // Uma correção administrativa não pode sobrescrever a autoria e a data originais.
-            Manutencao registroExistente = manutencaoRepository.findById(manutencao.getId())
-                    .orElse(null);
-
-            if (registroExistente == null) {
-                return "redirect:/manutencao/listagem";
-            }
-
+            // Preserva a autoria e o horário original do lançamento.
             manutencao.setRegistradoPorEmail(registroExistente.getRegistradoPorEmail());
             manutencao.setRegistradoEm(registroExistente.getRegistradoEm());
+
+            // Um USER que edita um item já em andamento não consegue alterar o status.
+            if (!admin && registroExistente.getStatusAtividade()
+                    == StatusAtividadeManutencao.EM_ANDAMENTO) {
+                manutencao.setStatusAtividade(StatusAtividadeManutencao.EM_ANDAMENTO);
+            }
+        }
+
+        if (manutencao.getNivelRisco() == null) {
+            manutencao.setNivelRisco(NivelRiscoManutencao.MODERADO);
+        }
+
+        if (manutencao.getStatusAtividade() == null) {
+            manutencao.setStatusAtividade(StatusAtividadeManutencao.REGISTRADA);
         }
 
         manutencao.setFlange(flange);
@@ -143,11 +189,17 @@ public class ManutencaoController {
             @PathVariable Long id,
             Model model,
             Authentication authentication) {
+
         Usuario usuario = buscarUsuarioLogado(authentication);
+        boolean admin = usuario.getRole() == Role.ADMIN;
         Manutencao manutencao = manutencaoRepository.findById(id).orElse(null);
 
         if (manutencao == null) {
-            return "redirect:/manutencao/listagem";
+            return "redirect:/manutencao/listagem?erro=nao_encontrado";
+        }
+
+        if (!podeEditar(manutencao, usuario, admin)) {
+            return "redirect:/manutencao/listagem?erro=permissao";
         }
 
         prepararFormulario(model, manutencao, usuario);
@@ -158,6 +210,28 @@ public class ManutencaoController {
     public String excluir(@PathVariable Long id) {
         manutencaoRepository.findById(id).ifPresent(manutencaoRepository::delete);
         return "redirect:/manutencao/listagem";
+    }
+
+    private boolean podeEditar(Manutencao manutencao, Usuario usuario, boolean admin) {
+        if (admin) {
+            return true;
+        }
+
+        if (manutencao.getRegistradoPorEmail() == null
+                || usuario.getUnidade() == null
+                || !usuario.getUnidade().isAtivo()
+                || manutencao.getFlange() == null
+                || manutencao.getFlange().getUnidade() == null) {
+            return false;
+        }
+
+        boolean ehAutor = manutencao.getRegistradoPorEmail()
+                .equalsIgnoreCase(usuario.getEmail());
+
+        boolean mesmaUnidade = manutencao.getFlange().getUnidade().getId()
+                .equals(usuario.getUnidade().getId());
+
+        return ehAutor && mesmaUnidade;
     }
 
     private Usuario buscarUsuarioLogado(Authentication authentication) {
@@ -171,7 +245,7 @@ public class ManutencaoController {
 
         if (admin) {
             flanges = flangeRepository.findAll();
-        } else if (usuario.getUnidade() == null) {
+        } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             flanges = Collections.emptyList();
         } else {
             flanges = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
@@ -191,17 +265,30 @@ public class ManutencaoController {
                 java.text.Collator.getInstance(new java.util.Locale("pt", "BR"))
         ));
 
+        List<StatusAtividadeManutencao> statusDisponiveis =
+                new ArrayList<>(List.of(StatusAtividadeManutencao.values()));
+
+        boolean statusAtividadeBloqueado = !admin
+                && manutencao.getStatusAtividade() == StatusAtividadeManutencao.EM_ANDAMENTO;
+
+        if (!admin) {
+            statusDisponiveis.remove(StatusAtividadeManutencao.EM_ANDAMENTO);
+        }
+
         model.addAttribute("manutencao", manutencao);
         model.addAttribute("flanges", flanges);
         model.addAttribute("funcionarios", funcionarios);
         model.addAttribute("ehAdmin", admin);
         model.addAttribute("unidadeUsuario", usuario.getUnidade());
         model.addAttribute("nenhumFuncionarioDisponivel", funcionarios.isEmpty());
+        model.addAttribute("niveisRisco", NivelRiscoManutencao.values());
+        model.addAttribute("statusAtividades", statusDisponiveis);
+        model.addAttribute("statusAtividadeBloqueado", statusAtividadeBloqueado);
     }
 
     private List<Funcionario> listarFuncionariosPermitidos(Usuario usuario) {
         if (usuario.getRole() == Role.ADMIN) {
-            return new java.util.ArrayList<>(funcionarioRepository.findAll()
+            return new ArrayList<>(funcionarioRepository.findAll()
                     .stream()
                     .filter(funcionario -> funcionario.getUnidade() != null
                             && funcionario.getUnidade().isAtivo()
@@ -214,10 +301,10 @@ public class ManutencaoController {
         }
 
         if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
 
-        return new java.util.ArrayList<>(
+        return new ArrayList<>(
                 funcionarioRepository.findByUnidadeIdOrderByIdAsc(
                         usuario.getUnidade().getId()
                 ).stream()
@@ -238,5 +325,15 @@ public class ManutencaoController {
 
         return "Não há funcionários operacionais vinculados a " + unidade
                 + ". Solicite ao ADMIN que cadastre ou vincule um funcionário a essa unidade.";
+    }
+
+    private String mensagemErroListagem(String erro) {
+        if ("permissao".equals(erro)) {
+            return "Você só pode editar os registros de manutenção criados pela sua própria conta e pertencentes à sua unidade.";
+        }
+        if ("nao_encontrado".equals(erro)) {
+            return "O registro de manutenção solicitado não foi encontrado.";
+        }
+        return null;
     }
 }
