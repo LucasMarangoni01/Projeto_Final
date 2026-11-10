@@ -31,4 +31,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     long countByUnidadeIdAndAtivoTrue(Long unidadeId);
 
     long countByRoleAndAtivoTrue(Role role);
+
+    Optional<Usuario> findFirstByAtivoTrueOrderByIdAsc();
 }
