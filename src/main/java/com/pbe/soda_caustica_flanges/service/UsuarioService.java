@@ -3,6 +3,7 @@ package com.pbe.soda_caustica_flanges.service;
 import com.pbe.soda_caustica_flanges.model.*;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import com.pbe.soda_caustica_flanges.repository.FuncionarioRepository;
+import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,17 +18,20 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final FuncionarioRepository funcionarioRepository;
+    private final ManutencaoRepository manutencaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioAuditoriaService auditoriaService;
 
     public UsuarioService(
             UsuarioRepository repository,
             FuncionarioRepository funcionarioRepository,
+            ManutencaoRepository manutencaoRepository,
             PasswordEncoder passwordEncoder,
             UsuarioAuditoriaService auditoriaService) {
 
         this.repository = repository;
         this.funcionarioRepository = funcionarioRepository;
+        this.manutencaoRepository = manutencaoRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditoriaService = auditoriaService;
     }
@@ -65,6 +69,26 @@ public class UsuarioService {
         Funcionario funcionario = funcionarioRepository.findByUsuarioId(usuario.getId())
                 .orElse(null);
         boolean novoVinculo = funcionario == null;
+
+        if (funcionario != null
+                && !java.util.Objects.equals(
+                        funcionario.getUnidade() == null ? null : funcionario.getUnidade().getId(),
+                        usuario.getUnidade() == null ? null : usuario.getUnidade().getId()
+                )
+                && manutencaoRepository.countByFuncionario_Id(funcionario.getId()) > 0) {
+            // Mantém a unidade histórica do funcionário referenciado por manutenções antigas.
+            // A conta passa a ter um novo cadastro operacional para a unidade atual.
+            Funcionario historico = funcionario;
+            historico.setUsuario(null);
+            funcionarioRepository.save(historico);
+
+            funcionario = new Funcionario();
+            funcionario.setNome_funcionario(usuario.getNome());
+            funcionario.setData_nascimento(historico.getData_nascimento());
+            funcionario.setIdade(historico.getIdade());
+            funcionario.setFuncionario_flange(historico.getFuncionario_flange());
+            novoVinculo = true;
+        }
 
         if (funcionario == null) {
             List<Funcionario> candidatos = usuario.getUnidade() == null
