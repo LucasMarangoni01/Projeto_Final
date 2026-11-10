@@ -198,13 +198,21 @@
                     <div class="unidade-member-tags" th:if="${funcionario.funcionario_flange != null and !#strings.isEmpty(funcionario.funcionario_flange)}">
                         <span th:text="${'Flange: ' + funcionario.funcionario_flange}">Flange</span>
                     </div>
+                    <div class="unidade-member-tags" th:if="${funcionario.usuario != null}">
+                        <span th:text="${'Conta: ' + funcionario.usuario.email}">Conta vinculada</span>
+                        <span th:text="${funcionario.usuario.role}">USER</span>
+                    </div>
                 </div>
-                <form th:action="@{/unidades/remover-funcionario}" method="post">
+                <form th:if="${funcionario.usuario == null}"
+                      th:action="@{/unidades/remover-funcionario}" method="post">
                     <input type="hidden" name="unidadeId" th:value="${unidade.id}">
                     <input type="hidden" name="funcionarioId" th:value="${funcionario.id}">
                     <button type="submit" class="unidade-member-remove"
                             onclick="return confirm('Desvincular este funcionário? O cadastro e o histórico de manutenções serão preservados.')">Desvincular</button>
                 </form>
+                <span th:if="${funcionario.usuario != null}" class="unidade-member-linked-note">
+                    Gerenciado pela conta em Usuários
+                </span>
             </article>
             <div class="unidade-members-empty" th:if="${#lists.isEmpty(funcionariosVinculados)}">
                 Nenhum funcionário operacional vinculado a esta unidade.
