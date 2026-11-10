@@ -94,8 +94,7 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/img/**",
                                 "/foto_ocorrencia/**",
-                                "/foto_pessoa/**",
-                                "/foto_flange/**"
+                                "/foto_pessoa/**"
                         ).permitAll()
 
                         // Telas de consulta disponíveis para os dois perfis.
