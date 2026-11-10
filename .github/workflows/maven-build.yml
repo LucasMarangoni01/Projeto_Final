@@ -3,6 +3,7 @@ name: Maven build validation
 on:
   push:
     branches:
+      - main
       - hardening/stabilizacao-seguranca
       - experimental/atalho-acesso-admin
   pull_request:
