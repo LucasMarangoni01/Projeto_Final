@@ -44,6 +44,9 @@
         <a th:if="${ehAdmin}" th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
     </div>
 
+    <div th:if="${erro == 'conta'}" class="alerta-erro" style="margin-bottom: 20px;">
+        Este funcionário está vinculado a uma conta de usuário. Para removê-lo da operação, altere ou desative a conta em Usuários.
+    </div>
     <div th:if="${erro == 'historico'}" class="alerta-erro" style="margin-bottom: 20px;">
         Este funcionário possui manutenções registradas. O cadastro foi preservado para manter a rastreabilidade.
     </div>
@@ -60,6 +63,7 @@
                 <th>Nome</th>
                 <th>Unidade</th>
                 <th>Flange Designada</th>
+                <th th:if="${ehAdmin}">Conta vinculada</th>
                 <th th:if="${ehAdmin}">Idade</th>
                 <th th:if="${ehAdmin}">Nascimento</th>
                 <th>Ações</th>
@@ -71,11 +75,14 @@
                 <td th:text="${f.nome_funcionario}" style="font-weight: 700;"></td>
                 <td th:text="${f.unidade != null ? f.unidade.nome : 'Sem unidade'}"></td>
                 <td><span class="fc-pill" th:text="${f.funcionario_flange}"></span></td>
+                <td th:if="${ehAdmin}"
+                    th:text="${f.usuario != null ? f.usuario.email + ' · ' + f.usuario.role : 'Cadastro operacional'}"></td>
                 <td th:if="${ehAdmin}" th:text="${f.idade}"></td>
                 <td th:if="${ehAdmin}" th:text="${f.data_nascimento != null ? #temporals.format(f.data_nascimento, 'dd/MM/yyyy') : '—'}"></td>
                 <td class="acoes-celula" th:if="${ehAdmin}">
                     <a th:href="@{/funcionario/alterar/{id}(id=${f.id})}" class="btn btn-alter" style="padding: 6px 12px; font-size: 0.8rem;">Alterar</a>
-                    <form th:action="@{/funcionario/excluir/{id}(id=${f.id})}"
+                    <form th:if="${f.usuario == null}"
+                          th:action="@{/funcionario/excluir/{id}(id=${f.id})}"
                           method="post"
                           style="display: inline; margin: 0;">
                         <button type="submit"
@@ -83,6 +90,7 @@
                                 style="padding: 6px 12px; font-size: 0.8rem;"
                                 onclick="return confirm('Confirmar remoção do registro?')">Excluir</button>
                     </form>
+                    <span th:if="${f.usuario != null}" class="badge">Conta vinculada</span>
                 </td>
                 <td th:unless="${ehAdmin}"><span class="badge">Somente leitura</span></td>
             </tr>
