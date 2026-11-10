@@ -89,6 +89,14 @@
 
                 </li>
 
+                <li class="nav-switch-account">
+                    <button type="button"
+                            class="btn-trocar-conta"
+                            onclick="trocarConta()">
+                        TROCAR DE CONTA
+                    </button>
+                </li>
+
                 <li class="nav-exit">
 
                     <button type="button"
@@ -205,6 +213,12 @@
                         </a>
 
                         <button type="button"
+                                class="mobile-switch-account"
+                                onclick="trocarConta()">
+                            TROCAR DE CONTA
+                        </button>
+
+                        <button type="button"
                                 class="mobile-logout"
                                 onclick="abrirModalLogout()">
                             Sair do Sistema
@@ -263,6 +277,12 @@
 
 
     <form id="logoutForm"
+          th:action="@{/logout}"
+          method="post"
+          style="display:none;">
+    </form>
+
+    <form id="switchAccountForm"
           th:action="@{/logout}"
           method="post"
           style="display:none;">
