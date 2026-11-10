@@ -204,7 +204,8 @@ public class ManutencaoController {
             return new java.util.ArrayList<>(funcionarioRepository.findAll()
                     .stream()
                     .filter(funcionario -> funcionario.getUnidade() != null
-                            && funcionario.getUnidade().isAtivo())
+                            && funcionario.getUnidade().isAtivo()
+                            && (funcionario.getUsuario() == null || funcionario.getUsuario().isAtivo()))
                     .sorted(java.util.Comparator.comparing(
                             Funcionario::getNome_funcionario,
                             java.text.Collator.getInstance(new java.util.Locale("pt", "BR"))
@@ -219,7 +220,10 @@ public class ManutencaoController {
         return new java.util.ArrayList<>(
                 funcionarioRepository.findByUnidadeIdOrderByIdAsc(
                         usuario.getUnidade().getId()
-                )
+                ).stream()
+                        .filter(funcionario -> funcionario.getUsuario() == null
+                                || funcionario.getUsuario().isAtivo())
+                        .toList()
         );
     }
 
