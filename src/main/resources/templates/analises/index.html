@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análises e indicadores | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/analises.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main class="analises-main">
+    <header class="analises-header">
+        <div class="analises-header-copy">
+            <span class="analises-eyebrow">INTELIGÊNCIA OPERACIONAL · NAOH 32%</span>
+            <h1>Análises e indicadores</h1>
+            <p>Acompanhe os registros históricos, a rotina de manutenção e a condição dos ativos monitorados.</p>
+        </div>
+
+        <form class="analises-filter" method="get" th:action="@{/analises}">
+            <label for="ano">PERÍODO DE ANÁLISE</label>
+            <div class="analises-filter-control">
+                <select id="ano" name="ano">
+                    <option th:each="ano : ${anosDisponiveis}"
+                            th:value="${ano}"
+                            th:text="${ano}"
+                            th:selected="${ano == anoSelecionado}">2026</option>
+                </select>
+                <button type="submit">Aplicar</button>
+            </div>
+        </form>
+    </header>
+
+    <section class="analises-kpis" aria-label="Indicadores principais">
+        <article class="analise-kpi">
+            <div class="analise-kpi-top">
+                <span>INCIDENTES REGISTRADOS</span>
+                <span class="analise-kpi-icon icon-blue">!</span>
+            </div>
+            <strong th:text="${totalIncidentes}">0</strong>
+            <small>Quantidade total informada em ${anoSelecionado}</small>
+        </article>
+
+        <article class="analise-kpi">
+            <div class="analise-kpi-top">
+                <span>PICO DE OCORRÊNCIAS</span>
+                <span class="analise-kpi-icon icon-amber">↗</span>
+            </div>
+            <strong class="analise-kpi-text" th:text="${mesPico}">Sem registros</strong>
+            <small th:text="${quantidadePico + ' ocorrência(s) no mês'}">0 ocorrência(s) no mês</small>
+        </article>
+
+        <article class="analise-kpi">
+            <div class="analise-kpi-top">
+                <span>MANUTENÇÕES</span>
+                <span class="analise-kpi-icon icon-cyan">⌁</span>
+            </div>
+            <strong th:text="${totalManutencoes}">0</strong>
+            <small>Registros lançados em ${anoSelecionado}</small>
+        </article>
+
+        <article class="analise-kpi">
+            <div class="analise-kpi-top">
+                <span>FLANGES EM ALERTA</span>
+                <span class="analise-kpi-icon icon-red">⚠</span>
+            </div>
+            <strong th:text="${flangesEmAlerta}">0</strong>
+            <small>Em atenção ou em estado crítico</small>
+        </article>
+
+        <article class="analise-kpi">
+            <div class="analise-kpi-top">
+                <span>CALIBRAÇÕES VENCIDAS</span>
+                <span class="analise-kpi-icon icon-purple">◷</span>
+            </div>
+            <strong th:text="${calibracoesVencidas}">0</strong>
+            <small>Entre os sensores cadastrados</small>
+        </article>
+    </section>
+
+    <section class="analises-section">
+        <div class="analises-section-heading">
+            <div>
+                <span class="analises-section-kicker">TENDÊNCIA NO TEMPO</span>
+                <h2>Evolução mensal</h2>
+                <p>Comparação entre quantidades de incidentes informadas e registros de manutenção.</p>
+            </div>
+            <div class="analises-legend">
+                <span><i class="legend-dot legend-incidentes"></i>Incidentes</span>
+                <span><i class="legend-dot legend-manutencoes"></i>Manutenções</span>
+            </div>
+        </div>
+
+        <div class="analises-meses-grid">
+            <article class="analises-mes-card" th:each="item : ${dadosMensais}">
+                <div class="analises-mes-heading">
+                    <strong th:text="${item.mes}">Jan</strong>
+                    <span th:text="${(item.incidentes + item.manutencoes) + ' registros'}">0 registros</span>
+                </div>
+
+                <div class="analises-serie">
+                    <div class="analises-serie-label">
+                        <span>Incidentes</span>
+                        <strong th:text="${item.incidentes}">0</strong>
+                    </div>
+                    <div class="analises-track">
+                        <span class="analises-fill fill-incidentes"
+                              th:style="|width: ${item.incidentesPercentual}%;|"></span>
+                    </div>
+                </div>
+
+                <div class="analises-serie">
+                    <div class="analises-serie-label">
+                        <span>Manutenções</span>
+                        <strong th:text="${item.manutencoes}">0</strong>
+                    </div>
+                    <div class="analises-track">
+                        <span class="analises-fill fill-manutencoes"
+                              th:style="|width: ${item.manutencoesPercentual}%;|"></span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <p class="analises-chart-footnote">As barras usam a mesma escala dentro do ano selecionado. A média mensal considera os 12 meses do ano.</p>
+    </section>
+
+    <section class="analises-panels-grid">
+        <article class="analises-panel">
+            <div class="analises-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">DISTRIBUIÇÃO GEOGRÁFICA</span>
+                    <h2>Ocorrências por localização</h2>
+                    <p>Locais com maior quantidade informada na base histórica.</p>
+                </div>
+            </div>
+
+            <div class="analises-ranking" th:if="${!#lists.isEmpty(rankingLocalizacoes)}">
+                <div class="analises-ranking-row" th:each="item, stat : ${rankingLocalizacoes}">
+                    <div class="analises-ranking-label">
+                        <span class="analises-ranking-position" th:text="${stat.count}">1</span>
+                        <strong th:text="${item.rotulo}">Localização</strong>
+                        <b th:text="${item.quantidade}">0</b>
+                    </div>
+                    <div class="analises-track ranking-track">
+                        <span class="analises-fill fill-ranking"
+                              th:style="|width: ${item.percentual}%;|"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analises-empty" th:if="${#lists.isEmpty(rankingLocalizacoes)}">
+                <span class="analises-empty-icon">⌖</span>
+                <strong>Nenhum incidente registrado neste período</strong>
+                <p>Quando houver registros históricos com localização, o ranking aparecerá aqui.</p>
+            </div>
+        </article>
+
+        <article class="analises-panel">
+            <div class="analises-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">CONDIÇÃO DOS ATIVOS</span>
+                    <h2>Situação das flanges</h2>
+                    <p>Distribuição conforme o status atual cadastrado.</p>
+                </div>
+                <strong class="analises-panel-total" th:text="${totalFlanges}">0</strong>
+            </div>
+
+            <div class="analises-distribution">
+                <div class="analises-distribution-row" th:each="item : ${distribuicaoFlanges}">
+                    <div class="analises-distribution-label">
+                        <span th:text="${item.rotulo}">Normal</span>
+                        <strong th:text="${item.quantidade}">0</strong>
+                    </div>
+                    <div class="analises-track">
+                        <span class="analises-fill"
+                              th:classappend="${item.rotulo == 'Normal' ? ' fill-normal' : (item.rotulo == 'Atenção' ? ' fill-atencao' : (item.rotulo == 'Crítica' ? ' fill-critico' : ' fill-manutencao'))}"
+                              th:style="|width: ${item.percentual}%;|"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analises-empty compact-empty" th:if="${totalFlanges == 0}">
+                <strong>Nenhuma flange cadastrada</strong>
+                <p>Cadastre os ativos para visualizar sua distribuição por status.</p>
+            </div>
+        </article>
+
+        <article class="analises-panel">
+            <div class="analises-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">INSTRUMENTAÇÃO</span>
+                    <h2>Inventário de sensores</h2>
+                    <p>Estado cadastrado dos dispositivos de monitoramento.</p>
+                </div>
+                <strong class="analises-panel-total" th:text="${totalSensores}">0</strong>
+            </div>
+
+            <div class="analises-distribution">
+                <div class="analises-distribution-row" th:each="item : ${distribuicaoSensores}">
+                    <div class="analises-distribution-label">
+                        <span th:text="${item.rotulo}">Instalado</span>
+                        <strong th:text="${item.quantidade}">0</strong>
+                    </div>
+                    <div class="analises-track">
+                        <span class="analises-fill"
+                              th:classappend="${item.rotulo == 'Instalado' ? ' fill-normal' : (item.rotulo == 'Em manutenção' ? ' fill-atencao' : (item.rotulo == 'Desativado' ? ' fill-critico' : ' fill-sensor'))}"
+                              th:style="|width: ${item.percentual}%;|"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analises-sensor-summary">
+                <div>
+                    <span>Sensores instalados</span>
+                    <strong th:text="${sensoresInstalados}">0</strong>
+                </div>
+                <div>
+                    <span>Calibrações vencidas</span>
+                    <strong th:text="${calibracoesVencidas}"
+                            th:classappend="${calibracoesVencidas > 0 ? ' text-danger' : ''}">0</strong>
+                </div>
+            </div>
+
+            <div class="analises-empty compact-empty" th:if="${totalSensores == 0}">
+                <strong>Nenhum sensor cadastrado</strong>
+                <p>O inventário aparecerá aqui depois do cadastro dos sensores.</p>
+            </div>
+        </article>
+
+        <article class="analises-panel analises-summary-panel">
+            <div class="analises-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">RESUMO DO PERÍODO</span>
+                    <h2>Leitura rápida</h2>
+                    <p>Indicadores calculados com os registros disponíveis.</p>
+                </div>
+            </div>
+
+            <div class="analises-summary-list">
+                <div>
+                    <span>Média de incidentes por mês</span>
+                    <strong th:text="${mediaMensal}">0,0</strong>
+                </div>
+                <div>
+                    <span>Localizações com registros</span>
+                    <strong th:text="${totalLocalizacoes}">0</strong>
+                </div>
+                <div>
+                    <span>Manutenções no ano</span>
+                    <strong th:text="${totalManutencoes}">0</strong>
+                </div>
+                <div>
+                    <span>Flanges cadastradas</span>
+                    <strong th:text="${totalFlanges}">0</strong>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <aside class="analises-data-note">
+        <span class="analises-note-icon">i</span>
+        <div>
+            <strong>Importante sobre a interpretação dos números</strong>
+            <p>A tabela histórica de incidentes do sistema armazena ano, mês, quantidade e localização, mas ainda não identifica o tipo de ocorrência. Por isso, este painel apresenta os valores como <b>incidentes registrados</b> e não os classifica automaticamente como vazamentos confirmados. Os registros de manutenção são contabilizados separadamente e não são considerados vazamentos.</p>
+        </div>
+    </aside>
+</main>
+
+<footer class="analises-footer">
+    <p>© 2026 Sistema de Monitoramento de Flanges · Análises calculadas a partir dos dados cadastrados.</p>
+</footer>
+
+</body>
+</html>
