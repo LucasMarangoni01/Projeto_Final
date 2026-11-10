@@ -1334,3 +1334,72 @@ hr {
     }
 
 }
+
+/* Estado informativo do seletor de funcionário na manutenção */
+.funcionario-select-help {
+    display: block;
+    margin-top: 7px;
+    color: #91a8c8;
+    font-size: 11px;
+    line-height: 1.45;
+}
+.funcionario-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 14px 15px;
+    border: 1px solid rgba(245,158,11,.28);
+    border-left: 3px solid #f59e0b;
+    border-radius: 9px;
+    background: rgba(245,158,11,.07);
+}
+.funcionario-empty-state strong {
+    color: #fde68a;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.funcionario-empty-state p {
+    margin: 0;
+    color: #b6c7df;
+    font-size: 11px;
+    line-height: 1.55;
+}
+.funcionario-empty-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    margin-top: 2px;
+    padding: 7px 12px;
+    border: 1px solid rgba(96,165,250,.35);
+    border-radius: 7px;
+    background: rgba(37,99,235,.16);
+    color: #bfdbfe;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background .18s ease, border-color .18s ease;
+}
+.funcionario-empty-link:hover {
+    border-color: rgba(96,165,250,.65);
+    background: rgba(37,99,235,.25);
+}
+.funcionario-empty-link-secondary {
+    margin-top: 0;
+    background: transparent;
+}
+#funcionarioId:disabled {
+    cursor: not-allowed;
+    opacity: .72;
+}
+@media (max-width: 600px) {
+    .funcionario-empty-state {
+        padding: 12px;
+    }
+    .funcionario-empty-link {
+        width: 100%;
+        min-height: 40px;
+    }
+}
