@@ -2,6 +2,7 @@ package com.pbe.soda_caustica_flanges.service;
 
 import com.pbe.soda_caustica_flanges.model.*;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
+import com.pbe.soda_caustica_flanges.repository.FuncionarioRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,18 @@ import java.util.Locale;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final FuncionarioRepository funcionarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioAuditoriaService auditoriaService;
 
     public UsuarioService(
             UsuarioRepository repository,
+            FuncionarioRepository funcionarioRepository,
             PasswordEncoder passwordEncoder,
             UsuarioAuditoriaService auditoriaService) {
 
         this.repository = repository;
+        this.funcionarioRepository = funcionarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditoriaService = auditoriaService;
     }
@@ -42,6 +46,7 @@ public class UsuarioService {
         usuario.setAtivo(true);
 
         Usuario salvo = repository.save(usuario);
+        sincronizarFuncionario(salvo);
         auditoriaService.registrar(
                 salvo,
                 salvo.getEmail(),
@@ -49,6 +54,77 @@ public class UsuarioService {
                 "Conta criada pelo formulário de cadastro."
         );
         return salvo;
+    }
+
+    @Transactional
+    public Funcionario sincronizarFuncionario(Usuario usuario) {
+        if (usuario == null || usuario.getId() == null) {
+            throw new IllegalArgumentException("Salve a conta antes de gerar o funcionário.");
+        }
+
+        Funcionario funcionario = funcionarioRepository.findByUsuarioId(usuario.getId())
+                .orElse(null);
+        boolean novoVinculo = funcionario == null;
+
+        if (funcionario == null) {
+            List<Funcionario> candidatos = usuario.getUnidade() == null
+                    ? funcionarioRepository.buscarSemContaPorNomeESemUnidade(usuario.getNome())
+                    : funcionarioRepository.buscarSemContaPorNomeEUnidade(
+                            usuario.getNome(),
+                            usuario.getUnidade().getId()
+                    );
+
+            // Reaproveita somente um cadastro homônimo inequívoco para não duplicar
+            // pessoas que já haviam sido cadastradas manualmente.
+            if (candidatos.size() == 1) {
+                funcionario = candidatos.get(0);
+            } else if (usuario.getUnidade() != null) {
+                List<Funcionario> semUnidade =
+                        funcionarioRepository.buscarSemContaPorNomeESemUnidade(usuario.getNome());
+                if (semUnidade.size() == 1 && candidatos.isEmpty()) {
+                    funcionario = semUnidade.get(0);
+                }
+            }
+
+            if (funcionario == null) {
+                funcionario = new Funcionario();
+                funcionario.setNome_funcionario(usuario.getNome());
+            }
+        }
+
+        funcionario.setUsuario(usuario);
+        funcionario.setNome_funcionario(usuario.getNome());
+        funcionario.setUnidade(usuario.getUnidade());
+
+        Funcionario salvo = funcionarioRepository.save(funcionario);
+
+        if (novoVinculo) {
+            auditoriaService.registrar(
+                    usuario,
+                    "SISTEMA",
+                    "FUNCIONARIO_OPERACIONAL_VINCULADO",
+                    "Cadastro operacional criado/sincronizado automaticamente com a conta. "
+                            + "Funcionário ID #" + salvo.getId() + "."
+            );
+        }
+
+        return salvo;
+    }
+
+    @Transactional
+    public int sincronizarFuncionariosExistentes() {
+        List<Usuario> usuarios = repository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+        int total = 0;
+
+        for (Usuario usuario : usuarios) {
+            boolean jaVinculado = funcionarioRepository.findByUsuarioId(usuario.getId()).isPresent();
+            sincronizarFuncionario(usuario);
+            if (!jaVinculado) {
+                total++;
+            }
+        }
+
+        return total;
     }
 
     public List<Usuario> listarTodos() {
@@ -95,6 +171,7 @@ public class UsuarioService {
         }
 
         Usuario salvo = repository.save(usuario);
+        sincronizarFuncionario(salvo);
         auditoriaService.registrar(
                 salvo,
                 salvo.getEmail(),
@@ -239,6 +316,7 @@ public class UsuarioService {
 
         usuario.setAtivo(!usuario.isAtivo());
         Usuario salvo = repository.save(usuario);
+        sincronizarFuncionario(salvo);
 
         auditoriaService.registrar(
                 salvo,
@@ -259,6 +337,7 @@ public class UsuarioService {
 
         usuario.setUnidade(unidade);
         Usuario salvo = repository.save(usuario);
+        sincronizarFuncionario(salvo);
 
         auditoriaService.registrar(
                 salvo,
