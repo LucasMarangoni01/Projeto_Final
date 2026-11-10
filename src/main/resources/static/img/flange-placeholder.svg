@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title">
+  <title id="title">Imagem de flange não cadastrada</title>
+  <rect width="640" height="420" rx="22" fill="#eaf0f8"/>
+  <g fill="none" stroke="#8da2bd" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M70 210h500"/>
+    <circle cx="320" cy="210" r="112"/>
+    <circle cx="320" cy="210" r="68"/>
+    <circle cx="320" cy="98" r="10"/>
+    <circle cx="399" cy="131" r="10"/>
+    <circle cx="432" cy="210" r="10"/>
+    <circle cx="399" cy="289" r="10"/>
+    <circle cx="320" cy="322" r="10"/>
+    <circle cx="241" cy="289" r="10"/>
+    <circle cx="208" cy="210" r="10"/>
+    <circle cx="241" cy="131" r="10"/>
+  </g>
+  <text x="320" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#526782">Sem imagem cadastrada</text>
+</svg>
