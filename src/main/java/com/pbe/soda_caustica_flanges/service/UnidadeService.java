@@ -315,7 +315,10 @@ public class UnidadeService {
     }
 
     public List<Funcionario> listarFuncionariosDisponiveis() {
-        return funcionarioRepository.findByUnidadeIsNullOrderByIdAsc();
+        return funcionarioRepository.findByUnidadeIsNullOrderByIdAsc()
+                .stream()
+                .filter(funcionario -> funcionario.getUsuario() == null)
+                .toList();
     }
 
     @Transactional
