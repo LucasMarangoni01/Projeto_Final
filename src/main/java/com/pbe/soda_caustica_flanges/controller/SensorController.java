@@ -10,11 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -130,6 +128,9 @@ public class SensorController {
         model.addAttribute("sensorDTO", sensorDTO);
         model.addAttribute("sensores", sensores);
         model.addAttribute("flanges", flanges);
+        model.addAttribute("flangesDisponiveis", flanges.stream()
+                .filter(flange -> flange.getUnidade() == null || flange.getUnidade().isAtivo())
+                .toList());
         model.addAttribute("coberturaFlanges", cobertura);
         model.addAttribute("tiposSensor", TipoSensor.values());
         model.addAttribute("statusSensores", StatusSensor.values());
@@ -138,7 +139,6 @@ public class SensorController {
         model.addAttribute("sensoresManutencao", sensoresManutencao);
         model.addAttribute("calibracoesVencidas", calibracoesVencidas);
         model.addAttribute("flangesSemSensor", flangesSemSensor);
-        model.addAttribute("dataHoje", LocalDate.now());
         model.addAttribute("sucesso", sucesso);
         model.addAttribute("erro", erro);
     }
