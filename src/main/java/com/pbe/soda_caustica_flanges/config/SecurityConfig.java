@@ -85,6 +85,7 @@ public class SecurityConfig {
                                 "/perfil.css",
                                 "/unidade.css",
                                 "/flange.css",
+                                "/sensor.css",
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
@@ -122,6 +123,7 @@ public class SecurityConfig {
                         // Gestão de ativos, pessoas, unidades e correções fica com ADMIN.
                         .requestMatchers(
                                 "/usuarios/**",
+                                "/sensores/**",
                                 "/usuario/**",
                                 "/unidades/**",
                                 "/flange/**",
