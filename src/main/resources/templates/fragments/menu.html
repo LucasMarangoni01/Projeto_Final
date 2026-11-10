@@ -26,6 +26,10 @@
                     <a th:href="@{/sensores}">Sensores</a>
                 </li>
 
+                <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                    <a th:href="@{/analises}">Análises</a>
+                </li>
+
                 <li>
                     <a th:href="@{/funcionario/listagem}">Funcionários</a>
                 </li>
@@ -162,6 +166,11 @@
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/sensores}">
                             Gestão de Sensores
+                        </a>
+
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/analises}">
+                            Análises e Indicadores
                         </a>
 
                         <a th:href="@{/funcionario/listagem}">
