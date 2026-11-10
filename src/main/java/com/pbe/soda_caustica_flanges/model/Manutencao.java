@@ -110,6 +110,10 @@ public class Manutencao {
         return nivelRisco == null ? NivelRiscoManutencao.MODERADO : nivelRisco;
     }
 
+    public boolean isNivelRiscoInformado() {
+        return nivelRisco != null;
+    }
+
     public void setNivelRisco(NivelRiscoManutencao nivelRisco) {
         this.nivelRisco = nivelRisco == null
                 ? NivelRiscoManutencao.MODERADO
@@ -120,6 +124,10 @@ public class Manutencao {
         return statusAtividade == null
                 ? StatusAtividadeManutencao.REGISTRADA
                 : statusAtividade;
+    }
+
+    public boolean isStatusAtividadeInformado() {
+        return statusAtividade != null;
     }
 
     public void setStatusAtividade(StatusAtividadeManutencao statusAtividade) {
