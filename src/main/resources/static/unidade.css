@@ -1253,3 +1253,19 @@
         width: auto !important;
     }
 }
+
+.unidade-member-linked-note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    min-height: 30px;
+    padding: 6px 9px;
+    border: 1px solid rgba(96,165,250,.24);
+    border-radius: 7px;
+    background: rgba(59,130,246,.08);
+    color: #a9caff;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+}
