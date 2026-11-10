@@ -140,7 +140,7 @@ Cada integrante utiliza seu próprio MySQL local. A aplicação conecta usando o
 4. Inicie a aplicação pelo IntelliJ. O Spring Boot importa o arquivo `.env` local automaticamente.
 5. Não envie o arquivo `.env` ao GitHub. Ele já está listado no `.gitignore`.
 
-A URL padrão aponta para `localhost`, portanto cada computador mantém seu banco independente. Se o projeto for hospedado em um servidor compartilhado, configure `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` no ambiente de implantação.
+A URL padrão aponta para `localhost`, portanto cada computador mantém seu banco independente. Se o projeto for hospedado em um servidor compartilhado, configure `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` no ambiente de implantação. Para implantação, ative o perfil `prod` (`SPRING_PROFILES_ACTIVE=prod`) atrás de um proxy reverso com HTTPS; esse perfil usa a porta 8080, oculta detalhes internos dos erros e desativa a saída de SQL.
 
 ### Primeiro administrador
 
