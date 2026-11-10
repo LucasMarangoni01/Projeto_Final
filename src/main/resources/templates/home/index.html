@@ -1079,7 +1079,7 @@
                     Painel operacional · estados demonstrativos
                 </div>
                 <div class="dashboard-data-note">
-                    Demonstração visual: alertas e alterações de status nesta tela são simulados no navegador e não substituem leituras de sensores reais.
+                    Demonstração visual: alertas e alterações de status nesta tela são simulados no navegador. A quantidade de sensores representa o inventário cadastrado; não há leitura automática de hardware nesta etapa.
                 </div>
             </div>
             <div class="badge ok-b" id="badge">Simulação sem alerta</div>
@@ -1297,6 +1297,9 @@
                                 <span th:text="${'ID #' + flange.id}">ID</span>
                                 <span th:text="${flange.temperaturaAmbiente != null ? #numbers.formatDecimal(flange.temperaturaAmbiente, 1, 1) + ' °C' : 'Temperatura não informada'}">Temperatura</span>
                                 <span th:text="${'Entrada: ' + flange.dataEntrada}">Data de entrada</span>
+                                <span th:text="${flange.totalSensores + ' sensor(es) cadastrado(s) · ' + flange.sensoresInstalados + ' instalado(s)'}">Sensores</span>
+                                <span th:if="${!#strings.isEmpty(flange.tiposSensores)}"
+                                      th:text="${'Tipos: ' + flange.tiposSensores}">Tipos de sensores</span>
                             </div>
                         </div>
                         <div class="fc-pill"
@@ -1333,6 +1336,9 @@
                 <div class="sc"><div class="sv status-warning-number" th:text="${totalAtencao}">0</div><div class="sl">Em atenção</div></div>
                 <div class="sc"><div class="sv status-critical-number" th:text="${totalCriticas}">0</div><div class="sl">Críticas</div></div>
                 <div class="sc"><div class="sv status-maintenance-number" th:text="${totalManutencao}">0</div><div class="sl">Em manutenção</div></div>
+                <div class="sc"><div class="sv" th:text="${totalSensores}">0</div><div class="sl">Sensores cadastrados</div></div>
+                <div class="sc"><div class="sv status-normal-number" th:text="${totalSensoresInstalados}">0</div><div class="sl">Sensores marcados como instalados</div></div>
+                <div class="sc"><div class="sv status-warning-number" th:text="${flangesSemSensor}">0</div><div class="sl">Flanges sem sensor associado</div></div>
             </div>
         </section>
 
