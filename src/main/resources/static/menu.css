@@ -1208,3 +1208,164 @@
         width: min(330px, calc(100vw - 20px));
     }
 }
+
+
+/* =========================================================
+   NAV FINAL · ACESSOS DIRETOS E MARCA DO PROJETO
+========================================================= */
+
+.nav-shell {
+    flex-wrap: nowrap;
+    gap: 14px;
+    padding: 8px 20px;
+}
+
+.nav-brand {
+    min-width: 235px;
+    max-width: 255px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-brand-logo {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: block;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.nav-brand-copy {
+    min-width: 0;
+    gap: 3px;
+}
+
+.nav-brand-copy strong {
+    color: #fff;
+    font-family: var(--menu-font);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+.nav-brand-copy small {
+    color: rgba(255,255,255,.76);
+    font-family: var(--menu-font);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.25;
+    white-space: normal;
+}
+
+.nav-desktop {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.nav-primary {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 1px;
+}
+
+.nav-primary > li {
+    flex: 0 0 auto;
+}
+
+.nav-link,
+.nav-dropdown > summary {
+    min-height: 36px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.nav-link-primary {
+    padding-right: 10px;
+    padding-left: 10px;
+    background: rgba(255,255,255,.11);
+    font-weight: 700;
+}
+
+.nav-link-primary:hover {
+    background: rgba(255,255,255,.18);
+}
+
+.nav-account {
+    gap: 6px;
+    padding-left: 10px;
+}
+
+.nav-account-profile {
+    max-width: 145px;
+    gap: 7px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.nav-account-copy strong {
+    max-width: 96px;
+    font-size: 9px;
+}
+
+.btn-trocar-conta,
+.btn-sair {
+    min-height: 32px;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 9px;
+}
+
+.nav-dropdown-panel {
+    z-index: 1200;
+}
+
+/* Breakpoint pensado para a quantidade máxima de links ADMIN. */
+@media (max-width: 1240px) {
+    .nav-desktop,
+    .nav-account {
+        display: none;
+    }
+
+    .nav-mobile {
+        display: block;
+    }
+
+    .nav-shell {
+        min-height: 64px;
+        justify-content: space-between;
+    }
+
+    .nav-brand {
+        min-width: 0;
+        max-width: min(75vw, 330px);
+    }
+}
+
+@media (max-width: 520px) {
+    .nav-shell {
+        min-height: 60px;
+        padding: 7px 12px;
+    }
+
+    .nav-brand-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+    .nav-brand-copy strong {
+        font-size: 11px;
+    }
+
+    .nav-brand-copy small {
+        font-size: 8px;
+    }
+}
