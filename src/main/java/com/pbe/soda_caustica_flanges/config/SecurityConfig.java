@@ -86,6 +86,7 @@ public class SecurityConfig {
                                 "/unidade.css",
                                 "/flange.css",
                                 "/sensor.css",
+                                "/sensor.js",
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
