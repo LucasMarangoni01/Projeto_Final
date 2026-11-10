@@ -132,35 +132,20 @@ A alteração de e-mail de acesso não é oferecida no autoatendimento: o e-mail
 
 ## Configuração do ambiente local
 
-A conexão com o MySQL desta branch está configurada diretamente em `src/main/resources/application.properties`, conforme a configuração local definida para o projeto. **Não é necessário criar ou preencher um arquivo `.env` para iniciar a aplicação.** O Spring Boot não carrega arquivos `.env` automaticamente nesta configuração.
+Cada integrante utiliza seu próprio MySQL local. A aplicação conecta usando o usuário de banco com privilégios restritos `soda_app`; não utiliza a conta administrativa `root`.
 
-Confira no `application.properties` o endereço do banco, usuário e senha que correspondem ao seu MySQL local. Não cadastre variáveis `DB_URL`, `DB_USERNAME` ou `DB_PASSWORD` na configuração de execução do IntelliJ, pois variáveis de ambiente podem sobrescrever os valores do arquivo.
+1. Copie `.env.example` para um arquivo chamado `.env` na raiz do projeto.
+2. Defina uma senha forte em `DB_PASSWORD`.
+3. Abra `database/setup.sql` no MySQL Workbench, substitua as duas ocorrências de `TROQUE_POR_UMA_SENHA_FORTE_2026` pela mesma senha definida em `.env` e execute o script usando uma conta administrativa do MySQL.
+4. Inicie a aplicação pelo IntelliJ. O Spring Boot importa o arquivo `.env` local automaticamente.
+5. Não envie o arquivo `.env` ao GitHub. Ele já está listado no `.gitignore`.
+
+A URL padrão aponta para `localhost`, portanto cada computador mantém seu banco independente. Se o projeto for hospedado em um servidor compartilhado, configure `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` no ambiente de implantação.
 
 ### Primeiro administrador
 
-O bootstrap cria a primeira conta ADMIN somente quando as variáveis de ambiente `ADMIN_EMAIL` e `ADMIN_PASSWORD` são informadas juntas. Se o banco já possui um administrador, não é necessário configurá-las.
+Em um banco sem usuários, o primeiro cadastro feito pelo formulário público recebe automaticamente o perfil `ADMIN`. Os cadastros seguintes recebem `USER` e precisam ser associados a uma unidade ativa por um administrador. Não é necessário usar um atalho de login nem informar variáveis `ADMIN_EMAIL` e `ADMIN_PASSWORD` para esse fluxo.
 
-No IntelliJ IDEA:
+### Rotação de credenciais expostas
 
-1. Abra **Run > Edit Configurations...** e selecione a aplicação.
-2. Em **Environment variables**, informe `ADMIN_EMAIL` com um e-mail que ainda não esteja cadastrado.
-3. Informe `ADMIN_PASSWORD` com uma senha de pelo menos 12 caracteres.
-4. Execute a aplicação. O bootstrap cria a conta apenas se o e-mail ainda não existir; ele não redefine a senha de contas existentes.
-5. Depois do primeiro acesso, remova essas duas variáveis da configuração de execução.
-
-Para executar pelo PowerShell, defina as duas variáveis apenas na janela atual:
-
-```powershell
-$env:ADMIN_EMAIL = "admin@empresa.com.br"
-$env:ADMIN_PASSWORD = "Use-Uma-Senha-Forte-Com-12+Caracteres"
-
-.\mvnw.cmd spring-boot:run
-```
-
-### Atenção ao administrador já existente
-
-Contas criadas pelo formulário público recebem o perfil USER e ficam sem unidade inicialmente; por segurança, não conseguem entrar até que um ADMIN as associe a uma unidade ativa. O primeiro ADMIN deve ser criado pelas variáveis de ambiente `ADMIN_EMAIL` e `ADMIN_PASSWORD` na configuração de execução do IntelliJ ou no terminal. O bootstrap cria essa conta somente quando o e-mail configurado ainda não existe. Ele não promove nem redefine senhas de contas existentes. Em bancos já utilizados, configure um novo e-mail administrativo, entre com a nova conta e desative a conta inicial antiga pela administração de usuários, depois de confirmar o acesso.
-
-### Rotação de credenciais
-
-Se uma senha já foi publicada no histórico de um repositório público, alterá-la apenas no arquivo atual não é suficiente. Troque a senha correspondente no próprio MySQL e atualize `spring.datasource.password` em `application.properties` (ou injete a nova credencial por um mecanismo de segredos da implantação). Senhas administrativas antigas também devem ser substituídas ou as respectivas contas desativadas.
+Uma credencial que já foi incluída em um repositório público deve ser considerada comprometida, mesmo depois de removida do arquivo atual. Faça a rotação da senha do usuário MySQL anteriormente utilizado e de qualquer outro segredo que tenha sido publicado. A aplicação passa a usar `soda_app`, com privilégios limitados ao banco do projeto.
