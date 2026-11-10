@@ -90,3 +90,183 @@
 @media(max-width:1120px){.analises-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.analises-meses-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.analises-main{padding:16px 12px 24px;gap:15px}.analises-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.analise-kpi{min-height:119px;padding:12px}.analise-kpi-top{font-size:8px}.analise-kpi>strong{font-size:25px}.analises-panels-grid{grid-template-columns:1fr;gap:12px}.analises-section-heading{flex-direction:column}.analises-section,.analises-panel{padding:15px}}
 @media(max-width:480px){.analises-header{align-items:stretch}.analises-filter{width:100%}.analises-filter-control select{min-width:0}.analises-meses-grid{grid-template-columns:1fr}.analises-kpis{gap:8px}.analise-kpi{min-height:114px}.analises-sensor-summary{grid-template-columns:1fr 1fr}}
+
+/* =========================================================
+   GRÁFICOS REAIS · REFERÊNCIA DE VISUALIZAÇÃO
+========================================================= */
+
+.analises-header {
+    text-align: left;
+}
+
+.chart-featured {
+    width: 100%;
+}
+
+.chart-featured .analises-section-heading {
+    align-items: center;
+}
+
+.chart-period-tag {
+    min-width: 54px;
+    padding: 7px 11px;
+    border: 1px solid rgba(96,165,250,.25);
+    border-radius: 7px;
+    background: rgba(59,130,246,.12);
+    color: #bfdbfe;
+    font: 800 11px 'JetBrains Mono', Consolas, monospace;
+    text-align: center;
+}
+
+.analises-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.chart-panel {
+    min-width: 0;
+    padding: 17px;
+}
+
+.chart-panel-heading {
+    min-height: 54px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 13px;
+}
+
+.chart-panel-heading h2 {
+    margin: 4px 0 4px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.chart-panel-heading p {
+    margin: 0;
+    color: #a8bad5;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.chart-type-mark {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 7px;
+    background: rgba(255,255,255,.045);
+    color: #9dbbe3;
+    font: 800 9px 'JetBrains Mono', Consolas, monospace;
+}
+
+.chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 258px;
+    min-width: 0;
+}
+
+.chart-line-wrap {
+    height: 340px;
+}
+
+.chart-radar-panel .chart-canvas-wrap {
+    height: 285px;
+}
+
+.chart-canvas-wrap canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-canvas-wrap canvas[hidden] {
+    display: none !important;
+}
+
+.chart-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 18px;
+    border: 1px dashed rgba(255,255,255,.12);
+    border-radius: 9px;
+    background: rgba(2,17,48,.18);
+    text-align: center;
+}
+
+.chart-empty[hidden] {
+    display: none !important;
+}
+
+.chart-empty strong {
+    color: #eaf2ff;
+    font-size: 11px;
+}
+
+.chart-empty span {
+    max-width: 260px;
+    color: #93aaca;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.chart-featured .chart-empty {
+    border-color: rgba(255,255,255,.15);
+}
+
+@media (max-width: 900px) {
+    .analises-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-canvas-wrap {
+        height: 280px;
+    }
+
+    .chart-line-wrap {
+        height: 310px;
+    }
+}
+
+@media (max-width: 600px) {
+    .analises-section-heading {
+        align-items: flex-start;
+    }
+
+    .chart-period-tag {
+        align-self: flex-start;
+    }
+
+    .chart-panel {
+        padding: 14px;
+    }
+
+    .chart-canvas-wrap {
+        height: 250px;
+    }
+
+    .chart-line-wrap {
+        height: 270px;
+    }
+
+    .chart-radar-panel .chart-canvas-wrap {
+        height: 270px;
+    }
+
+    .chart-panel-heading h2 {
+        font-size: 15px;
+    }
+}
