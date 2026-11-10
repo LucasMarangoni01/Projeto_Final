@@ -75,7 +75,13 @@ public class ManutencaoController {
         }
 
         if (flangeId == null || funcionarioId == null) {
-            model.addAttribute("erro", "Selecione uma flange e um funcionário.");
+            List<Funcionario> funcionariosDisponiveis = listarFuncionariosPermitidos(usuario);
+
+            String mensagem = funcionariosDisponiveis.isEmpty()
+                    ? mensagemSemFuncionarios(usuario)
+                    : "Selecione uma flange e um funcionário responsável.";
+
+            model.addAttribute("erro", mensagem);
             prepararFormulario(model, manutencao, usuario);
             return "manutencao/cadastro";
         }
@@ -162,24 +168,55 @@ public class ManutencaoController {
     private void prepararFormulario(Model model, Manutencao manutencao, Usuario usuario) {
         boolean admin = usuario.getRole() == Role.ADMIN;
         List<Flange> flanges;
-        List<Funcionario> funcionarios;
 
         if (admin) {
             flanges = flangeRepository.findAll();
-            funcionarios = funcionarioRepository.findAll();
         } else if (usuario.getUnidade() == null) {
             flanges = Collections.emptyList();
-            funcionarios = Collections.emptyList();
         } else {
-            Long unidadeId = usuario.getUnidade().getId();
-            flanges = flangeRepository.findByUnidadeId(unidadeId);
-            funcionarios = funcionarioRepository.findByUnidadeIdOrderByIdAsc(unidadeId);
+            flanges = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
         }
+
+        List<Funcionario> funcionarios = listarFuncionariosPermitidos(usuario);
 
         model.addAttribute("manutencao", manutencao);
         model.addAttribute("flanges", flanges);
         model.addAttribute("funcionarios", funcionarios);
         model.addAttribute("ehAdmin", admin);
         model.addAttribute("unidadeUsuario", usuario.getUnidade());
+        model.addAttribute("nenhumFuncionarioDisponivel", funcionarios.isEmpty());
+    }
+
+    private List<Funcionario> listarFuncionariosPermitidos(Usuario usuario) {
+        if (usuario.getRole() == Role.ADMIN) {
+            return funcionarioRepository.findAll()
+                    .stream()
+                    .sorted(java.util.Comparator.comparing(
+                            Funcionario::getNome_funcionario,
+                            java.text.Collator.getInstance(new java.util.Locale("pt", "BR"))
+                    ))
+                    .toList();
+        }
+
+        if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
+            return Collections.emptyList();
+        }
+
+        return funcionarioRepository.findByUnidadeIdOrderByIdAsc(
+                usuario.getUnidade().getId()
+        );
+    }
+
+    private String mensagemSemFuncionarios(Usuario usuario) {
+        if (usuario.getRole() == Role.ADMIN) {
+            return "Não há funcionários operacionais cadastrados. Cadastre um funcionário antes de registrar a manutenção.";
+        }
+
+        String unidade = usuario.getUnidade() == null
+                ? "sua unidade"
+                : usuario.getUnidade().getNome();
+
+        return "Não há funcionários operacionais vinculados a " + unidade
+                + ". Solicite ao ADMIN que cadastre ou vincule um funcionário a essa unidade.";
     }
 }
