@@ -10,9 +10,11 @@ import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
 import com.pbe.soda_caustica_flanges.repository.SensorRepository;
 import com.pbe.soda_caustica_flanges.repository.UnidadeRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
+import com.pbe.soda_caustica_flanges.service.FotoFlangeService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,31 +22,68 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 @Controller
 public class FlangeController {
 
-    @Autowired
-    private FlangeRepository flangeRepository;
+    private final FlangeRepository flangeRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final UnidadeRepository unidadeRepository;
+    private final ManutencaoRepository manutencaoRepository;
+    private final SensorRepository sensorRepository;
+    private final FotoFlangeService fotoFlangeService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public FlangeController(
+            FlangeRepository flangeRepository,
+            UsuarioRepository usuarioRepository,
+            UnidadeRepository unidadeRepository,
+            ManutencaoRepository manutencaoRepository,
+            SensorRepository sensorRepository,
+            FotoFlangeService fotoFlangeService) {
+        this.flangeRepository = flangeRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.unidadeRepository = unidadeRepository;
+        this.manutencaoRepository = manutencaoRepository;
+        this.sensorRepository = sensorRepository;
+        this.fotoFlangeService = fotoFlangeService;
+    }
 
-    @Autowired
-    private UnidadeRepository unidadeRepository;
+    /**
+     * Entrega a imagem somente a usuários autenticados e autorizados
+     * a visualizar a flange da própria unidade.
+     */
+    @GetMapping("/flange/foto/{id}")
+    public ResponseEntity<byte[]> foto(
+            @PathVariable Long id,
+            Authentication authentication) {
 
-    @Autowired
-    private ManutencaoRepository manutencaoRepository;
+        Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
+                .orElse(null);
+        Flange flange = flangeRepository.findById(id).orElse(null);
 
-    @Autowired
-    private SensorRepository sensorRepository;
+        if (usuario == null || flange == null || flange.getFoto() == null
+                || flange.getFoto().isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
 
-    private final String uploadDir =
-            "src/main/resources/static/foto_flange/";
+        if (usuario.getRole() != Role.ADMIN) {
+            if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
+                    || flange.getUnidade() == null
+                    || !flange.getUnidade().getId().equals(usuario.getUnidade().getId())) {
+                return ResponseEntity.notFound().build();
+            }
+        }
+
+        try {
+            FotoFlangeService.FotoCarregada foto = fotoFlangeService.carregar(flange.getFoto());
+            return ResponseEntity.ok()
+                    .contentType(foto.contentType())
+                    .cacheControl(CacheControl.noStore())
+                    .body(foto.bytes());
+        } catch (IOException | IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @GetMapping("/flange/listagem")
     public String listagem(
@@ -327,40 +366,7 @@ public class FlangeController {
         try {
 
             if (arquivoFoto != null && !arquivoFoto.isEmpty()) {
-
-                String nomeOriginal = arquivoFoto.getOriginalFilename();
-                String extensao = "";
-
-                if (nomeOriginal != null) {
-                    String nomeLimpo = Paths.get(nomeOriginal).getFileName().toString();
-                    int ponto = nomeLimpo.lastIndexOf('.');
-
-                    if (ponto >= 0) {
-                        String extensaoInformada = nomeLimpo.substring(ponto).toLowerCase();
-
-                        if (extensaoInformada.matches("\\.(jpg|jpeg|png|webp)")) {
-                            extensao = extensaoInformada;
-                        }
-                    }
-                }
-
-                String nomeArquivo = UUID.randomUUID() + extensao;
-
-                Path diretorio =
-                        Paths.get(uploadDir).toAbsolutePath();
-
-                if (!Files.exists(diretorio)) {
-                    Files.createDirectories(diretorio);
-                }
-
-                Path arquivo = diretorio.resolve(nomeArquivo).normalize();
-
-                if (!arquivo.startsWith(diretorio.normalize())) {
-                    throw new IOException("Nome de arquivo inválido.");
-                }
-
-                arquivoFoto.transferTo(arquivo.toFile());
-                flange.setFoto(nomeArquivo);
+                flange.setFoto(fotoFlangeService.salvar(arquivoFoto));
             } else if (flangeExistente != null) {
                 flange.setFoto(flangeExistente.getFoto());
             }
@@ -369,8 +375,11 @@ public class FlangeController {
                 flange.setStatus(flangeExistente.getStatus());
             }
 
-        } catch (IOException e) {
-            model.addAttribute("erro", "Não foi possível salvar a foto da flange.");
+        } catch (IOException | IllegalArgumentException e) {
+            model.addAttribute("erro",
+                    e.getMessage() == null
+                            ? "Não foi possível salvar a foto da flange."
+                            : e.getMessage());
             model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
 
             if (usuario.getRole() == Role.ADMIN) {
