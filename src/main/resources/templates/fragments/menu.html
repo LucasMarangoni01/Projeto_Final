@@ -7,11 +7,12 @@
     <nav class="main-nav" aria-label="Navegação principal">
         <div class="nav-shell">
 
-            <a class="nav-brand" th:href="@{/}" aria-label="Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica - Página inicial">
-                <span class="nav-brand-mark">MF</span>
+            <a class="nav-brand"
+               th:href="@{/}"
+               aria-label="Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica">
                 <span class="nav-brand-copy">
-                    <strong>MONITORAMENTO DE FLANGES</strong>
-                    <small>AMBIENTES INDUSTRIAIS · SODA CÁUSTICA</small>
+                    <strong>Monitoramento de Flanges</strong>
+                    <small>Ambientes industriais com soda cáustica</small>
                 </span>
             </a>
 
@@ -19,72 +20,46 @@
                 <ul class="nav-primary">
 
                     <li>
-                        <a class="nav-link nav-link-home" th:href="@{/}">
-                            <span class="nav-link-icon">⌂</span>
-                            Visão geral
-                        </a>
+                        <a class="nav-link" th:href="@{/}">Início</a>
                     </li>
 
                     <li>
-                        <details class="nav-dropdown">
-                            <summary>
-                                Operação
-                                <span class="nav-chevron"></span>
-                            </summary>
-                            <div class="nav-dropdown-panel">
-                                <span class="nav-dropdown-label">ATIVOS E ROTINA</span>
-
-                                <a th:href="@{/flange/listagem}">
-                                    <span class="nav-item-icon">▤</span>
-                                    <span>
-                                        <strong>Flanges</strong>
-                                        <small>Visualizar ativos monitorados</small>
-                                    </span>
-                                </a>
-
-                                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                                   th:href="@{/sensores}">
-                                    <span class="nav-item-icon">⌁</span>
-                                    <span>
-                                        <strong>Sensores</strong>
-                                        <small>Instrumentação e calibração</small>
-                                    </span>
-                                </a>
-
-                                <a th:href="@{/funcionario/listagem}">
-                                    <span class="nav-item-icon">♙</span>
-                                    <span>
-                                        <strong>Funcionários</strong>
-                                        <small>Equipe operacional</small>
-                                    </span>
-                                </a>
-
-                                <span class="nav-dropdown-divider"></span>
-                                <span class="nav-dropdown-label">MANUTENÇÃO</span>
-
-                                <a th:href="@{/manutencao/listagem}">
-                                    <span class="nav-item-icon">▣</span>
-                                    <span>
-                                        <strong>Histórico de manutenções</strong>
-                                        <small>Consultar atividades registradas</small>
-                                    </span>
-                                </a>
-
-                                <a th:href="@{/manutencao/cadastro}" class="nav-dropdown-action">
-                                    <span class="nav-item-icon">＋</span>
-                                    <span>
-                                        <strong>Registrar manutenção</strong>
-                                        <small>Abrir um novo registro</small>
-                                    </span>
-                                </a>
-                            </div>
-                        </details>
+                        <a class="nav-link" th:href="@{/flange/listagem}">Flanges</a>
                     </li>
 
                     <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                        <a class="nav-link nav-link-analytics" th:href="@{/analises}">
-                            Análises
+                        <a class="nav-link" th:href="@{/sensores}">Sensores</a>
+                    </li>
+
+                    <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                        <a class="nav-link" th:href="@{/analises}">Análises</a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link" th:href="@{/funcionario/listagem}">Funcionários</a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link" th:href="@{/manutencao/listagem}">Manutenções</a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link nav-link-primary" th:href="@{/manutencao/cadastro}">
+                            Registrar manutenção
                         </a>
+                    </li>
+
+                    <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                        <details class="nav-dropdown">
+                            <summary>
+                                Cadastros
+                                <span class="nav-chevron"></span>
+                            </summary>
+                            <div class="nav-dropdown-panel">
+                                <a th:href="@{/flange/cadastro}">Cadastrar flange</a>
+                                <a th:href="@{/funcionario/cadastro}">Cadastrar funcionário</a>
+                            </div>
+                        </details>
                     </li>
 
                     <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
@@ -94,39 +69,8 @@
                                 <span class="nav-chevron"></span>
                             </summary>
                             <div class="nav-dropdown-panel nav-dropdown-panel-right">
-                                <span class="nav-dropdown-label">CONFIGURAÇÃO DO SISTEMA</span>
-
-                                <a th:href="@{/flange/cadastro}">
-                                    <span class="nav-item-icon">＋</span>
-                                    <span>
-                                        <strong>Cadastrar flange</strong>
-                                        <small>Adicionar um novo ativo</small>
-                                    </span>
-                                </a>
-
-                                <a th:href="@{/funcionario/cadastro}">
-                                    <span class="nav-item-icon">♙</span>
-                                    <span>
-                                        <strong>Cadastrar funcionário</strong>
-                                        <small>Adicionar pessoa à operação</small>
-                                    </span>
-                                </a>
-
-                                <a th:href="@{/usuarios}">
-                                    <span class="nav-item-icon">⚙</span>
-                                    <span>
-                                        <strong>Usuários e permissões</strong>
-                                        <small>Contas e níveis de acesso</small>
-                                    </span>
-                                </a>
-
-                                <a th:href="@{/unidades}">
-                                    <span class="nav-item-icon">⌖</span>
-                                    <span>
-                                        <strong>Unidades</strong>
-                                        <small>Gerenciar plantas e equipes</small>
-                                    </span>
-                                </a>
+                                <a th:href="@{/usuarios}">Usuários e permissões</a>
+                                <a th:href="@{/unidades}">Unidades</a>
                             </div>
                         </details>
                     </li>
@@ -156,8 +100,7 @@
                         class="btn-trocar-conta"
                         onclick="trocarConta()"
                         title="Encerrar esta sessão e entrar com outra conta">
-                    <span class="account-action-icon">⇄</span>
-                    <span>Trocar conta</span>
+                    Trocar conta
                 </button>
 
                 <button type="button"
@@ -172,7 +115,7 @@
                 <details class="mobile-menu">
                     <summary>
                         <span class="menu-icon"><i></i><i></i><i></i></span>
-                        <span>MENU</span>
+                        <span>Menu</span>
                     </summary>
 
                     <div class="mobile-menu-content">
@@ -189,26 +132,24 @@
                                 <strong th:text="${usuarioLogado.nome}">Usuário</strong>
                                 <small th:text="${usuarioLogado.role}">USER</small>
                             </span>
-                            <span class="mobile-profile-arrow">›</span>
                         </a>
 
-                        <span class="mobile-menu-label">VISÃO GERAL</span>
-                        <a th:href="@{/}" class="mobile-menu-link">Página inicial</a>
-                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-                           th:href="@{/analises}" class="mobile-menu-link">Análises e indicadores</a>
-
-                        <span class="mobile-menu-label">OPERAÇÃO</span>
+                        <a th:href="@{/}" class="mobile-menu-link">Início</a>
                         <a th:href="@{/flange/listagem}" class="mobile-menu-link">Flanges</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/sensores}" class="mobile-menu-link">Sensores</a>
+                        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                           th:href="@{/analises}" class="mobile-menu-link">Análises</a>
                         <a th:href="@{/funcionario/listagem}" class="mobile-menu-link">Funcionários</a>
-                        <a th:href="@{/manutencao/listagem}" class="mobile-menu-link">Histórico de manutenções</a>
+                        <a th:href="@{/manutencao/listagem}" class="mobile-menu-link">Manutenções</a>
                         <a th:href="@{/manutencao/cadastro}" class="mobile-menu-link">Registrar manutenção</a>
 
                         <div th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-                            <span class="mobile-menu-label">ADMINISTRAÇÃO</span>
+                            <span class="mobile-menu-label">CADASTROS</span>
                             <a th:href="@{/flange/cadastro}" class="mobile-menu-link">Cadastrar flange</a>
                             <a th:href="@{/funcionario/cadastro}" class="mobile-menu-link">Cadastrar funcionário</a>
+
+                            <span class="mobile-menu-label">ADMINISTRAÇÃO</span>
                             <a th:href="@{/usuarios}" class="mobile-menu-link">Usuários e permissões</a>
                             <a th:href="@{/unidades}" class="mobile-menu-link">Unidades</a>
                         </div>
@@ -217,7 +158,7 @@
                             <button type="button"
                                     class="mobile-switch-account"
                                     onclick="trocarConta()">
-                                ⇄ &nbsp; TROCAR DE CONTA
+                                Trocar de conta
                             </button>
                             <button type="button"
                                     class="mobile-logout"
