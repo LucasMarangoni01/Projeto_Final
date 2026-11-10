@@ -6,78 +6,158 @@
     <title>Manutenções | Soda Cáustica Flanges</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/manutencao.css}">
 </head>
 <body>
 <div th:replace="~{fragments/menu :: menu}"></div>
-<main>
-    <header class="listagem-topbar">
-        <div class="listagem-meta">
+
+<main class="maintenance-page">
+    <header class="maintenance-header">
+        <div class="maintenance-header-copy">
             <div class="topbar-eyebrow">OPERAÇÃO INDUSTRIAL · HISTÓRICO TÉCNICO</div>
-            <div class="topbar-title">Manutenções</div>
+            <h1>Manutenções</h1>
             <p th:if="${!ehAdmin and usuarioLogado.unidade != null}"
                th:text="${'Registros da unidade ' + usuarioLogado.unidade.nome}">Unidade</p>
             <p th:if="${ehAdmin}">Visão administrativa de todas as unidades.</p>
             <p>O autor do lançamento e o funcionário executor são identificados separadamente.</p>
         </div>
-        <a th:href="@{/manutencao/cadastro}" class="btn btn-primary">+ Registrar manutenção</a>
+
+        <a th:href="@{/manutencao/cadastro}" class="btn btn-primary maintenance-new-button">
+            + Registrar manutenção
+        </a>
     </header>
 
-    <section class="card">
-        <div class="topo-card">
+    <div class="maintenance-feedback" th:if="${erro != null}" th:text="${erro}"></div>
+
+    <section class="card maintenance-card">
+        <div class="maintenance-card-heading">
             <div>
+                <span class="maintenance-kicker">RASTREABILIDADE OPERACIONAL</span>
                 <h2>Histórico de manutenções</h2>
-                <p th:text="${#lists.size(manutencoes) + ' registro(s) encontrado(s).'}">0 registros</p>
+                <p th:text="${#lists.size(manutencoes) + ' registro(s) encontrado(s).'}">0 registros encontrados.</p>
+            </div>
+            <div class="maintenance-heading-note">
+                <span class="maintenance-heading-dot"></span>
+                <span>Dados registrados no sistema</span>
             </div>
         </div>
 
-        <div class="table-container">
-            <table>
+        <div class="maintenance-table-wrap">
+            <table class="maintenance-table">
+                <colgroup>
+                    <col class="col-id">
+                    <col class="col-activity">
+                    <col class="col-risk">
+                    <col class="col-status">
+                    <col class="col-date">
+                    <col class="col-flange">
+                    <col class="col-worker">
+                    <col class="col-unit">
+                    <col class="col-author">
+                    <col class="col-actions">
+                </colgroup>
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Ocorrência</th>
-                    <th>Número de série</th>
+                    <th>Atividade / ordem</th>
+                    <th>Risco</th>
+                    <th>Andamento</th>
                     <th>Data</th>
                     <th>Flange</th>
-                    <th>Funcionário</th>
+                    <th>Executor</th>
                     <th>Unidade</th>
                     <th>Registrado por</th>
-                    <th>Lançado em</th>
-                    <th th:if="${ehAdmin}">Ações administrativas</th>
-                    <th th:unless="${ehAdmin}">Registro</th>
+                    <th>Ações</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="manutencao : ${manutencoes}">
-                    <td th:text="${manutencao.id}"></td>
-                    <td th:text="${manutencao.ocorrencia}"></td>
-                    <td th:text="${manutencao.num_serie}"></td>
-                    <td th:text="${manutencao.data != null ? #dates.format(manutencao.data, 'dd/MM/yyyy') : '—'}"></td>
-                    <td th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}"></td>
-                    <td th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}"></td>
-                    <td th:text="${manutencao.flange != null and manutencao.flange.unidade != null ? manutencao.flange.unidade.nome : 'Sem unidade'}"></td>
-                    <td th:text="${manutencao.registradoPorEmail != null ? manutencao.registradoPorEmail : 'Registro legado'}">Registro legado</td>
-                    <td th:text="${manutencao.registradoEm != null ? #temporals.format(manutencao.registradoEm, 'dd/MM/yyyy HH:mm') : 'Não registrado'}">Não registrado</td>
-                    <td th:if="${ehAdmin}" class="acoes">
-                        <a th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}" class="btn btn-edit">Editar</a>
-                        <form th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-delete"
-                                    onclick="return confirm('Excluir definitivamente este registro de manutenção?')">Excluir</button>
-                        </form>
+                <tr class="maintenance-row" th:each="manutencao : ${manutencoes}">
+                    <td class="maintenance-id" th:text="${'#' + manutencao.id}">#1</td>
+
+                    <td class="maintenance-activity-cell">
+                        <strong th:text="${manutencao.ocorrencia}" th:title="${manutencao.ocorrencia}">Descrição</strong>
+                        <small th:text="${'Ordem / série: ' + (manutencao.num_serie != null ? manutencao.num_serie : 'Não informada')}">
+                            Ordem / série
+                        </small>
                     </td>
-                    <td th:unless="${ehAdmin}"><span class="badge">Somente leitura</span></td>
+
+                    <td>
+                        <span class="maintenance-risk-pill"
+                              th:classappend="${manutencao.nivelRisco.classeCss}"
+                              th:text="${manutencao.nivelRisco.descricao}">Moderado</span>
+                    </td>
+
+                    <td>
+                        <span class="maintenance-status-pill"
+                              th:classappend="${manutencao.statusAtividade.classeCss}"
+                              th:text="${manutencao.statusAtividade.descricao}">Registrada</span>
+                    </td>
+
+                    <td class="maintenance-date"
+                        th:text="${manutencao.data != null ? #dates.format(manutencao.data, 'dd/MM/yyyy') : '—'}">10/11/2026</td>
+
+                    <td class="maintenance-asset"
+                        th:text="${manutencao.flange != null ? manutencao.flange.nome_flange : 'Sem flange'}">FL-001</td>
+
+                    <td class="maintenance-worker"
+                        th:text="${manutencao.funcionario != null ? manutencao.funcionario.nome_funcionario : 'Sem funcionário'}">
+                        Funcionário
+                    </td>
+
+                    <td class="maintenance-unit"
+                        th:text="${manutencao.flange != null and manutencao.flange.unidade != null ? manutencao.flange.unidade.nome : 'Sem unidade'}">
+                        Unidade
+                    </td>
+
+                    <td class="maintenance-author">
+                        <strong th:text="${manutencao.registradoPorEmail != null ? manutencao.registradoPorEmail : 'Registro legado'}">
+                            Registro legado
+                        </strong>
+                        <small th:text="${manutencao.registradoEm != null ? #temporals.format(manutencao.registradoEm, 'dd/MM/yy HH:mm') : 'Data não registrada'}">
+                            Data
+                        </small>
+                    </td>
+
+                    <td class="maintenance-actions">
+                        <a th:if="${ehAdmin or (manutencao.registradoPorEmail != null and manutencao.registradoPorEmail == usuarioLogado.email)}"
+                           th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}"
+                           class="maintenance-edit-button">Editar</a>
+
+                        <form th:if="${ehAdmin}"
+                              th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
+                              method="post"
+                              class="maintenance-delete-form">
+                            <button type="submit"
+                                    class="maintenance-delete-button"
+                                    onclick="return confirm('Excluir definitivamente este registro de manutenção?')">
+                                Excluir
+                            </button>
+                        </form>
+
+                        <span th:if="${!ehAdmin and (manutencao.registradoPorEmail == null or manutencao.registradoPorEmail != usuarioLogado.email)}"
+                              class="maintenance-readonly">Leitura</span>
+                    </td>
                 </tr>
+
                 <tr th:if="${#lists.isEmpty(manutencoes)}">
-                    <td colspan="10" style="text-align:center;padding:28px">Nenhuma manutenção encontrada para esta unidade.</td>
+                    <td colspan="10" class="maintenance-empty-row">
+                        <strong>Nenhuma manutenção encontrada.</strong>
+                        <span>Os registros da unidade aparecerão aqui após o primeiro lançamento.</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
         <p class="maintenance-permission-note" th:if="${!ehAdmin}">
-            Seus registros são adicionados ao histórico da unidade. Para corrigir ou remover um lançamento, solicite a um administrador.
+            Você pode editar os lançamentos criados pela sua própria conta. Somente o ADMIN pode colocar uma atividade como “Em andamento”.
+        </p>
+        <p class="maintenance-permission-note" th:if="${ehAdmin}">
+            O ADMIN pode consultar e editar os registros de todas as unidades, além de atualizar o andamento das atividades.
         </p>
     </section>
 </main>
+
 <script th:src="@{/menu.js}"></script>
 </body>
 </html>
