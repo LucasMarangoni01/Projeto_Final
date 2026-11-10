@@ -6,6 +6,7 @@
     <title>Registrar manutenção | Soda Cáustica Flanges</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/manutencao.css}">
 </head>
 <body>
 <div th:replace="~{fragments/menu :: menu}"></div>
@@ -35,6 +36,39 @@
                 <div class="form-group">
                     <label for="data">Data da manutenção *</label>
                     <input id="data" type="date" th:field="*{data}" required>
+                </div>
+                <div class="form-group">
+                    <label for="nivelRisco">Nível de risco *</label>
+                    <select id="nivelRisco" th:field="*{nivelRisco}" required>
+                        <option th:each="nivel : ${niveisRisco}"
+                                th:value="${nivel}"
+                                th:text="${nivel.descricao}">Moderado</option>
+                    </select>
+                    <small class="maintenance-help">Classifique o risco associado à atividade ou ocorrência.</small>
+                </div>
+                <div class="form-group">
+                    <label for="statusAtividade">Andamento da atividade *</label>
+                    <select id="statusAtividade"
+                            th:if="${!statusAtividadeBloqueado}"
+                            th:field="*{statusAtividade}"
+                            required>
+                        <option th:each="status : ${statusAtividades}"
+                                th:value="${status}"
+                                th:text="${status.descricao}">Registrada</option>
+                    </select>
+
+                    <div class="maintenance-status-locked" th:if="${statusAtividadeBloqueado}">
+                        <input type="hidden" th:field="*{statusAtividade}">
+                        <span class="maintenance-status-pill activity-progress"
+                              th:text="${manutencao.statusAtividade.descricao}">Em andamento</span>
+                    </div>
+
+                    <small class="maintenance-help" th:if="${!ehAdmin}">
+                        Somente um ADMIN pode definir uma atividade como “Em andamento”.
+                    </small>
+                    <small class="maintenance-help" th:if="${statusAtividadeBloqueado}">
+                        A atividade já está em andamento. Somente o ADMIN pode alterar esse status.
+                    </small>
                 </div>
                 <div class="form-group">
                     <label for="flangeId">Flange *</label>
