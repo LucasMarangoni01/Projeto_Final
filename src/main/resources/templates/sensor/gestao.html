@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de sensores | Soda Cáustica Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/sensor.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main class="sensor-main">
+    <header class="sensor-page-header">
+        <div>
+            <span class="sensor-eyebrow">INSTRUMENTAÇÃO · NAOH 32%</span>
+            <h1>Gestão de sensores</h1>
+            <p>Cadastre os dispositivos, identifique cada unidade e associe cada sensor ao ponto de flange que ele acompanha.</p>
+        </div>
+        <a th:href="@{/}" class="sensor-header-link">← Voltar ao dashboard</a>
+    </header>
+
+    <div class="sensor-feedback sensor-feedback-success" th:if="${sucesso != null}">
+        <span class="sensor-feedback-icon">✓</span>
+        <span th:text="${sucesso == 'atualizado' ? 'Dados do sensor atualizados.' : 'Sensor cadastrado e associado à flange.'}">Operação concluída.</span>
+    </div>
+    <div class="sensor-feedback sensor-feedback-error" th:if="${erro != null}">
+        <span class="sensor-feedback-icon">!</span>
+        <span th:text="${erro}">Não foi possível concluir a operação.</span>
+    </div>
+
+    <section class="sensor-metrics" aria-label="Resumo do inventário de sensores">
+        <article class="sensor-metric">
+            <span>SENSORES CADASTRADOS</span>
+            <strong th:text="${totalSensores}">0</strong>
+            <small>Dispositivos no inventário</small>
+        </article>
+        <article class="sensor-metric sensor-metric-green">
+            <span>INSTALADOS</span>
+            <strong th:text="${sensoresInstalados}">0</strong>
+            <small>Marcados como instalados</small>
+        </article>
+        <article class="sensor-metric sensor-metric-amber">
+            <span>EM MANUTENÇÃO</span>
+            <strong th:text="${sensoresManutencao}">0</strong>
+            <small>Fora da operação para revisão</small>
+        </article>
+        <article class="sensor-metric sensor-metric-red">
+            <span>CALIBRAÇÃO VENCIDA</span>
+            <strong th:text="${calibracoesVencidas}">0</strong>
+            <small>Exige verificação de calendário</small>
+        </article>
+        <article class="sensor-metric sensor-metric-blue">
+            <span>FLANGES SEM SENSOR</span>
+            <strong th:text="${flangesSemSensor}">0</strong>
+            <small>Pontos ainda sem associação</small>
+        </article>
+    </section>
+
+    <div class="sensor-workspace">
+        <section class="sensor-panel sensor-form-panel">
+            <div class="sensor-panel-heading">
+                <div>
+                    <span class="sensor-panel-kicker">INVENTÁRIO</span>
+                    <h2 th:text="${sensorDTO.id == null ? 'Adicionar sensor' : 'Editar sensor'}">Adicionar sensor</h2>
+                    <p>Identificação e vínculo físico no processo.</p>
+                </div>
+                <span class="sensor-panel-icon" aria-hidden="true">⌁</span>
+            </div>
+
+            <form th:action="@{/sensores/salvar}" th:object="${sensorDTO}" method="post" class="sensor-form">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="sensor-field-grid">
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="codigoIdentificacao">Código de identificação *</label>
+                        <input id="codigoIdentificacao" type="text" th:field="*{codigoIdentificacao}"
+                               placeholder="Ex.: SNS-FLG-001" maxlength="60" required>
+                        <small>Use um código único para rastrear o equipamento.</small>
+                        <span class="sensor-field-error" th:if="${#fields.hasErrors('codigoIdentificacao')}" th:errors="*{codigoIdentificacao}"></span>
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="tipo">Tipo de sensor *</label>
+                        <select id="tipo" th:field="*{tipo}" required>
+                            <option value="">Selecione o tipo</option>
+                            <option th:each="tipo : ${tiposSensor}" th:value="${tipo}" th:text="${tipo.descricao}">Tipo</option>
+                        </select>
+                        <small id="sensorTypeHelp">Selecione a grandeza ou condição acompanhada pelo dispositivo.</small>
+                        <span class="sensor-field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></span>
+                    </div>
+
+                    <div class="sensor-field">
+                        <label for="fabricante">Fabricante</label>
+                        <input id="fabricante" type="text" th:field="*{fabricante}" placeholder="Ex.: fabricante" maxlength="100">
+                    </div>
+                    <div class="sensor-field">
+                        <label for="modelo">Modelo</label>
+                        <input id="modelo" type="text" th:field="*{modelo}" placeholder="Modelo do dispositivo" maxlength="100">
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="numeroSerie">Número de série</label>
+                        <input id="numeroSerie" type="text" th:field="*{numeroSerie}" placeholder="Número gravado no equipamento" maxlength="100">
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="flangeId">Flange monitorada *</label>
+                        <select id="flangeId" th:field="*{flangeId}" required>
+                            <option value="">Selecione a flange</option>
+                            <option th:each="flange : ${flanges}" th:value="${flange.id}"
+                                    th:text="${flange.nome_flange + ' · ' + (flange.unidade != null ? flange.unidade.nome : 'Sem unidade')}">Flange</option>
+                        </select>
+                        <small>Um sensor fica vinculado a uma flange. Uma flange pode receber vários sensores.</small>
+                        <span class="sensor-field-error" th:if="${#fields.hasErrors('flangeId')}" th:errors="*{flangeId}"></span>
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="status">Situação do equipamento *</label>
+                        <select id="status" th:field="*{status}" required>
+                            <option th:each="status : ${statusSensores}" th:value="${status}" th:text="${status.descricao}">Status</option>
+                        </select>
+                        <small>“Instalado” registra a condição informada pela equipe; não representa conexão ou leitura em tempo real.</small>
+                        <span class="sensor-field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
+                    </div>
+
+                    <div class="sensor-field">
+                        <label for="dataInstalacao">Data de instalação</label>
+                        <input id="dataInstalacao" type="date" th:field="*{dataInstalacao}">
+                    </div>
+                    <div class="sensor-field">
+                        <label for="ultimaCalibracao">Última calibração</label>
+                        <input id="ultimaCalibracao" type="date" th:field="*{ultimaCalibracao}">
+                    </div>
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="proximaCalibracao">Próxima calibração prevista</label>
+                        <input id="proximaCalibracao" type="date" th:field="*{proximaCalibracao}">
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide">
+                        <label for="observacoes">Observações técnicas</label>
+                        <textarea id="observacoes" th:field="*{observacoes}" rows="3" maxlength="1000"
+                                  placeholder="Ex.: posição de montagem, faixa de operação, referência do fabricante..."></textarea>
+                    </div>
+                </div>
+
+                <div class="sensor-form-actions">
+                    <button type="submit" class="sensor-button sensor-button-primary"
+                            th:text="${sensorDTO.id == null ? 'Cadastrar e vincular sensor' : 'Salvar alterações'}">Cadastrar sensor</button>
+                    <a th:href="@{/sensores}" class="sensor-button sensor-button-secondary">Limpar formulário</a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="sensor-panel sensor-coverage-panel">
+            <div class="sensor-panel-heading">
+                <div>
+                    <span class="sensor-panel-kicker">COBERTURA DO PROCESSO</span>
+                    <h2>Sensores por flange</h2>
+                    <p>Visualize os pontos instrumentados e os que ainda precisam de configuração.</p>
+                </div>
+            </div>
+
+            <div class="sensor-coverage-list" th:if="${!#lists.isEmpty(coberturaFlanges)}">
+                <article class="sensor-coverage-item" th:each="resumo : ${coberturaFlanges}">
+                    <div class="sensor-coverage-top">
+                        <div>
+                            <strong th:text="${resumo.nomeFlange}">Flange</strong>
+                            <span th:text="${resumo.unidade}">Unidade</span>
+                        </div>
+                        <span class="sensor-coverage-count"
+                              th:classappend="${resumo.totalSensores > 0 ? ' has-sensors' : ' no-sensors'}"
+                              th:text="${resumo.totalSensores + (resumo.totalSensores == 1 ? ' sensor' : ' sensores')}">0 sensores</span>
+                    </div>
+                    <div class="sensor-coverage-track">
+                        <span th:style="${'width:' + (resumo.totalSensores == 0 ? 0 : (resumo.instalados * 100 / resumo.totalSensores)) + '%'}"></span>
+                    </div>
+                    <div class="sensor-coverage-meta">
+                        <span th:text="${resumo.instalados + ' instalado(s)'}">0 instalados</span>
+                        <span th:if="${resumo.totalSensores == 0}">Ponto sem sensor associado</span>
+                    </div>
+                    <div class="sensor-type-tags" th:if="${!#lists.isEmpty(resumo.tiposSensores)}">
+                        <span th:each="tipo : ${resumo.tiposSensores}" th:text="${tipo.descricao}">Tipo</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="sensor-empty-coverage" th:if="${#lists.isEmpty(coberturaFlanges)}">
+                <strong>Nenhuma flange cadastrada.</strong>
+                <p>Cadastre uma flange antes de associar sensores.</p>
+                <a th:href="@{/flange/cadastro}">Cadastrar flange →</a>
+            </div>
+
+            <div class="sensor-coverage-legend">
+                <span><i class="legend-dot legend-dot-green"></i> Instalado</span>
+                <span><i class="legend-dot legend-dot-gray"></i> Sem instalação confirmada</span>
+            </div>
+        </aside>
+    </div>
+
+    <section class="sensor-panel sensor-inventory-panel">
+        <div class="sensor-inventory-heading">
+            <div>
+                <span class="sensor-panel-kicker">RASTREABILIDADE</span>
+                <h2>Inventário de sensores</h2>
+                <p>Consulte a identificação, o ponto associado e a situação de cada equipamento.</p>
+            </div>
+            <span class="sensor-inventory-total" th:text="${totalSensores + (totalSensores == 1 ? ' registro' : ' registros')}">0 registros</span>
+        </div>
+
+        <div class="sensor-table-wrap">
+            <table class="sensor-table">
+                <thead>
+                <tr>
+                    <th>Identificação</th>
+                    <th>Tipo / Modelo</th>
+                    <th>Flange</th>
+                    <th>Unidade</th>
+                    <th>Situação</th>
+                    <th>Calibração</th>
+                    <th>Ação</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(sensores)}">
+                    <td colspan="7" class="sensor-table-empty">Nenhum sensor cadastrado. Use o formulário acima para registrar o primeiro equipamento.</td>
+                </tr>
+                <tr th:each="sensor : ${sensores}">
+                    <td>
+                        <strong class="sensor-code" th:text="${sensor.codigoIdentificacao}">SNS-FLG-001</strong>
+                        <small th:if="${sensor.numeroSerie != null}" th:text="${'Série: ' + sensor.numeroSerie}">Série</small>
+                    </td>
+                    <td>
+                        <strong th:text="${sensor.tipo.descricao}">Tipo</strong>
+                        <small th:text="${(sensor.fabricante != null ? sensor.fabricante : 'Fabricante não informado') + (sensor.modelo != null ? ' · ' + sensor.modelo : '')}">Fabricante / modelo</small>
+                    </td>
+                    <td th:text="${sensor.flange.nome_flange}">Flange</td>
+                    <td th:text="${sensor.flange.unidade != null ? sensor.flange.unidade.nome : 'Sem unidade'}">Unidade</td>
+                    <td>
+                        <span class="sensor-status-pill" th:classappend="${sensor.status.classeCss}" th:text="${sensor.status.descricao}">Cadastrado</span>
+                    </td>
+                    <td>
+                        <span class="sensor-calibration-overdue" th:if="${sensor.calibracaoVencida}">Vencida</span>
+                        <span class="sensor-calibration-ok" th:if="${sensor.proximaCalibracao != null and !sensor.calibracaoVencida}"
+                              th:text="${'Até ' + #temporals.format(sensor.proximaCalibracao, 'dd/MM/yyyy')}">Data</span>
+                        <span class="sensor-calibration-missing" th:if="${sensor.proximaCalibracao == null}">Não informada</span>
+                    </td>
+                    <td>
+                        <a class="sensor-edit-link" th:href="@{/sensores/editar/{id}(id=${sensor.id})}">Editar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="sensor-integration-note">
+        <span class="sensor-integration-icon">i</span>
+        <p><strong>Sobre as leituras:</strong> esta página mantém o inventário e a associação física dos sensores às flanges. O cadastro ou o status “Instalado” não significa que o dispositivo esteja transmitindo dados. A leitura automática, alarmes reais e integração com CLP/IoT serão habilitados quando o hardware e o protocolo de comunicação forem conectados.</p>
+    </div>
+</main>
+
+<footer><p>© 2026 Sistema de Monitoramento de Flanges. Todos os direitos reservados.</p></footer>
+<script th:src="@{/menu.js}"></script>
+</body>
+</html>
