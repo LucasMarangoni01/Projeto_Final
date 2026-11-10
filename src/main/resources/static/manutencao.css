@@ -1,0 +1,466 @@
+/* =========================================================
+   MANUTENÇÃO · HISTÓRICO E FORMULÁRIO
+========================================================= */
+
+.maintenance-page {
+    width: 100%;
+    max-width: 1840px;
+    padding: 28px clamp(14px, 2vw, 28px) 64px;
+}
+
+.maintenance-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 0 auto 18px;
+    padding: 8px 2px 0;
+    text-align: left;
+}
+
+.maintenance-header-copy {
+    min-width: 260px;
+    flex: 1 1 580px;
+}
+
+.maintenance-header .topbar-eyebrow {
+    margin-bottom: 5px;
+}
+
+.maintenance-header h1 {
+    margin: 0 0 6px;
+    color: #93bbff;
+    font-size: clamp(24px, 2.3vw, 31px);
+    line-height: 1.15;
+}
+
+.maintenance-header p {
+    margin: 2px 0 0;
+    color: #c5d6ed;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.maintenance-new-button {
+    width: auto;
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 9px 15px;
+}
+
+.maintenance-card {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    padding: clamp(15px, 1.5vw, 23px);
+    overflow: visible;
+    background: #023e7d;
+}
+
+.maintenance-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.maintenance-card-heading h2 {
+    margin: 4px 0 4px;
+    color: #93bbff;
+    font-size: clamp(18px, 1.5vw, 22px);
+}
+
+.maintenance-card-heading p {
+    margin: 0;
+    color: #c6d8ef;
+    font-size: 11px;
+}
+
+.maintenance-kicker {
+    color: #fbbf24;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .1em;
+}
+
+.maintenance-heading-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #a9c2e4;
+    font-size: 10px;
+}
+
+.maintenance-heading-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74,222,128,.12);
+}
+
+.maintenance-feedback {
+    margin: 0 auto 14px;
+    padding: 11px 14px;
+    border: 1px solid rgba(248,113,113,.3);
+    border-left: 3px solid #fb7185;
+    border-radius: 8px;
+    background: rgba(127,29,29,.18);
+    color: #fecaca;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.maintenance-table-wrap {
+    width: 100%;
+    overflow: visible;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    background: #1c2d73;
+}
+
+.maintenance-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+}
+
+.maintenance-table .col-id { width: 4%; }
+.maintenance-table .col-activity { width: 16%; }
+.maintenance-table .col-risk { width: 8%; }
+.maintenance-table .col-status { width: 10%; }
+.maintenance-table .col-date { width: 8%; }
+.maintenance-table .col-flange { width: 10%; }
+.maintenance-table .col-worker { width: 11%; }
+.maintenance-table .col-unit { width: 10%; }
+.maintenance-table .col-author { width: 15%; }
+.maintenance-table .col-actions { width: 8%; }
+
+.maintenance-table thead th {
+    padding: 11px 9px;
+    color: #e8f1ff;
+    font-size: 9px;
+    letter-spacing: .045em;
+    white-space: normal;
+    line-height: 1.3;
+    background: #1c2335;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.maintenance-table tbody td {
+    padding: 12px 9px;
+    color: #dce8fa;
+    font-size: 10px;
+    line-height: 1.4;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    border-bottom: 1px solid rgba(255,255,255,.065);
+    background: #1c2d73;
+}
+
+.maintenance-table tbody tr:hover td {
+    background: #243d83;
+}
+
+.maintenance-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.maintenance-id {
+    color: #93c5fd !important;
+    font-family: var(--font-mono);
+    font-size: 10px !important;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.maintenance-activity-cell strong {
+    display: block;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.maintenance-activity-cell small,
+.maintenance-author small {
+    display: block;
+    margin-top: 4px;
+    color: #9fb5d5;
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+.maintenance-author strong {
+    display: block;
+    color: #dbeafe;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.maintenance-date {
+    white-space: nowrap;
+    color: #f3f6fc !important;
+}
+
+.maintenance-asset,
+.maintenance-worker,
+.maintenance-unit {
+    color: #e1ebfa !important;
+    font-weight: 600;
+}
+
+.maintenance-risk-pill,
+.maintenance-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 5px 7px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+}
+
+.risk-low {
+    color: #86efac;
+    border-color: rgba(74,222,128,.25);
+    background: rgba(34,197,94,.1);
+}
+
+.risk-medium {
+    color: #fde68a;
+    border-color: rgba(251,191,36,.25);
+    background: rgba(245,158,11,.1);
+}
+
+.risk-high {
+    color: #fdba74;
+    border-color: rgba(251,146,60,.3);
+    background: rgba(234,88,12,.13);
+}
+
+.risk-critical {
+    color: #fda4af;
+    border-color: rgba(251,113,133,.3);
+    background: rgba(225,29,72,.14);
+}
+
+.activity-registered {
+    color: #bfdbfe;
+    border-color: rgba(96,165,250,.25);
+    background: rgba(59,130,246,.12);
+}
+
+.activity-waiting {
+    color: #fde68a;
+    border-color: rgba(251,191,36,.25);
+    background: rgba(245,158,11,.1);
+}
+
+.activity-progress {
+    color: #67e8f9;
+    border-color: rgba(34,211,238,.3);
+    background: rgba(8,145,178,.15);
+}
+
+.activity-completed {
+    color: #86efac;
+    border-color: rgba(74,222,128,.25);
+    background: rgba(34,197,94,.1);
+}
+
+.activity-paused {
+    color: #d8b4fe;
+    border-color: rgba(192,132,252,.25);
+    background: rgba(147,51,234,.12);
+}
+
+.maintenance-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 5px;
+}
+
+.maintenance-edit-button,
+.maintenance-delete-button,
+.maintenance-readonly {
+    width: 100%;
+    min-height: 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 6px;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.maintenance-edit-button {
+    border: 1px solid rgba(96,165,250,.32);
+    background: rgba(59,130,246,.15);
+    color: #bfdbfe;
+}
+
+.maintenance-edit-button:hover {
+    background: rgba(59,130,246,.27);
+}
+
+.maintenance-delete-form {
+    width: 100%;
+    margin: 0;
+}
+
+.maintenance-delete-button {
+    border: 1px solid rgba(251,113,133,.25);
+    background: rgba(225,29,72,.1);
+    color: #fda4af;
+    cursor: pointer;
+}
+
+.maintenance-delete-button:hover {
+    background: rgba(225,29,72,.2);
+}
+
+.maintenance-readonly {
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.04);
+    color: #9fb5d5;
+}
+
+.maintenance-empty-row {
+    padding: 32px 15px !important;
+    text-align: center;
+}
+
+.maintenance-empty-row strong,
+.maintenance-empty-row span {
+    display: block;
+}
+
+.maintenance-empty-row strong {
+    color: #e5efff;
+    font-size: 12px;
+}
+
+.maintenance-empty-row span {
+    margin-top: 5px;
+    color: #9fb5d5;
+    font-size: 10px;
+}
+
+.maintenance-permission-note {
+    margin: 12px 0 0;
+    color: #a9c2e4;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+/* Formulário de cadastro e edição */
+.maintenance-help {
+    display: block;
+    margin-top: 6px;
+    color: #9fb5d5;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.maintenance-status-locked {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid rgba(34,211,238,.2);
+    border-radius: var(--radius-md);
+    background: rgba(8,145,178,.1);
+}
+
+.maintenance-status-locked .maintenance-status-pill {
+    font-size: 11px;
+}
+
+@media (max-width: 1400px) {
+    .maintenance-page {
+        max-width: 100%;
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .maintenance-table thead th {
+        padding: 9px 6px;
+        font-size: 8px;
+    }
+
+    .maintenance-table tbody td {
+        padding: 10px 6px;
+        font-size: 9px;
+    }
+
+    .maintenance-activity-cell strong {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 1050px) {
+    .maintenance-table-wrap {
+        overflow-x: auto;
+    }
+
+    .maintenance-table {
+        min-width: 1080px;
+    }
+}
+
+@media (max-width: 768px) {
+    .maintenance-page {
+        padding: 16px 12px 45px;
+    }
+
+    .maintenance-header {
+        align-items: stretch;
+        gap: 12px;
+        padding-top: 3px;
+    }
+
+    .maintenance-header-copy {
+        min-width: 0;
+    }
+
+    .maintenance-new-button {
+        width: 100%;
+    }
+
+    .maintenance-card {
+        padding: 13px;
+    }
+
+    .maintenance-heading-note {
+        width: 100%;
+    }
+
+    .maintenance-table {
+        min-width: 1080px;
+    }
+}
