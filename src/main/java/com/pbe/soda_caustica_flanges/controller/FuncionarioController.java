@@ -113,6 +113,11 @@ public class FuncionarioController {
     public String alterar(@PathVariable Long id, Model model) {
         Funcionario funcionario = funcionarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado."));
+
+        if (funcionario.getUsuario() != null) {
+            return "redirect:/usuarios/editar/" + funcionario.getUsuario().getId();
+        }
+
         model.addAttribute("funcionario", funcionario);
         model.addAttribute("unidades", listarUnidadesAtivas());
         return "funcionario/alterar";
