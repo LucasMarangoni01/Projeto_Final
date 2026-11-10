@@ -90,6 +90,11 @@ public class ManutencaoController {
             if (!podeEditar(registroExistente, usuario, admin)) {
                 return "redirect:/manutencao/listagem?erro=permissao";
             }
+
+            // Mantém as associações atuais disponíveis caso a validação precise
+            // devolver o formulário com uma mensagem de erro.
+            manutencao.setFlange(registroExistente.getFlange());
+            manutencao.setFuncionario(registroExistente.getFuncionario());
         }
 
         if (flangeId == null || funcionarioId == null) {
