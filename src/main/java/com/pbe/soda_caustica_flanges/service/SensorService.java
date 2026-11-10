@@ -58,6 +58,13 @@ public class SensorService {
             );
         }
 
+        if (dados.getStatus() == StatusSensor.INSTALADO
+                && dados.getDataInstalacao() == null) {
+            throw new IllegalArgumentException(
+                    "Informe a data de instalação para marcar o sensor como instalado."
+            );
+        }
+
         Flange flange = flangeRepository.findById(dados.getFlangeId())
                 .orElseThrow(() -> new IllegalArgumentException("A flange selecionada não existe."));
 
