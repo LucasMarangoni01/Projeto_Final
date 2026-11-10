@@ -4,6 +4,7 @@ import com.pbe.soda_caustica_flanges.model.*;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import com.pbe.soda_caustica_flanges.repository.FuncionarioRepository;
 import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
+import com.pbe.soda_caustica_flanges.repository.RegistroCadastroLockRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,19 +22,22 @@ public class UsuarioService {
     private final ManutencaoRepository manutencaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioAuditoriaService auditoriaService;
+    private final RegistroCadastroLockRepository registroCadastroLockRepository;
 
     public UsuarioService(
             UsuarioRepository repository,
             FuncionarioRepository funcionarioRepository,
             ManutencaoRepository manutencaoRepository,
             PasswordEncoder passwordEncoder,
-            UsuarioAuditoriaService auditoriaService) {
+            UsuarioAuditoriaService auditoriaService,
+            RegistroCadastroLockRepository registroCadastroLockRepository) {
 
         this.repository = repository;
         this.funcionarioRepository = funcionarioRepository;
         this.manutencaoRepository = manutencaoRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditoriaService = auditoriaService;
+        this.registroCadastroLockRepository = registroCadastroLockRepository;
     }
 
     public boolean emailExiste(String email) {
@@ -42,12 +46,19 @@ public class UsuarioService {
 
     @Transactional
     public Usuario cadastrar(CadastroDTO cadastroDTO) {
+        // O bloqueio no banco impede que dois cadastros simultâneos recebam ADMIN.
+        registroCadastroLockRepository.bloquearPorId(1L)
+                .orElseThrow(() -> new IllegalStateException(
+                        "O controle do primeiro cadastro não foi inicializado. Reinicie a aplicação."
+                ));
+
+        boolean primeiroCadastro = repository.count() == 0;
+
         Usuario usuario = new Usuario();
         usuario.setNome(cadastroDTO.getNome().trim());
         usuario.setEmail(normalizarEmail(cadastroDTO.getEmail()));
         usuario.setSenha(passwordEncoder.encode(cadastroDTO.getSenha()));
-        usuario.setRole(Role.USER);
-        usuario.setAtivo(true);
+        usuario.setRole(primeiroCadastro ? Role.ADMIN : Role.USER);        usuario.setAtivo(true);
 
         Usuario salvo = repository.save(usuario);
         sincronizarFuncionario(salvo);
@@ -55,7 +66,9 @@ public class UsuarioService {
                 salvo,
                 salvo.getEmail(),
                 "CONTA_CRIADA",
-                "Conta criada pelo formulário de cadastro."
+                primeiroCadastro
+                        ? "Primeira conta criada no sistema e definida automaticamente como ADMIN."
+                        : "Conta criada pelo formulário de cadastro com perfil USER."
         );
         return salvo;
     }
