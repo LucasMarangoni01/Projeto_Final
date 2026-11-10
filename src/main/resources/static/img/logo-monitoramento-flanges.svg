@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Monitoramento de Flanges</title>
+  <desc id="desc">Flange industrial com escudo de proteção e símbolo de confirmação.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#173f91"/>
+      <stop offset="1" stop-color="#071e52"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".55" stop-color="#e5edf7"/>
+      <stop offset="1" stop-color="#aebfd4"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd977"/>
+      <stop offset="1" stop-color="#e5a51d"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="10" y="10" width="236" height="236" rx="43" fill="url(#bg)"/>
+  <rect x="10.75" y="10.75" width="234.5" height="234.5" rx="42.25" fill="none" stroke="#6d9bd7" stroke-opacity=".38" stroke-width="1.5"/>
+
+  <!-- Tubulação e corpo da flange -->
+  <rect x="25" y="111" width="207" height="29" rx="12" fill="url(#steel)"/>
+  <rect x="25" y="118" width="207" height="7" rx="3.5" fill="#ffffff" opacity=".45"/>
+  <rect x="25" y="135" width="207" height="5" rx="2.5" fill="#758aa6" opacity=".55"/>
+
+  <circle cx="108" cy="126" r="69" fill="url(#steel)"/>
+  <circle cx="108" cy="126" r="51" fill="#0b285f"/>
+  <circle cx="108" cy="126" r="59.5" fill="none" stroke="#91a7c2" stroke-width="3" opacity=".72"/>
+
+  <!-- Parafusos da flange -->
+  <g fill="#0b285f" stroke="#dce7f3" stroke-width="1.5">
+    <circle cx="108" cy="64" r="6"/>
+    <circle cx="152" cy="82" r="6"/>
+    <circle cx="170" cy="126" r="6"/>
+    <circle cx="152" cy="170" r="6"/>
+    <circle cx="108" cy="188" r="6"/>
+    <circle cx="64" cy="170" r="6"/>
+    <circle cx="46" cy="126" r="6"/>
+    <circle cx="64" cy="82" r="6"/>
+  </g>
+
+  <!-- Escudo de proteção -->
+  <path d="M174 103 L219 120 V153 C219 181 201 203 174 222 C147 203 129 181 129 153 V120 Z"
+        fill="#061a46" opacity=".38"/>
+  <path d="M171 96 L214 112 V148 C214 176 197 197 171 215 C145 197 128 176 128 148 V112 Z"
+        fill="url(#gold)" stroke="#ffe39a" stroke-width="2"/>
+  <path d="M171 107 L203 119 V148 C203 168 191 185 171 200 C151 185 139 168 139 148 V119 Z"
+        fill="#0c2d69" stroke="#f4bd45" stroke-width="2"/>
+  <path d="M153 151 L166 164 L191 137"
+        fill="none" stroke="#ffd15d" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
