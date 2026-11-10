@@ -39,3 +39,17 @@ document.addEventListener("keydown", function(event) {
         fecharModalLogout();
     }
 });
+
+/**
+ * Encerra a sessão atual e retorna à tela de login para autenticar
+ * com outra conta. Não altera nem remove o cadastro existente.
+ */
+function trocarConta() {
+    const switchAccountForm = document.getElementById("switchAccountForm");
+
+    if (!switchAccountForm) {
+        return;
+    }
+
+    switchAccountForm.submit();
+}
