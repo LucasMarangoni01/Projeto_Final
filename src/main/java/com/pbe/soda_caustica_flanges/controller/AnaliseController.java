@@ -129,6 +129,8 @@ public class AnaliseController {
         long totalManutencoes = 0;
         long manutencoesConcluidas = 0;
         long manutencoesEmAndamento = 0;
+        long statusNaoInformado = 0;
+        long riscoNaoClassificado = 0;
 
         for (Manutencao manutencao : todasManutencoes) {
             if (manutencao.getData() == null) {
@@ -147,9 +149,19 @@ public class AnaliseController {
             NivelRiscoManutencao risco = manutencao.getNivelRisco();
 
             manutencoesPorMes.merge(mes, 1L, Long::sum);
-            manutencoesPorStatus.merge(status, 1L, Long::sum);
-            manutencoesPorRisco.merge(risco, 1L, Long::sum);
             totalManutencoes++;
+
+            if (manutencao.isStatusAtividadeInformado()) {
+                manutencoesPorStatus.merge(status, 1L, Long::sum);
+            } else {
+                statusNaoInformado++;
+            }
+
+            if (manutencao.isNivelRiscoInformado()) {
+                manutencoesPorRisco.merge(risco, 1L, Long::sum);
+            } else {
+                riscoNaoClassificado++;
+            }
 
             if (status == StatusAtividadeManutencao.CONCLUIDA) {
                 concluidasPorMes.merge(mes, 1L, Long::sum);
@@ -290,12 +302,20 @@ public class AnaliseController {
             statusLabels.add(status.getDescricao());
             statusValores.add(manutencoesPorStatus.get(status));
         }
+        if (statusNaoInformado > 0) {
+            statusLabels.add("Não informado");
+            statusValores.add(statusNaoInformado);
+        }
 
         List<String> riscoLabels = new ArrayList<>();
         List<Long> riscoValores = new ArrayList<>();
         for (NivelRiscoManutencao risco : NivelRiscoManutencao.values()) {
             riscoLabels.add(risco.getDescricao());
             riscoValores.add(manutencoesPorRisco.get(risco));
+        }
+        if (riscoNaoClassificado > 0) {
+            riscoLabels.add("Não classificado");
+            riscoValores.add(riscoNaoClassificado);
         }
 
         List<String> localizacaoLabels = locaisOrdenados.stream()
