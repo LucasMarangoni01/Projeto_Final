@@ -140,39 +140,6 @@
             </div>
 
 
-            <!-- LOGIN INSTANTÂNEO ADMIN — SOMENTE NO PERFIL DEV -->
-            <div class="admin-login-shortcut"
-                 th:if="${@environment.getProperty('app.experimental.admin-shortcut.enabled', 'true') == 'true'}">
-                <form th:action="@{/experimental/admin-login}"
-                      method="post"
-                      class="admin-shortcut-form">
-                    <button type="submit" class="admin-shortcut-button">
-                        <span class="admin-shortcut-icon" aria-hidden="true">⚡</span>
-                        <span class="admin-shortcut-copy">
-                            <strong>Entrar como ADMIN</strong>
-                            <small>Acesso instantâneo à conta administrativa</small>
-                        </span>
-                        <span class="admin-shortcut-arrow" aria-hidden="true">→</span>
-                    </button>
-                </form>
-                <p class="admin-shortcut-local-note">Atalho experimental disponível somente no ambiente local de desenvolvimento.</p>
-            </div>
-
-            <div class="alert alert-error"
-                 th:if="${param.adminShortcutError}">
-                <div class="alert-icon">!</div>
-                <div>
-                    <strong>Não foi possível iniciar a sessão ADMIN</strong>
-                    <span th:if="${param.adminShortcutError[0] == 'account'}">
-                        Configure um e-mail ADMIN específico ou mantenha somente uma conta ADMIN ativa para o atalho.
-                    </span>
-                    <span th:if="${param.adminShortcutError[0] == 'inactive'}">
-                        A conta ADMIN configurada está inativa ou sem permissão administrativa.
-                    </span>
-                </div>
-            </div>
-
-
             <!-- ==================================
                  MENSAGEM DE ERRO
                  ================================== -->
