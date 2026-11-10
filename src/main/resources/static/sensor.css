@@ -1,0 +1,747 @@
+/* =========================================================
+   GESTÃO DE SENSORES — SODA CÁUSTICA FLANGES
+   Inventário responsivo e associação por flange
+========================================================= */
+
+.sensor-main {
+    width: min(1440px, 100%);
+    margin: 0 auto;
+    padding: clamp(18px, 2.6vw, 34px) clamp(14px, 2.4vw, 30px) 64px;
+}
+
+.sensor-page-header,
+.sensor-inventory-heading,
+.sensor-panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.sensor-page-header {
+    margin-bottom: 22px;
+}
+
+.sensor-eyebrow,
+.sensor-panel-kicker {
+    display: block;
+    color: #7db8ff;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.sensor-page-header h1 {
+    margin: 7px 0 8px;
+    color: #ffffff;
+    font-size: clamp(25px, 3vw, 36px);
+    letter-spacing: -.035em;
+}
+
+.sensor-page-header p,
+.sensor-panel-heading p,
+.sensor-inventory-heading p {
+    max-width: 720px;
+    color: #adc3df;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.sensor-header-link {
+    flex-shrink: 0;
+    padding: 10px 13px;
+    border: 1px solid rgba(125,184,255,.25);
+    border-radius: 8px;
+    background: rgba(59,130,246,.09);
+    color: #b8d8ff;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: .18s ease;
+}
+
+.sensor-header-link:hover {
+    background: rgba(59,130,246,.18);
+    border-color: rgba(125,184,255,.5);
+}
+
+.sensor-feedback {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border: 1px solid;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sensor-feedback-success {
+    border-color: rgba(34,197,94,.25);
+    background: rgba(34,197,94,.08);
+    color: #a7f3c1;
+}
+
+.sensor-feedback-error {
+    border-color: rgba(239,68,68,.3);
+    background: rgba(239,68,68,.08);
+    color: #fecaca;
+}
+
+.sensor-feedback-icon {
+    display: inline-grid;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+}
+
+.sensor-metrics {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.sensor-metric {
+    min-width: 0;
+    padding: 15px 16px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 11px;
+    background: linear-gradient(145deg, #102f61, #0b244a);
+    box-shadow: 0 7px 18px rgba(0,0,0,.15);
+}
+
+.sensor-metric > span {
+    display: block;
+    min-height: 26px;
+    color: #9db8da;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .07em;
+    line-height: 1.45;
+}
+
+.sensor-metric strong {
+    display: block;
+    margin: 8px 0 5px;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: clamp(23px, 2.4vw, 30px);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.sensor-metric small {
+    display: block;
+    color: #9db3d0;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.sensor-metric-green strong { color: #86efac; }
+.sensor-metric-amber strong { color: #fcd34d; }
+.sensor-metric-red strong { color: #fca5a5; }
+.sensor-metric-blue strong { color: #93c5fd; }
+
+.sensor-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(310px, .9fr);
+    align-items: start;
+    gap: 14px;
+}
+
+.sensor-panel {
+    min-width: 0;
+    padding: clamp(16px, 2vw, 23px);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 13px;
+    background: linear-gradient(155deg, #0c2b57, #082044);
+    box-shadow: 0 10px 25px rgba(0,0,0,.18);
+}
+
+.sensor-panel-heading {
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.sensor-panel-heading h2,
+.sensor-inventory-heading h2 {
+    margin: 5px 0 5px;
+    color: #f3f7ff;
+    font-size: 19px;
+    letter-spacing: -.02em;
+}
+
+.sensor-panel-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    place-items: center;
+    border: 1px solid rgba(59,130,246,.28);
+    border-radius: 10px;
+    background: rgba(59,130,246,.1);
+    color: #8fc6ff;
+    font-size: 26px;
+}
+
+.sensor-form {
+    margin: 0;
+}
+
+.sensor-field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px 12px;
+}
+
+.sensor-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sensor-field-wide {
+    grid-column: 1 / -1;
+}
+
+.sensor-field label {
+    color: #d8e6f7;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sensor-field input,
+.sensor-field select,
+.sensor-field textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 11px;
+    border: 1px solid rgba(173,195,223,.2);
+    border-radius: 7px;
+    outline: none;
+    background: #061a38;
+    color: #f6f9ff;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.sensor-field input::placeholder,
+.sensor-field textarea::placeholder {
+    color: #7189aa;
+}
+
+.sensor-field input:focus,
+.sensor-field select:focus,
+.sensor-field textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.14);
+}
+
+.sensor-field select {
+    cursor: pointer;
+}
+
+.sensor-field input[type="date"] {
+    color-scheme: dark;
+}
+
+.sensor-field textarea {
+    min-height: 82px;
+    resize: vertical;
+}
+
+.sensor-field small {
+    color: #819bbd;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.sensor-field-error {
+    color: #fca5a5;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.sensor-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.sensor-button {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.sensor-button-primary {
+    background: #2563eb;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+.sensor-button-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.sensor-button-secondary {
+    background: rgba(255,255,255,.045);
+    border-color: rgba(255,255,255,.12);
+    color: #c9d9ee;
+}
+
+.sensor-button-secondary:hover {
+    background: rgba(255,255,255,.09);
+}
+
+.sensor-coverage-panel {
+    position: sticky;
+    top: 14px;
+}
+
+.sensor-coverage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    max-height: 650px;
+    overflow-y: auto;
+    padding-right: 3px;
+    scrollbar-color: rgba(147,197,253,.35) transparent;
+    scrollbar-width: thin;
+}
+
+.sensor-coverage-item {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+    background: rgba(3,17,39,.52);
+}
+
+.sensor-coverage-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sensor-coverage-top > div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sensor-coverage-top strong {
+    overflow-wrap: anywhere;
+    color: #eff6ff;
+    font-size: 12px;
+}
+
+.sensor-coverage-top > div span,
+.sensor-coverage-meta {
+    color: #8fa9c9;
+    font-size: 9px;
+}
+
+.sensor-coverage-count {
+    flex-shrink: 0;
+    padding: 5px 7px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.sensor-coverage-count.has-sensors {
+    border-color: rgba(96,165,250,.25);
+    background: rgba(59,130,246,.1);
+    color: #bfdbfe;
+}
+
+.sensor-coverage-count.no-sensors {
+    border-color: rgba(245,158,11,.22);
+    background: rgba(245,158,11,.08);
+    color: #fcd34d;
+}
+
+.sensor-coverage-track {
+    height: 5px;
+    margin: 10px 0 7px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(255,255,255,.08);
+}
+
+.sensor-coverage-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #2563eb, #34d399);
+}
+
+.sensor-coverage-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sensor-type-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 9px;
+}
+
+.sensor-type-tags span {
+    padding: 4px 6px;
+    border: 1px solid rgba(125,184,255,.15);
+    border-radius: 5px;
+    background: rgba(59,130,246,.08);
+    color: #a9ccf5;
+    font-size: 8px;
+    line-height: 1.3;
+}
+
+.sensor-empty-coverage {
+    padding: 24px 12px;
+    border: 1px dashed rgba(255,255,255,.15);
+    border-radius: 9px;
+    text-align: center;
+}
+
+.sensor-empty-coverage strong {
+    color: #e6f1ff;
+    font-size: 12px;
+}
+
+.sensor-empty-coverage p {
+    margin: 6px 0 10px;
+    color: #8fa9c9;
+    font-size: 10px;
+}
+
+.sensor-empty-coverage a {
+    color: #93c5fd;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.sensor-coverage-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 13px;
+    color: #93a9c7;
+    font-size: 9px;
+}
+
+.sensor-coverage-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.legend-dot-green { background: #34d399; }
+.legend-dot-gray { background: #64748b; }
+
+.sensor-inventory-panel {
+    margin-top: 14px;
+}
+
+.sensor-inventory-heading {
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.sensor-inventory-total {
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border: 1px solid rgba(125,184,255,.18);
+    border-radius: 30px;
+    background: rgba(59,130,246,.08);
+    color: #bfdbfe;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sensor-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+}
+
+.sensor-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    background: rgba(3,17,39,.45);
+    text-align: left;
+}
+
+.sensor-table th {
+    padding: 12px 13px;
+    background: rgba(59,130,246,.1);
+    color: #9dbbe0;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.sensor-table td {
+    padding: 12px 13px;
+    border-top: 1px solid rgba(255,255,255,.055);
+    color: #dbeafe;
+    font-size: 10px;
+    vertical-align: middle;
+}
+
+.sensor-table tbody tr:hover {
+    background: rgba(59,130,246,.055);
+}
+
+.sensor-table td strong,
+.sensor-table td small {
+    display: block;
+}
+
+.sensor-table td strong {
+    color: #f1f6ff;
+    font-size: 10px;
+}
+
+.sensor-table td small {
+    margin-top: 4px;
+    color: #8da6c6;
+    font-size: 9px;
+}
+
+.sensor-code {
+    color: #93c5fd !important;
+    font-family: var(--font-mono);
+}
+
+.sensor-status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 7px;
+    border: 1px solid;
+    border-radius: 20px;
+    font-size: 8px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.sensor-status-registered {
+    border-color: rgba(148,163,184,.2);
+    background: rgba(148,163,184,.08);
+    color: #cbd5e1;
+}
+
+.sensor-status-installed {
+    border-color: rgba(52,211,153,.25);
+    background: rgba(52,211,153,.08);
+    color: #86efac;
+}
+
+.sensor-status-maintenance {
+    border-color: rgba(245,158,11,.25);
+    background: rgba(245,158,11,.08);
+    color: #fcd34d;
+}
+
+.sensor-status-disabled {
+    border-color: rgba(239,68,68,.23);
+    background: rgba(239,68,68,.08);
+    color: #fca5a5;
+}
+
+.sensor-calibration-overdue {
+    color: #fca5a5;
+    font-weight: 800;
+}
+
+.sensor-calibration-ok {
+    color: #a7f3d0;
+}
+
+.sensor-calibration-missing {
+    color: #94a3b8;
+}
+
+.sensor-edit-link {
+    display: inline-flex;
+    padding: 6px 9px;
+    border: 1px solid rgba(96,165,250,.25);
+    border-radius: 6px;
+    background: rgba(59,130,246,.09);
+    color: #bfdbfe;
+    font-size: 9px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.sensor-edit-link:hover {
+    background: rgba(59,130,246,.18);
+}
+
+.sensor-table-empty {
+    padding: 25px !important;
+    color: #9db3d0 !important;
+    text-align: center;
+}
+
+.sensor-integration-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 14px;
+    padding: 13px 15px;
+    border: 1px solid rgba(59,130,246,.18);
+    border-radius: 9px;
+    background: rgba(11,35,70,.75);
+}
+
+.sensor-integration-icon {
+    display: grid;
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(59,130,246,.18);
+    color: #93c5fd;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sensor-integration-note p {
+    color: #9db4d3;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.sensor-integration-note strong {
+    color: #dceaff;
+}
+
+@media (max-width: 1100px) {
+    .sensor-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .sensor-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sensor-coverage-panel {
+        position: static;
+    }
+
+    .sensor-coverage-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: none;
+    }
+}
+
+@media (max-width: 650px) {
+    .sensor-main {
+        padding: 17px 12px 40px;
+    }
+
+    .sensor-page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sensor-header-link {
+        align-self: flex-start;
+    }
+
+    .sensor-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .sensor-metric {
+        padding: 12px;
+    }
+
+    .sensor-metric > span {
+        min-height: 23px;
+        font-size: 7px;
+    }
+
+    .sensor-coverage-list {
+        grid-template-columns: 1fr;
+    }
+
+    .sensor-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sensor-field-wide {
+        grid-column: auto;
+    }
+
+    .sensor-form-actions {
+        flex-direction: column;
+    }
+
+    .sensor-button {
+        width: 100%;
+    }
+
+    .sensor-inventory-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sensor-integration-note {
+        padding: 11px;
+    }
+}
+
+@media (max-width: 380px) {
+    .sensor-metrics {
+        grid-template-columns: 1fr;
+    }
+}
