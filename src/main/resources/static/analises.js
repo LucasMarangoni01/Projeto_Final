@@ -280,9 +280,11 @@
                 }]
             }, {
                 cutout: "58%",
+                scales: {},
                 plugins: {
                     legend: {
-                        position: "bottom"
+                        position: "bottom",
+                        labels: { pointStyle: "rect" }
                     }
                 }
             });
