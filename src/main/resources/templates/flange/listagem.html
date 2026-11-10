@@ -31,8 +31,11 @@
 
     </div>
 
-    <div th:if="${param.erro != null}" class="alerta-erro" style="margin-bottom:16px;">
+    <div th:if="${param.erro != null and param.erro[0] == 'historico'}" class="alerta-erro" style="margin-bottom:16px;">
         Não é possível excluir uma flange que possui manutenções registradas. Preserve o histórico operacional.
+    </div>
+    <div th:if="${param.erro != null and param.erro[0] == 'sensores'}" class="alerta-erro" style="margin-bottom:16px;">
+        Esta flange possui sensores associados. Edite os sensores e transfira o vínculo antes de excluir o ponto.
     </div>
     <div th:if="${param.sucesso != null}" class="badge ok-b" style="margin-bottom:16px;">
         Registro removido.
