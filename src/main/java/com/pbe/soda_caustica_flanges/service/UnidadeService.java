@@ -19,6 +19,7 @@ public class UnidadeService {
     private final FuncionarioRepository funcionarioRepository;
     private final UnidadeAuditoriaService auditoriaService;
     private final UsuarioAuditoriaService usuarioAuditoriaService;
+    private final UsuarioService usuarioService;
 
     public UnidadeService(
             UnidadeRepository repository,
@@ -27,7 +28,8 @@ public class UnidadeService {
             ManutencaoRepository manutencaoRepository,
             FuncionarioRepository funcionarioRepository,
             UnidadeAuditoriaService auditoriaService,
-            UsuarioAuditoriaService usuarioAuditoriaService) {
+            UsuarioAuditoriaService usuarioAuditoriaService,
+            UsuarioService usuarioService) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.flangeRepository = flangeRepository;
@@ -35,6 +37,7 @@ public class UnidadeService {
         this.funcionarioRepository = funcionarioRepository;
         this.auditoriaService = auditoriaService;
         this.usuarioAuditoriaService = usuarioAuditoriaService;
+        this.usuarioService = usuarioService;
     }
 
     public List<UnidadeResumoDTO> listarResumos() {
@@ -254,6 +257,7 @@ public class UnidadeService {
 
         usuario.setUnidade(unidade);
         Usuario salvo = usuarioRepository.save(usuario);
+        usuarioService.sincronizarFuncionario(salvo);
 
         usuarioAuditoriaService.registrar(
                 salvo,
@@ -289,6 +293,7 @@ public class UnidadeService {
 
         usuario.setUnidade(null);
         Usuario salvo = usuarioRepository.save(usuario);
+        usuarioService.sincronizarFuncionario(salvo);
 
         usuarioAuditoriaService.registrar(
                 salvo,
@@ -328,6 +333,12 @@ public class UnidadeService {
 
         Funcionario funcionario = resolverFuncionario(identificador);
 
+        if (funcionario.getUsuario() != null) {
+            throw new IllegalArgumentException(
+                    "Este funcionário está vinculado a uma conta de usuário. Altere a unidade pela tela de usuários para manter os dois cadastros sincronizados."
+            );
+        }
+
         if (funcionario.getUnidade() != null) {
             if (funcionario.getUnidade().getId().equals(unidadeId)) {
                 throw new IllegalArgumentException(
@@ -363,6 +374,12 @@ public class UnidadeService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("Funcionário não encontrado.")
                 );
+
+        if (funcionario.getUsuario() != null) {
+            throw new IllegalArgumentException(
+                    "Este funcionário está vinculado a uma conta. Altere a unidade pela gestão de usuários para preservar a sincronização."
+            );
+        }
 
         if (funcionario.getUnidade() == null
                 || !funcionario.getUnidade().getId().equals(unidadeId)) {
