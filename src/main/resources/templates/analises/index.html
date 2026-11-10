@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
     <link rel="stylesheet" th:href="@{/analises.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -17,7 +18,7 @@
         <div class="analises-header-copy">
             <span class="analises-eyebrow">INTELIGÊNCIA OPERACIONAL · NAOH 32%</span>
             <h1>Análises e indicadores</h1>
-            <p>Acompanhe os registros históricos, a rotina de manutenção e a condição dos ativos monitorados.</p>
+            <p>Visualização gráfica dos incidentes, atividades de manutenção e condição dos ativos.</p>
         </div>
 
         <form class="analises-filter" method="get" th:action="@{/analises}">
@@ -41,7 +42,7 @@
                 <span class="analise-kpi-icon icon-blue">!</span>
             </div>
             <strong th:text="${totalIncidentes}">0</strong>
-            <small th:text="|Quantidade total informada em ${anoSelecionado}|">Quantidade total informada no ano</small>
+            <small th:text="|Quantidade real informada em ${anoSelecionado}|">Quantidade registrada no ano</small>
         </article>
 
         <article class="analise-kpi">
@@ -50,7 +51,7 @@
                 <span class="analise-kpi-icon icon-amber">↗</span>
             </div>
             <strong class="analise-kpi-text" th:text="${mesPico}">Sem registros</strong>
-            <small th:text="${quantidadePico + ' ocorrência(s) no mês'}">0 ocorrência(s) no mês</small>
+            <small th:text="|${quantidadePico} incidente(s) no mês|">0 incidentes no mês</small>
         </article>
 
         <article class="analise-kpi">
@@ -59,7 +60,7 @@
                 <span class="analise-kpi-icon icon-cyan">⌁</span>
             </div>
             <strong th:text="${totalManutencoes}">0</strong>
-            <small th:text="|Registros lançados em ${anoSelecionado}|">Registros lançados no ano</small>
+            <small th:text="|${manutencoesConcluidas} concluída(s) · ${manutencoesEmAndamento} em andamento|">Situação das atividades</small>
         </article>
 
         <article class="analise-kpi">
@@ -77,201 +78,170 @@
                 <span class="analise-kpi-icon icon-purple">◷</span>
             </div>
             <strong th:text="${calibracoesVencidas}">0</strong>
-            <small>Entre os sensores cadastrados</small>
+            <small>Inventário atual de sensores</small>
         </article>
     </section>
 
-    <section class="analises-section">
+    <section class="analises-section chart-featured">
         <div class="analises-section-heading">
             <div>
-                <span class="analises-section-kicker">TENDÊNCIA NO TEMPO</span>
-                <h2>Evolução mensal</h2>
-                <p>Comparação entre quantidades de incidentes informadas e registros de manutenção.</p>
+                <span class="analises-section-kicker">COMPARATIVO OPERACIONAL · ${anoSelecionado}</span>
+                <h2>Evolução mensal — três séries reais</h2>
+                <p>Incidentes históricos, manutenções registradas e manutenções concluídas, agrupados pelo mês da data cadastrada.</p>
             </div>
-            <div class="analises-legend">
-                <span><i class="legend-dot legend-incidentes"></i>Incidentes</span>
-                <span><i class="legend-dot legend-manutencoes"></i>Manutenções</span>
+            <span class="chart-period-tag" th:text="${anoSelecionado}">2026</span>
+        </div>
+        <div class="chart-canvas-wrap chart-line-wrap">
+            <canvas id="graficoLinhas" role="img" aria-label="Gráfico de linhas comparando incidentes, manutenções e manutenções concluídas por mês"></canvas>
+            <div class="chart-empty" id="vazioLinhas" hidden>
+                <strong>Sem dados para comparar neste período</strong>
+                <span>Os gráficos serão preenchidos conforme os registros forem lançados.</span>
             </div>
         </div>
-
-        <div class="analises-meses-grid">
-            <article class="analises-mes-card" th:each="item : ${dadosMensais}">
-                <div class="analises-mes-heading">
-                    <strong th:text="${item.mes}">Jan</strong>
-                </div>
-
-                <div class="analises-serie">
-                    <div class="analises-serie-label">
-                        <span>Incidentes</span>
-                        <strong th:text="${item.incidentes}">0</strong>
-                    </div>
-                    <div class="analises-track">
-                        <span class="analises-fill fill-incidentes"
-                              th:style="|width: ${item.incidentesPercentual}%;|"></span>
-                    </div>
-                </div>
-
-                <div class="analises-serie">
-                    <div class="analises-serie-label">
-                        <span>Manutenções</span>
-                        <strong th:text="${item.manutencoes}">0</strong>
-                    </div>
-                    <div class="analises-track">
-                        <span class="analises-fill fill-manutencoes"
-                              th:style="|width: ${item.manutencoesPercentual}%;|"></span>
-                    </div>
-                </div>
-            </article>
-        </div>
-
-        <p class="analises-chart-footnote">As barras usam a mesma escala dentro do ano selecionado. A média mensal considera os 12 meses do ano.</p>
     </section>
 
-    <section class="analises-panels-grid">
-        <article class="analises-panel">
-            <div class="analises-panel-heading">
+    <section class="analises-chart-grid" aria-label="Gráficos de análise">
+        <article class="analises-panel chart-panel">
+            <div class="chart-panel-heading">
                 <div>
-                    <span class="analises-section-kicker">DISTRIBUIÇÃO GEOGRÁFICA</span>
-                    <h2>Ocorrências por localização</h2>
-                    <p>Locais com maior quantidade informada na base histórica.</p>
+                    <span class="analises-section-kicker">VOLUME MENSAL</span>
+                    <h2>Gráfico — Colunas</h2>
+                    <p>Quantidade de incidentes informados por mês.</p>
                 </div>
+                <span class="chart-type-mark">01</span>
             </div>
-
-            <div class="analises-ranking" th:if="${!#lists.isEmpty(rankingLocalizacoes)}">
-                <div class="analises-ranking-row" th:each="item, stat : ${rankingLocalizacoes}">
-                    <div class="analises-ranking-label">
-                        <span class="analises-ranking-position" th:text="${stat.count}">1</span>
-                        <strong th:text="${item.rotulo}">Localização</strong>
-                        <b th:text="${item.quantidade}">0</b>
-                    </div>
-                    <div class="analises-track ranking-track">
-                        <span class="analises-fill fill-ranking"
-                              th:style="|width: ${item.percentual}%;|"></span>
-                    </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoColunas" role="img" aria-label="Gráfico de colunas dos incidentes por mês"></canvas>
+                <div class="chart-empty" id="vazioColunas" hidden>
+                    <strong>Sem incidentes registrados</strong>
+                    <span>Não há valores para o ano selecionado.</span>
                 </div>
-            </div>
-
-            <div class="analises-empty" th:if="${#lists.isEmpty(rankingLocalizacoes)}">
-                <span class="analises-empty-icon">⌖</span>
-                <strong>Nenhum incidente registrado neste período</strong>
-                <p>Quando houver registros históricos com localização, o ranking aparecerá aqui.</p>
             </div>
         </article>
 
-        <article class="analises-panel">
-            <div class="analises-panel-heading">
+        <article class="analises-panel chart-panel">
+            <div class="chart-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">SITUAÇÃO DAS ATIVIDADES</span>
+                    <h2>Gráfico — Pizza</h2>
+                    <p>Distribuição das manutenções por status atual.</p>
+                </div>
+                <span class="chart-type-mark">02</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoPizza" role="img" aria-label="Gráfico de pizza dos status das manutenções"></canvas>
+                <div class="chart-empty" id="vazioPizza" hidden>
+                    <strong>Sem manutenções registradas</strong>
+                    <span>Não há atividades cadastradas no ano selecionado.</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="analises-panel chart-panel">
+            <div class="chart-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">CLASSIFICAÇÃO DE RISCO</span>
+                    <h2>Gráfico — Rosca</h2>
+                    <p>Distribuição real do nível de risco das manutenções.</p>
+                </div>
+                <span class="chart-type-mark">03</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoRosca" role="img" aria-label="Gráfico de rosca dos níveis de risco das manutenções"></canvas>
+                <div class="chart-empty" id="vazioRosca" hidden>
+                    <strong>Sem riscos classificados</strong>
+                    <span>Os níveis aparecem após o registro de manutenções.</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="analises-panel chart-panel">
+            <div class="chart-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">LOCAIS COM REGISTROS</span>
+                    <h2>Gráfico — Barras</h2>
+                    <p>Localizações com maior quantidade de incidentes.</p>
+                </div>
+                <span class="chart-type-mark">04</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoBarras" role="img" aria-label="Gráfico de barras de incidentes por localização"></canvas>
+                <div class="chart-empty" id="vazioBarras" hidden>
+                    <strong>Sem localização com incidentes</strong>
+                    <span>O ranking depende dos registros históricos existentes.</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="analises-panel chart-panel chart-radar-panel">
+            <div class="chart-panel-heading">
+                <div>
+                    <span class="analises-section-kicker">PERFIL AO LONGO DO ANO</span>
+                    <h2>Gráfico — Radar</h2>
+                    <p>Comparação mensal entre incidentes e atividades de manutenção.</p>
+                </div>
+                <span class="chart-type-mark">05</span>
+            </div>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoRadar" role="img" aria-label="Gráfico radar comparando séries mensais reais"></canvas>
+                <div class="chart-empty" id="vazioRadar" hidden>
+                    <strong>Sem dados para o radar</strong>
+                    <span>Não há registros no período selecionado.</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="analises-panel chart-panel">
+            <div class="chart-panel-heading">
                 <div>
                     <span class="analises-section-kicker">CONDIÇÃO DOS ATIVOS</span>
-                    <h2>Situação das flanges</h2>
-                    <p>Distribuição conforme o status atual cadastrado.</p>
+                    <h2>Gráfico — Rosca de flanges</h2>
+                    <p>Distribuição atual por situação operacional.</p>
                 </div>
-                <strong class="analises-panel-total" th:text="${totalFlanges}">0</strong>
+                <span class="chart-type-mark">06</span>
             </div>
-
-            <div class="analises-distribution">
-                <div class="analises-distribution-row" th:each="item : ${distribuicaoFlanges}">
-                    <div class="analises-distribution-label">
-                        <span th:text="${item.rotulo}">Normal</span>
-                        <strong th:text="${item.quantidade}">0</strong>
-                    </div>
-                    <div class="analises-track">
-                        <span class="analises-fill"
-                              th:classappend="${item.rotulo == 'Normal' ? ' fill-normal' : (item.rotulo == 'Atenção' ? ' fill-atencao' : (item.rotulo == 'Crítica' ? ' fill-critico' : ' fill-manutencao'))}"
-                              th:style="|width: ${item.percentual}%;|"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="analises-empty compact-empty" th:if="${totalFlanges == 0}">
-                <strong>Nenhuma flange cadastrada</strong>
-                <p>Cadastre os ativos para visualizar sua distribuição por status.</p>
-            </div>
-        </article>
-
-        <article class="analises-panel">
-            <div class="analises-panel-heading">
-                <div>
-                    <span class="analises-section-kicker">INSTRUMENTAÇÃO</span>
-                    <h2>Inventário de sensores</h2>
-                    <p>Estado cadastrado dos dispositivos de monitoramento.</p>
-                </div>
-                <strong class="analises-panel-total" th:text="${totalSensores}">0</strong>
-            </div>
-
-            <div class="analises-distribution">
-                <div class="analises-distribution-row" th:each="item : ${distribuicaoSensores}">
-                    <div class="analises-distribution-label">
-                        <span th:text="${item.rotulo}">Instalado</span>
-                        <strong th:text="${item.quantidade}">0</strong>
-                    </div>
-                    <div class="analises-track">
-                        <span class="analises-fill"
-                              th:classappend="${item.rotulo == 'Instalado' ? ' fill-normal' : (item.rotulo == 'Em manutenção' ? ' fill-atencao' : (item.rotulo == 'Desativado' ? ' fill-critico' : ' fill-sensor'))}"
-                              th:style="|width: ${item.percentual}%;|"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="analises-sensor-summary">
-                <div>
-                    <span>Sensores instalados</span>
-                    <strong th:text="${sensoresInstalados}">0</strong>
-                </div>
-                <div>
-                    <span>Calibrações vencidas</span>
-                    <strong th:text="${calibracoesVencidas}"
-                            th:classappend="${calibracoesVencidas > 0 ? ' text-danger' : ''}">0</strong>
-                </div>
-            </div>
-
-            <div class="analises-empty compact-empty" th:if="${totalSensores == 0}">
-                <strong>Nenhum sensor cadastrado</strong>
-                <p>O inventário aparecerá aqui depois do cadastro dos sensores.</p>
-            </div>
-        </article>
-
-        <article class="analises-panel analises-summary-panel">
-            <div class="analises-panel-heading">
-                <div>
-                    <span class="analises-section-kicker">RESUMO DO PERÍODO</span>
-                    <h2>Leitura rápida</h2>
-                    <p>Indicadores calculados com os registros disponíveis.</p>
-                </div>
-            </div>
-
-            <div class="analises-summary-list">
-                <div>
-                    <span>Média de incidentes por mês</span>
-                    <strong th:text="${mediaMensal}">0,0</strong>
-                </div>
-                <div>
-                    <span>Localizações com registros</span>
-                    <strong th:text="${totalLocalizacoes}">0</strong>
-                </div>
-                <div>
-                    <span>Manutenções no ano</span>
-                    <strong th:text="${totalManutencoes}">0</strong>
-                </div>
-                <div>
-                    <span>Flanges cadastradas</span>
-                    <strong th:text="${totalFlanges}">0</strong>
+            <div class="chart-canvas-wrap">
+                <canvas id="graficoFlanges" role="img" aria-label="Gráfico de rosca da situação atual das flanges"></canvas>
+                <div class="chart-empty" id="vazioFlanges" hidden>
+                    <strong>Nenhuma flange cadastrada</strong>
+                    <span>Cadastre ativos para acompanhar a situação operacional.</span>
                 </div>
             </div>
         </article>
     </section>
 
-    <aside class="analises-data-note">
+    <section class="analises-data-note">
         <span class="analises-note-icon">i</span>
         <div>
-            <strong>Importante sobre a interpretação dos números</strong>
-            <p>A tabela histórica de incidentes do sistema armazena ano, mês, quantidade e localização, mas ainda não identifica o tipo de ocorrência. Por isso, este painel apresenta os valores como <b>incidentes registrados</b> e não os classifica automaticamente como vazamentos confirmados. Os registros de manutenção são contabilizados separadamente e não são considerados vazamentos.</p>
+            <strong>Origem e interpretação dos dados</strong>
+            <p>Todos os gráficos são alimentados pelos registros do banco de dados, conforme o ano selecionado. A tabela histórica de incidentes possui ano, mês, quantidade e localização, mas ainda não identifica o tipo de ocorrência; por isso, os valores são exibidos como <b>incidentes registrados</b>, e não como vazamentos confirmados. As manutenções são contadas separadamente. O gráfico de situação das flanges representa o estado atual cadastrado, não um histórico mensal.</p>
         </div>
-    </aside>
+    </section>
 </main>
 
 <footer class="analises-footer">
-    <p>© 2026 Sistema de Monitoramento de Flanges · Análises calculadas a partir dos dados cadastrados.</p>
+    <p>© 2026 Sistema de Monitoramento de Flanges · Gráficos gerados a partir dos dados cadastrados.</p>
 </footer>
+
+<script th:inline="javascript">
+    const dadosAnalise = {
+        meses: /*[[${chartMeses}]]*/ [],
+        incidentes: /*[[${chartIncidentes}]]*/ [],
+        manutencoes: /*[[${chartManutencoes}]]*/ [],
+        concluidas: /*[[${chartConcluidas}]]*/ [],
+        emAndamento: /*[[${chartEmAndamento}]]*/ [],
+        statusLabels: /*[[${chartStatusLabels}]]*/ [],
+        statusValores: /*[[${chartStatusValores}]]*/ [],
+        riscoLabels: /*[[${chartRiscoLabels}]]*/ [],
+        riscoValores: /*[[${chartRiscoValores}]]*/ [],
+        localizacaoLabels: /*[[${chartLocalizacaoLabels}]]*/ [],
+        localizacaoValores: /*[[${chartLocalizacaoValores}]]*/ [],
+        radarLabels: /*[[${chartRadarLabels}]]*/ [],
+        flangesLabels: /*[[${distribuicaoFlanges.![rotulo]}]]*/ [],
+        flangesValores: /*[[${distribuicaoFlanges.![quantidade]}]]*/ []
+    };
+</script>
+<script th:src="@{/analises.js}"></script>
 
 </body>
 </html>
