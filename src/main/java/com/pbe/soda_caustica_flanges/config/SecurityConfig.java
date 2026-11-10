@@ -113,6 +113,11 @@ public class SecurityConfig {
                                 "/manutencao/salvar"
                         ).hasAnyRole("ADMIN", "USER")
 
+                        // USER pode abrir o formulário apenas para editar registros próprios;
+                        // o ManutencaoController valida autoria e unidade antes de exibir/salvar.
+                        .requestMatchers(HttpMethod.GET, "/manutencao/alterar/**")
+                        .hasAnyRole("ADMIN", "USER")
+
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
 
