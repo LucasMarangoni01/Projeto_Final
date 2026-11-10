@@ -129,7 +129,10 @@ public class SensorController {
         model.addAttribute("sensores", sensores);
         model.addAttribute("flanges", flanges);
         model.addAttribute("flangesDisponiveis", flanges.stream()
-                .filter(flange -> flange.getUnidade() == null || flange.getUnidade().isAtivo())
+                .filter(flange -> flange.getUnidade() == null
+                        || flange.getUnidade().isAtivo()
+                        || (sensorDTO.getFlangeId() != null
+                        && flange.getId().equals(sensorDTO.getFlangeId())))
                 .toList());
         model.addAttribute("coberturaFlanges", cobertura);
         model.addAttribute("tiposSensor", TipoSensor.values());
