@@ -10,6 +10,9 @@
             <a class="nav-brand"
                th:href="@{/}"
                aria-label="Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica">
+                <img class="nav-brand-logo"
+                     th:src="@{/img/logo-monitoramento-flanges.svg}"
+                     alt="">
                 <span class="nav-brand-copy">
                     <strong>Monitoramento de Flanges</strong>
                     <small>Ambientes industriais com soda cáustica</small>
@@ -18,7 +21,6 @@
 
             <div class="nav-desktop">
                 <ul class="nav-primary">
-
                     <li>
                         <a class="nav-link" th:href="@{/}">Início</a>
                     </li>
@@ -74,7 +76,6 @@
                             </div>
                         </details>
                     </li>
-
                 </ul>
             </div>
 
@@ -177,12 +178,10 @@
          class="logout-overlay"
          hidden
          onclick="fecharModalLogout(event)">
-
         <div class="logout-modal" onclick="event.stopPropagation()">
             <div class="logout-icon">⏻</div>
             <h2>Deseja sair?</h2>
             <p>Você será desconectado do sistema.</p>
-
             <div class="logout-botoes">
                 <button type="button"
                         class="btn-cancelar"
