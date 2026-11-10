@@ -1,10 +1,14 @@
-# Sistema de Prevenção e Monitoramento de Soda Cáustica
+# Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica
 
-Projeto desenvolvido com foco na **prevenção de acidentes envolvendo soda cáustica**, especialmente em ambientes industriais que utilizam linhas, tubulações e flanges para transporte de NaOH.
+Projeto desenvolvido com foco no **monitoramento e gerenciamento de flanges em ambientes industriais com soda cáustica (NaOH)**, apoiando a prevenção de acidentes, o acompanhamento de ativos e a organização das atividades operacionais.
 
 O sistema tem como objetivo auxiliar no **monitoramento de flanges**, identificação de possíveis falhas, controle de manutenções e organização das informações relacionadas à segurança industrial.
 
 ---
+
+## Nome do Projeto
+
+**Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica**
 
 ## Sobre o Projeto
 
