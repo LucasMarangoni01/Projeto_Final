@@ -41,7 +41,7 @@
                 <span class="analise-kpi-icon icon-blue">!</span>
             </div>
             <strong th:text="${totalIncidentes}">0</strong>
-            <small>Quantidade total informada em ${anoSelecionado}</small>
+            <small th:text="|Quantidade total informada em ${anoSelecionado}|">Quantidade total informada no ano</small>
         </article>
 
         <article class="analise-kpi">
@@ -59,7 +59,7 @@
                 <span class="analise-kpi-icon icon-cyan">⌁</span>
             </div>
             <strong th:text="${totalManutencoes}">0</strong>
-            <small>Registros lançados em ${anoSelecionado}</small>
+            <small th:text="|Registros lançados em ${anoSelecionado}|">Registros lançados no ano</small>
         </article>
 
         <article class="analise-kpi">
@@ -98,7 +98,6 @@
             <article class="analises-mes-card" th:each="item : ${dadosMensais}">
                 <div class="analises-mes-heading">
                     <strong th:text="${item.mes}">Jan</strong>
-                    <span th:text="${(item.incidentes + item.manutencoes) + ' registros'}">0 registros</span>
                 </div>
 
                 <div class="analises-serie">
