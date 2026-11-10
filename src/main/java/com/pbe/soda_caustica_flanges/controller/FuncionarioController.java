@@ -100,11 +100,8 @@ public class FuncionarioController {
         }
 
         if (existente != null && existente.getUsuario() != null) {
-            Usuario conta = existente.getUsuario();
-            conta.setNome(funcionario.getNome_funcionario().trim());
-            conta.setUnidade(unidade);
-            usuarioRepository.save(conta);
-            funcionario.setUsuario(conta);
+            return "redirect:/usuarios/editar/" + existente.getUsuario().getId()
+                    + "?erro=funcionario-vinculado";
         }
 
         funcionario.setUnidade(unidade);
