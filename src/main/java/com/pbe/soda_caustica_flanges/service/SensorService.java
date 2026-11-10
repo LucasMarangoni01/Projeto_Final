@@ -68,15 +68,20 @@ public class SensorService {
         Flange flange = flangeRepository.findById(dados.getFlangeId())
                 .orElseThrow(() -> new IllegalArgumentException("A flange selecionada não existe."));
 
-        if (flange.getUnidade() != null && !flange.getUnidade().isAtivo()) {
+        Sensor sensor = dados.getId() == null
+                ? new Sensor()
+                : buscarPorId(dados.getId());
+
+        boolean mantendoVinculoExistente = sensor.getFlange() != null
+                && sensor.getFlange().getId().equals(flange.getId());
+
+        if (flange.getUnidade() != null
+                && !flange.getUnidade().isAtivo()
+                && !mantendoVinculoExistente) {
             throw new IllegalArgumentException(
                     "Não é possível vincular sensores a uma flange de unidade inativa."
             );
         }
-
-        Sensor sensor = dados.getId() == null
-                ? new Sensor()
-                : buscarPorId(dados.getId());
 
         sensor.setCodigoIdentificacao(codigo);
         sensor.setTipo(dados.getTipo());
