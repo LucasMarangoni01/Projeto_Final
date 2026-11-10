@@ -745,3 +745,54 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+.sensor-inventory-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 11px;
+}
+
+.sensor-inventory-tools label {
+    color: #8fa9c9;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .07em;
+}
+
+.sensor-inventory-tools input {
+    width: min(100%, 310px);
+    min-height: 36px;
+    padding: 8px 11px;
+    border: 1px solid rgba(173,195,223,.18);
+    border-radius: 7px;
+    outline: none;
+    background: #061a38;
+    color: #f6f9ff;
+    font-family: var(--font-ui);
+    font-size: 11px;
+}
+
+.sensor-inventory-tools input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+}
+
+.sensor-inventory-tools input::placeholder {
+    color: #7189aa;
+}
+
+@media (max-width: 650px) {
+    .sensor-inventory-tools {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .sensor-inventory-tools input {
+        width: 100%;
+    }
+}
