@@ -29,6 +29,14 @@ public class Manutencao {
     @JoinColumn(name = "funcionario_id")
     private Funcionario funcionario;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nivel_risco", length = 20)
+    private NivelRiscoManutencao nivelRisco = NivelRiscoManutencao.MODERADO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_atividade", length = 30)
+    private StatusAtividadeManutencao statusAtividade = StatusAtividadeManutencao.REGISTRADA;
+
     @Column(name = "registrado_por_email", length = 100)
     private String registradoPorEmail;
 
@@ -39,6 +47,12 @@ public class Manutencao {
     public void antesDeCriar() {
         if (registradoEm == null) {
             registradoEm = LocalDateTime.now();
+        }
+        if (nivelRisco == null) {
+            nivelRisco = NivelRiscoManutencao.MODERADO;
+        }
+        if (statusAtividade == null) {
+            statusAtividade = StatusAtividadeManutencao.REGISTRADA;
         }
     }
 
@@ -90,6 +104,28 @@ public class Manutencao {
 
     public void setFuncionario(Funcionario funcionario) {
         this.funcionario = funcionario;
+    }
+
+    public NivelRiscoManutencao getNivelRisco() {
+        return nivelRisco == null ? NivelRiscoManutencao.MODERADO : nivelRisco;
+    }
+
+    public void setNivelRisco(NivelRiscoManutencao nivelRisco) {
+        this.nivelRisco = nivelRisco == null
+                ? NivelRiscoManutencao.MODERADO
+                : nivelRisco;
+    }
+
+    public StatusAtividadeManutencao getStatusAtividade() {
+        return statusAtividade == null
+                ? StatusAtividadeManutencao.REGISTRADA
+                : statusAtividade;
+    }
+
+    public void setStatusAtividade(StatusAtividadeManutencao statusAtividade) {
+        this.statusAtividade = statusAtividade == null
+                ? StatusAtividadeManutencao.REGISTRADA
+                : statusAtividade;
     }
 
     public String getRegistradoPorEmail() {
