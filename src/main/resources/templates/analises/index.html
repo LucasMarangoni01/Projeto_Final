@@ -85,7 +85,7 @@
     <section class="analises-section chart-featured">
         <div class="analises-section-heading">
             <div>
-                <span class="analises-section-kicker">COMPARATIVO OPERACIONAL · ${anoSelecionado}</span>
+                <span class="analises-section-kicker" th:text="|COMPARATIVO OPERACIONAL · ${anoSelecionado}|">COMPARATIVO OPERACIONAL</span>
                 <h2>Evolução mensal — três séries reais</h2>
                 <p>Incidentes históricos, manutenções registradas e manutenções concluídas, agrupados pelo mês da data cadastrada.</p>
             </div>
@@ -237,8 +237,8 @@
         localizacaoLabels: /*[[${chartLocalizacaoLabels}]]*/ [],
         localizacaoValores: /*[[${chartLocalizacaoValores}]]*/ [],
         radarLabels: /*[[${chartRadarLabels}]]*/ [],
-        flangesLabels: /*[[${distribuicaoFlanges.![rotulo]}]]*/ [],
-        flangesValores: /*[[${distribuicaoFlanges.![quantidade]}]]*/ []
+        flangesLabels: /*[[${chartFlangeLabels}]]*/ [],
+        flangesValores: /*[[${chartFlangeValores}]]*/ []
     };
 </script>
 <script th:src="@{/analises.js}"></script>
