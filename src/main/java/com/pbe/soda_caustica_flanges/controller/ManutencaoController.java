@@ -179,6 +179,18 @@ public class ManutencaoController {
 
         List<Funcionario> funcionarios = listarFuncionariosPermitidos(usuario);
 
+        // Ao editar um registro histórico, preserva a pessoa que já estava associada,
+        // mesmo que a unidade tenha sido arquivada posteriormente.
+        if (manutencao.getFuncionario() != null
+                && funcionarios.stream().noneMatch(f -> f.getId().equals(manutencao.getFuncionario().getId()))) {
+            funcionarios.add(manutencao.getFuncionario());
+        }
+
+        funcionarios.sort(java.util.Comparator.comparing(
+                Funcionario::getNome_funcionario,
+                java.text.Collator.getInstance(new java.util.Locale("pt", "BR"))
+        ));
+
         model.addAttribute("manutencao", manutencao);
         model.addAttribute("flanges", flanges);
         model.addAttribute("funcionarios", funcionarios);
@@ -189,21 +201,25 @@ public class ManutencaoController {
 
     private List<Funcionario> listarFuncionariosPermitidos(Usuario usuario) {
         if (usuario.getRole() == Role.ADMIN) {
-            return funcionarioRepository.findAll()
+            return new java.util.ArrayList<>(funcionarioRepository.findAll()
                     .stream()
+                    .filter(funcionario -> funcionario.getUnidade() != null
+                            && funcionario.getUnidade().isAtivo())
                     .sorted(java.util.Comparator.comparing(
                             Funcionario::getNome_funcionario,
                             java.text.Collator.getInstance(new java.util.Locale("pt", "BR"))
                     ))
-                    .toList();
+                    .toList());
         }
 
         if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
-            return Collections.emptyList();
+            return new java.util.ArrayList<>();
         }
 
-        return funcionarioRepository.findByUnidadeIdOrderByIdAsc(
-                usuario.getUnidade().getId()
+        return new java.util.ArrayList<>(
+                funcionarioRepository.findByUnidadeIdOrderByIdAsc(
+                        usuario.getUnidade().getId()
+                )
         );
     }
 
