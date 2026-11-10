@@ -310,6 +310,13 @@ public class AnaliseController {
         List<String> radarLabels = List.of("Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
                 "Jul", "Ago", "Set", "Out", "Nov", "Dez");
 
+        List<String> flangeLabels = new ArrayList<>();
+        List<Long> flangeValores = new ArrayList<>();
+        for (StatusFlange status : StatusFlange.values()) {
+            flangeLabels.add(descricaoStatusFlange(status));
+            flangeValores.add(contagemFlanges.get(status));
+        }
+
         model.addAttribute("anoSelecionado", anoSelecionado);
         model.addAttribute("anosDisponiveis", anosComDados.descendingSet());
         model.addAttribute("dadosMensais", dadosMensais);
@@ -345,6 +352,8 @@ public class AnaliseController {
         model.addAttribute("chartLocalizacaoLabels", localizacaoLabels);
         model.addAttribute("chartLocalizacaoValores", localizacaoValores);
         model.addAttribute("chartRadarLabels", radarLabels);
+        model.addAttribute("chartFlangeLabels", flangeLabels);
+        model.addAttribute("chartFlangeValores", flangeValores);
 
         return "analises/index";
     }
