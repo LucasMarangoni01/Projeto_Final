@@ -1,6 +1,8 @@
 package com.pbe.soda_caustica_flanges.controller;
 
 import com.pbe.soda_caustica_flanges.model.CadastroDTO;
+import com.pbe.soda_caustica_flanges.model.Role;
+import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -141,14 +143,13 @@ public class CadastroController {
         // SALVAR USUÁRIO
         // ==============================
 
-        usuarioService.cadastrar(
-                cadastroDTO
-        );
+        Usuario usuarioCriado = usuarioService.cadastrar(cadastroDTO);
 
-
-        // ==============================
-        // VOLTAR PARA LOGIN
-        // ==============================
+        // O primeiro cadastro recebe ADMIN e já pode acessar o sistema.
+        // Os cadastros seguintes são USER e continuam sujeitos à vinculação de unidade.
+        if (usuarioCriado.getRole() == Role.ADMIN) {
+            return "redirect:/login?cadastro=admin";
+        }
 
         return "redirect:/login?cadastro=pendente";
     }
