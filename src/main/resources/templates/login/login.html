@@ -231,7 +231,29 @@
 
             <div
                     class="alert alert-success"
-                    th:if="${param.cadastro}">
+                    th:if="${param.cadastro != null and param.cadastro[0] == 'admin'}">
+
+                <div class="alert-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <strong>
+                        Conta ADMIN criada com sucesso
+                    </strong>
+
+                    <span>
+                        Esta foi a primeira conta do sistema. Você já pode entrar com seu e-mail e senha e administrar a instalação.
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div
+                    class="alert alert-success"
+                    th:if="${param.cadastro != null and param.cadastro[0] == 'pendente'}">
 
                 <div class="alert-icon">
                     ✓
@@ -244,7 +266,7 @@
                     </strong>
 
                     <span>
-                        Sua conta foi criada. Para liberar o primeiro acesso, um administrador precisa vinculá-la a uma unidade ativa.
+                        Sua conta foi criada como USER. Para liberar o acesso, um administrador precisa vinculá-la a uma unidade ativa.
                     </span>
 
                 </div>
