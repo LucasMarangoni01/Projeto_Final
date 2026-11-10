@@ -58,7 +58,8 @@ public class UsuarioService {
         usuario.setNome(cadastroDTO.getNome().trim());
         usuario.setEmail(normalizarEmail(cadastroDTO.getEmail()));
         usuario.setSenha(passwordEncoder.encode(cadastroDTO.getSenha()));
-        usuario.setRole(primeiroCadastro ? Role.ADMIN : Role.USER);        usuario.setAtivo(true);
+        usuario.setRole(primeiroCadastro ? Role.ADMIN : Role.USER);
+        usuario.setAtivo(true);
 
         Usuario salvo = repository.save(usuario);
         sincronizarFuncionario(salvo);
