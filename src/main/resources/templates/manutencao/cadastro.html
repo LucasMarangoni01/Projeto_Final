@@ -49,14 +49,42 @@
                 </div>
                 <div class="form-group">
                     <label for="funcionarioId">Funcionário responsável *</label>
-                    <select id="funcionarioId" name="funcionarioId" required>
+                    <select id="funcionarioId"
+                            name="funcionarioId"
+                            required
+                            aria-describedby="funcionarioAjuda"
+                            th:disabled="${nenhumFuncionarioDisponivel}">
                         <option value="">Selecione o funcionário</option>
                         <option th:each="funcionario : ${funcionarios}"
                                 th:value="${funcionario.id}"
-                                th:text="${funcionario.nome_funcionario + ' · ID #' + funcionario.id}"
+                                th:text="${funcionario.nome_funcionario + ' · ID #' + funcionario.id + (funcionario.unidade != null ? ' · ' + funcionario.unidade.nome : ' · Sem unidade')}"
                                 th:selected="${manutencao.funcionario != null and manutencao.funcionario.id == funcionario.id}">
                         </option>
                     </select>
+                    <small id="funcionarioAjuda"
+                           class="funcionario-select-help"
+                           th:if="${!#lists.isEmpty(funcionarios)}"
+                           th:text="${#lists.size(funcionarios) + (#lists.size(funcionarios) == 1 ? ' funcionário operacional disponível.' : ' funcionários operacionais disponíveis.') + (ehAdmin ? ' Confira a unidade do funcionário e da flange antes de registrar.' : '')}">
+                        Funcionários disponíveis.
+                    </small>
+
+                    <div class="funcionario-empty-state" th:if="${#lists.isEmpty(funcionarios)}">
+                        <strong th:if="${ehAdmin}">Nenhum funcionário operacional cadastrado.</strong>
+                        <strong th:unless="${ehAdmin}">Nenhum funcionário vinculado à sua unidade.</strong>
+                        <p th:if="${ehAdmin}">
+                            O campo não utiliza contas de login. Cadastre um operador em Funcionários para disponibilizá-lo como responsável pela manutenção.
+                        </p>
+                        <p th:unless="${ehAdmin}"
+                           th:text="${'A unidade ' + (unidadeUsuario != null ? unidadeUsuario.nome : 'do seu usuário') + ' não possui funcionário operacional vinculado. Solicite ao ADMIN que cadastre ou associe um funcionário à planta.'}">
+                            Solicite ao administrador que vincule um funcionário à unidade.
+                        </p>
+                        <a th:if="${ehAdmin}"
+                           th:href="@{/funcionario/cadastro}"
+                           class="funcionario-empty-link">+ Cadastrar funcionário</a>
+                        <a th:if="${ehAdmin}"
+                           th:href="@{/unidades}"
+                           class="funcionario-empty-link funcionario-empty-link-secondary">Gerenciar unidades</a>
+                    </div>
                 </div>
             </div>
 
