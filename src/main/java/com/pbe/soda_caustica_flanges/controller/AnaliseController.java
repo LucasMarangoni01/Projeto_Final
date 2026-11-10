@@ -12,10 +12,10 @@ import java.time.Month;
 import java.util.*;
 
 /**
- * Consolida os dados históricos e operacionais já persistidos.
+ * Consolida dados reais de incidentes, manutenções, flanges e sensores.
  *
- * Observação: a entidade Incidente guarda ano, mês, quantidade e localização.
- * Ela ainda não possui um campo que classifique o tipo da ocorrência.
+ * A entidade Incidente guarda ano, mês, quantidade e localização, mas ainda
+ * não classifica a ocorrência como vazamento ou outro tipo de incidente.
  */
 @Controller
 @RequestMapping("/analises")
@@ -75,16 +75,19 @@ public class AnaliseController {
                 ? anoSolicitado
                 : (anosComDados.isEmpty() ? anoAtual : anosComDados.last());
 
-        // Mantém o ano selecionado disponível no filtro, mesmo quando ainda não há dados nele.
         anosComDados.add(anoAtual);
         anosComDados.add(anoSelecionado);
 
         Map<Month, Long> incidentesPorMes = new EnumMap<>(Month.class);
         Map<Month, Long> manutencoesPorMes = new EnumMap<>(Month.class);
+        Map<Month, Long> concluidasPorMes = new EnumMap<>(Month.class);
+        Map<Month, Long> emAndamentoPorMes = new EnumMap<>(Month.class);
 
         for (Month mes : Month.values()) {
             incidentesPorMes.put(mes, 0L);
             manutencoesPorMes.put(mes, 0L);
+            concluidasPorMes.put(mes, 0L);
+            emAndamentoPorMes.put(mes, 0L);
         }
 
         Map<String, Long> incidentesPorLocalizacao = new HashMap<>();
@@ -98,7 +101,7 @@ public class AnaliseController {
 
             long quantidade = incidente.getQuantidade() == null
                     ? 0L
-                    : incidente.getQuantidade();
+                    : Math.max(0, incidente.getQuantidade());
 
             incidentesPorMes.merge(incidente.getMes(), quantidade, Long::sum);
             totalIncidentes += quantidade;
@@ -111,7 +114,21 @@ public class AnaliseController {
             incidentesPorLocalizacao.merge(localizacao, quantidade, Long::sum);
         }
 
+        Map<StatusAtividadeManutencao, Long> manutencoesPorStatus =
+                new EnumMap<>(StatusAtividadeManutencao.class);
+        for (StatusAtividadeManutencao status : StatusAtividadeManutencao.values()) {
+            manutencoesPorStatus.put(status, 0L);
+        }
+
+        Map<NivelRiscoManutencao, Long> manutencoesPorRisco =
+                new EnumMap<>(NivelRiscoManutencao.class);
+        for (NivelRiscoManutencao risco : NivelRiscoManutencao.values()) {
+            manutencoesPorRisco.put(risco, 0L);
+        }
+
         long totalManutencoes = 0;
+        long manutencoesConcluidas = 0;
+        long manutencoesEmAndamento = 0;
 
         for (Manutencao manutencao : todasManutencoes) {
             if (manutencao.getData() == null) {
@@ -126,17 +143,32 @@ public class AnaliseController {
             }
 
             Month mes = Month.of(calendario.get(Calendar.MONTH) + 1);
+            StatusAtividadeManutencao status = manutencao.getStatusAtividade();
+            NivelRiscoManutencao risco = manutencao.getNivelRisco();
+
             manutencoesPorMes.merge(mes, 1L, Long::sum);
+            manutencoesPorStatus.merge(status, 1L, Long::sum);
+            manutencoesPorRisco.merge(risco, 1L, Long::sum);
             totalManutencoes++;
+
+            if (status == StatusAtividadeManutencao.CONCLUIDA) {
+                concluidasPorMes.merge(mes, 1L, Long::sum);
+                manutencoesConcluidas++;
+            }
+
+            if (status == StatusAtividadeManutencao.EM_ANDAMENTO) {
+                emAndamentoPorMes.merge(mes, 1L, Long::sum);
+                manutencoesEmAndamento++;
+            }
         }
 
         long maiorValorMensal = 0;
+        List<AnaliseMensalDTO> dadosMensais = new ArrayList<>();
+
         for (Month mes : Month.values()) {
             maiorValorMensal = Math.max(maiorValorMensal, incidentesPorMes.get(mes));
             maiorValorMensal = Math.max(maiorValorMensal, manutencoesPorMes.get(mes));
         }
-
-        List<AnaliseMensalDTO> dadosMensais = new ArrayList<>();
 
         for (int indice = 0; indice < 12; indice++) {
             Month mes = Month.of(indice + 1);
@@ -238,6 +270,46 @@ public class AnaliseController {
         long flangesEmAlerta = contagemFlanges.get(StatusFlange.ATENCAO)
                 + contagemFlanges.get(StatusFlange.CRITICO);
 
+        // Arrays com dados reais para o Chart.js. Os valores zero representam
+        // ausência de registros naquele mês/categoria, não dados de demonstração.
+        List<Long> serieIncidentes = new ArrayList<>();
+        List<Long> serieManutencoes = new ArrayList<>();
+        List<Long> serieConcluidas = new ArrayList<>();
+        List<Long> serieEmAndamento = new ArrayList<>();
+
+        for (Month mes : Month.values()) {
+            serieIncidentes.add(incidentesPorMes.get(mes));
+            serieManutencoes.add(manutencoesPorMes.get(mes));
+            serieConcluidas.add(concluidasPorMes.get(mes));
+            serieEmAndamento.add(emAndamentoPorMes.get(mes));
+        }
+
+        List<String> statusLabels = new ArrayList<>();
+        List<Long> statusValores = new ArrayList<>();
+        for (StatusAtividadeManutencao status : StatusAtividadeManutencao.values()) {
+            statusLabels.add(status.getDescricao());
+            statusValores.add(manutencoesPorStatus.get(status));
+        }
+
+        List<String> riscoLabels = new ArrayList<>();
+        List<Long> riscoValores = new ArrayList<>();
+        for (NivelRiscoManutencao risco : NivelRiscoManutencao.values()) {
+            riscoLabels.add(risco.getDescricao());
+            riscoValores.add(manutencoesPorRisco.get(risco));
+        }
+
+        List<String> localizacaoLabels = locaisOrdenados.stream()
+                .limit(8)
+                .map(Map.Entry::getKey)
+                .toList();
+        List<Long> localizacaoValores = locaisOrdenados.stream()
+                .limit(8)
+                .map(Map.Entry::getValue)
+                .toList();
+
+        List<String> radarLabels = List.of("Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                "Jul", "Ago", "Set", "Out", "Nov", "Dez");
+
         model.addAttribute("anoSelecionado", anoSelecionado);
         model.addAttribute("anosDisponiveis", anosComDados.descendingSet());
         model.addAttribute("dadosMensais", dadosMensais);
@@ -253,11 +325,26 @@ public class AnaliseController {
         ));
         model.addAttribute("totalLocalizacoes", incidentesPorLocalizacao.size());
         model.addAttribute("totalManutencoes", totalManutencoes);
+        model.addAttribute("manutencoesConcluidas", manutencoesConcluidas);
+        model.addAttribute("manutencoesEmAndamento", manutencoesEmAndamento);
         model.addAttribute("totalFlanges", flanges.size());
         model.addAttribute("flangesEmAlerta", flangesEmAlerta);
         model.addAttribute("totalSensores", sensores.size());
         model.addAttribute("sensoresInstalados", sensoresInstalados);
         model.addAttribute("calibracoesVencidas", calibracoesVencidas);
+
+        model.addAttribute("chartMeses", MESES);
+        model.addAttribute("chartIncidentes", serieIncidentes);
+        model.addAttribute("chartManutencoes", serieManutencoes);
+        model.addAttribute("chartConcluidas", serieConcluidas);
+        model.addAttribute("chartEmAndamento", serieEmAndamento);
+        model.addAttribute("chartStatusLabels", statusLabels);
+        model.addAttribute("chartStatusValores", statusValores);
+        model.addAttribute("chartRiscoLabels", riscoLabels);
+        model.addAttribute("chartRiscoValores", riscoValores);
+        model.addAttribute("chartLocalizacaoLabels", localizacaoLabels);
+        model.addAttribute("chartLocalizacaoValores", localizacaoValores);
+        model.addAttribute("chartRadarLabels", radarLabels);
 
         return "analises/index";
     }
