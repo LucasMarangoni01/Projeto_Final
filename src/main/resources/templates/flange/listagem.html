@@ -76,11 +76,11 @@
                 <td>
 
                     <img th:if="${p.foto != null}"
-                         th:src="@{'/foto_flange/' + ${p.foto}}"
+                         th:src="@{/flange/foto/{id}(id=${p.id})}"
                          class="foto-tabela">
 
                     <img th:if="${p.foto == null}"
-                         src="/foto_flange/default.png"
+                         th:src="@{/img/flange-placeholder.svg}"
                          class="foto-tabela">
 
                 </td>
