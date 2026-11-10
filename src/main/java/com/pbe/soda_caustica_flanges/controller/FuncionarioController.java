@@ -91,6 +91,22 @@ public class FuncionarioController {
                     : "funcionario/alterar";
         }
 
+        Funcionario existente = funcionario.getId() == null
+                ? null
+                : funcionarioRepository.findById(funcionario.getId()).orElse(null);
+
+        if (funcionario.getId() != null && existente == null) {
+            return "redirect:/funcionario/listagem?erro=nao-encontrado";
+        }
+
+        if (existente != null && existente.getUsuario() != null) {
+            Usuario conta = existente.getUsuario();
+            conta.setNome(funcionario.getNome_funcionario().trim());
+            conta.setUnidade(unidade);
+            usuarioRepository.save(conta);
+            funcionario.setUsuario(conta);
+        }
+
         funcionario.setUnidade(unidade);
         funcionarioRepository.save(funcionario);
         return "redirect:/funcionario/listagem";
@@ -107,6 +123,15 @@ public class FuncionarioController {
 
     @PostMapping("/funcionario/excluir/{id}")
     public String excluir(@PathVariable Long id) {
+        Funcionario funcionario = funcionarioRepository.findById(id).orElse(null);
+        if (funcionario == null) {
+            return "redirect:/funcionario/listagem";
+        }
+
+        if (funcionario.getUsuario() != null) {
+            return "redirect:/funcionario/listagem?erro=conta";
+        }
+
         if (manutencaoRepository.countByFuncionario_Id(id) > 0) {
             return "redirect:/funcionario/listagem?erro=historico";
         }
