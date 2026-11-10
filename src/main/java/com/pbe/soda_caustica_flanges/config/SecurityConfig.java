@@ -119,6 +119,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/manutencao/alterar/**")
                         .hasAnyRole("ADMIN", "USER")
 
+                        // Fotos de flanges passam por verificação de unidade no controller.
+                        .requestMatchers(HttpMethod.GET, "/flange/foto/**")
+                        .hasAnyRole("ADMIN", "USER")
+
+                        // Arquivos antigos na pasta static ficam restritos a ADMIN durante a migração.
+                        .requestMatchers("/foto_flange/**").hasRole("ADMIN")
+
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
 
