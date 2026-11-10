@@ -11,8 +11,8 @@
     <groupId>com.pbe</groupId>
     <artifactId>ianes</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ianes</name>
-    <description>Demo project for Spring Boot</description>
+    <name>Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica</name>
+    <description>Sistema web para monitoramento e gerenciamento de flanges, sensores, incidentes, funcionários e manutenções em ambientes industriais com soda cáustica (NaOH).</description>
     <url/>
     <licenses>
         <license/>
