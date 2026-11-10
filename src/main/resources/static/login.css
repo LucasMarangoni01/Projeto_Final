@@ -998,3 +998,22 @@ body::before {
         transition: none;
     }
 }
+/* Marca institucional no cabeçalho da autenticação */
+.system-badge {
+    gap: 10px;
+    padding: 5px 13px 5px 6px;
+    border-color: rgba(110, 158, 225, .28);
+    background: rgba(45, 91, 163, .13);
+    color: #dceaff;
+    letter-spacing: .07em;
+}
+
+.system-badge-logo {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: block;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
