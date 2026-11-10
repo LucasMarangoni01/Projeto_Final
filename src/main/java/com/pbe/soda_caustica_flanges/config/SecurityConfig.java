@@ -88,6 +88,7 @@ public class SecurityConfig {
                                 "/sensor.css",
                                 "/sensor.js",
                                 "/analises.css",
+                                "/manutencao.css",
                                 "/js/**",
                                 "/css/**",
                                 "/img/**",
