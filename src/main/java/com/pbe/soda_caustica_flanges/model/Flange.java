@@ -44,6 +44,18 @@ public class Flange {
     private StatusFlange status = StatusFlange.NORMAL;
 
     // Dados construtivos e de integridade solicitados pela documentação.
+    @Size(max = 80)
+    @Column(name = "norma_tecnica", length = 80)
+    private String normaTecnica = "ASME B16.5";
+
+    @Size(max = 30)
+    @Column(name = "tipo_flange", length = 30)
+    private String tipoFlange;
+
+    @Size(max = 30)
+    @Column(name = "diametro_nominal", length = 30)
+    private String diametroNominal;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "classe_pressao", length = 20)
     private ClassePressaoFlange classePressao;
@@ -139,6 +151,15 @@ public class Flange {
         return status == null ? StatusFlange.NORMAL : status;
     }
     public void setStatus(StatusFlange status) { this.status = status; }
+
+    public String getNormaTecnica() { return normaTecnica; }
+    public void setNormaTecnica(String normaTecnica) { this.normaTecnica = normaTecnica; }
+
+    public String getTipoFlange() { return tipoFlange; }
+    public void setTipoFlange(String tipoFlange) { this.tipoFlange = tipoFlange; }
+
+    public String getDiametroNominal() { return diametroNominal; }
+    public void setDiametroNominal(String diametroNominal) { this.diametroNominal = diametroNominal; }
 
     public ClassePressaoFlange getClassePressao() { return classePressao; }
     public void setClassePressao(ClassePressaoFlange classePressao) { this.classePressao = classePressao; }
