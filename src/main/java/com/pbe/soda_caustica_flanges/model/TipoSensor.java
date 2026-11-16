@@ -14,6 +14,18 @@ public enum TipoSensor {
             "Pressão do processo",
             "Acompanha a pressão da linha associada ao conjunto monitorado."
     ),
+    PH_PROCESSO(
+            "pH do processo",
+            "Mede o pH no ponto instrumentado. Os limites de alarme devem ser definidos para o processo específico."
+    ),
+    CONDUTIVIDADE_LIQUIDO(
+            "Condutividade / presença de líquido",
+            "Detecta alteração de condutividade no elemento instalado; a compatibilidade química do elemento deve ser validada."
+    ),
+    PRESSAO_DIFERENCIAL(
+            "Pressão diferencial",
+            "Compara pressão entre pontos da linha para identificar quedas anormais conforme limites definidos pelo responsável técnico."
+    ),
     VIBRACAO(
             "Vibração",
             "Ajuda a identificar vibrações anormais no conjunto de tubulação e flange."
