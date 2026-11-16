@@ -80,6 +80,13 @@ public class UsuarioService {
             throw new IllegalArgumentException("Salve a conta antes de gerar o funcionário.");
         }
 
+        String nomeUsuario = usuario.getNome() == null ? "" : usuario.getNome().trim();
+        if (nomeUsuario.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Esta conta está sem nome cadastrado. Atualize o nome no perfil antes de sincronizar o funcionário."
+            );
+        }
+
         Funcionario funcionario = funcionarioRepository.findByUsuarioId(usuario.getId())
                 .orElse(null);
         boolean novoVinculo = funcionario == null;
@@ -97,7 +104,7 @@ public class UsuarioService {
             funcionarioRepository.save(historico);
 
             funcionario = new Funcionario();
-            funcionario.setNome_funcionario(usuario.getNome());
+            funcionario.setNome_funcionario(nomeUsuario);
             funcionario.setData_nascimento(historico.getData_nascimento());
             funcionario.setIdade(historico.getIdade());
             funcionario.setFuncionario_flange(historico.getFuncionario_flange());
@@ -106,9 +113,9 @@ public class UsuarioService {
 
         if (funcionario == null) {
             List<Funcionario> candidatos = usuario.getUnidade() == null
-                    ? funcionarioRepository.buscarSemContaPorNomeESemUnidade(usuario.getNome())
+                    ? funcionarioRepository.buscarSemContaPorNomeESemUnidade(nomeUsuario)
                     : funcionarioRepository.buscarSemContaPorNomeEUnidade(
-                            usuario.getNome(),
+                            nomeUsuario,
                             usuario.getUnidade().getId()
                     );
 
@@ -155,6 +162,19 @@ public class UsuarioService {
         int total = 0;
 
         for (Usuario usuario : usuarios) {
+            String nome = usuario.getNome() == null ? "" : usuario.getNome().trim();
+
+            // Dados antigos podem conter contas sem nome, mesmo que os formulários
+            // atuais já validem esse campo. Não interrompe a inicialização inteira
+            // por causa de um único registro legado inválido.
+            if (nome.isBlank()) {
+                System.err.println(
+                        "[SINCRONIZACAO] Conta ID #" + usuario.getId()
+                                + " ignorada: nome não cadastrado. Atualize o perfil dessa conta."
+                );
+                continue;
+            }
+
             boolean jaVinculado = funcionarioRepository.findByUsuarioId(usuario.getId()).isPresent();
             sincronizarFuncionario(usuario);
             if (!jaVinculado) {
