@@ -1,140 +1,140 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Flanges | Monitoramento de Flanges</title>
-
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="apple-touch-icon" th:href="@{/favicon.svg}">
 </head>
-
 <body>
+<div th:replace="~{fragments/menu :: menu}"></div>
 
-<!-- Menu -->
-<div th:replace="~{/fragments/menu.html :: menu}"></div>
+<main class="flange-list-page" style="max-width:1600px;margin:0 auto;padding:24px 18px 55px;">
+    <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+        <div>
+            <span style="color:#f4c45f;font:800 9px 'JetBrains Mono',monospace;letter-spacing:.1em;">GESTÃO DE ATIVOS · NAOH</span>
+            <h1 style="margin:5px 0;color:#fff;font-size:26px;"
+                th:text="${mostrarArquivadas ? 'Flanges arquivadas' : 'Flanges monitoradas'}">Flanges monitoradas</h1>
+            <p style="margin:0;color:#a8bad5;font-size:11px;"
+               th:text="${#lists.size(flanges) + ' registro(s) nesta consulta.'}">0 registros</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a th:if="${ehAdmin and !mostrarArquivadas}" th:href="@{/flange/listagem(arquivadas=true)}"
+               class="btn btn-alter">Ver arquivadas</a>
+            <a th:if="${ehAdmin and mostrarArquivadas}" th:href="@{/flange/listagem}"
+               class="btn btn-alter">Ver ativas</a>
+            <a th:if="${ehAdmin and !mostrarArquivadas}" th:href="@{/flange/cadastro}"
+               class="btn btn-success">Cadastrar nova flange</a>
+        </div>
+    </header>
 
-<main>
-
-    <!-- Cabeçalho da página -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-
-        <h2>Listagem de Flanges</h2>
-
-        <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
-           th:href="@{/flange/cadastro}"
-           class="btn btn-success">
-            Cadastrar Novo
-        </a>
-
+    <div th:if="${param.erro != null and param.erro[0] == 'alarme'}" class="alerta-erro" style="margin-bottom:16px;">
+        Esta flange possui um alerta ativo. Reconheça e normalize a ocorrência antes de arquivar o ativo.
+    </div>
+    <div th:if="${param.erro != null and param.erro[0] == 'motivo'}" class="alerta-erro" style="margin-bottom:16px;">
+        Informe uma justificativa de arquivamento com até 500 caracteres.
+    </div>
+    <div th:if="${param.erro != null and param.erro[0] == 'unidade_inativa'}" class="alerta-erro" style="margin-bottom:16px;">
+        Reative a unidade antes de restaurar esta flange.
+    </div>
+    <div th:if="${param.sucesso != null}" class="badge ok-b" style="margin-bottom:16px;"
+         th:text="${param.sucesso[0] == 'arquivada' ? 'Flange arquivada. Histórico e vínculos preservados.' : 'Flange restaurada.'}">
+        Operação concluída.
     </div>
 
-    <div th:if="${param.erro != null and param.erro[0] == 'historico'}" class="alerta-erro" style="margin-bottom:16px;">
-        Não é possível excluir uma flange que possui manutenções registradas. Preserve o histórico operacional.
-    </div>
-    <div th:if="${param.erro != null and param.erro[0] == 'sensores'}" class="alerta-erro" style="margin-bottom:16px;">
-        Esta flange possui sensores associados. Edite os sensores e transfira o vínculo antes de excluir o ponto.
-    </div>
-    <div th:if="${param.sucesso != null}" class="badge ok-b" style="margin-bottom:16px;">
-        Registro removido.
-    </div>
-
-    <!-- Tabela -->
-    <div class="table-container">
-
-        <table>
-
+    <div class="table-container" style="overflow-x:auto;">
+        <table style="min-width:1100px;width:100%;">
             <thead>
             <tr>
                 <th>Foto</th>
-                <th>Nome da flange</th>
+                <th>Identificação</th>
                 <th>Localização</th>
-                <th>Temperatura Ambiente</th>
+                <th>Diâmetro / classe</th>
+                <th>Norma / material</th>
                 <th>Data de entrada</th>
                 <th>Unidade</th>
-                <th>Ações</th>
+                <th th:if="${mostrarArquivadas}">Arquivamento</th>
+                <th th:if="${ehAdmin}">Ações</th>
             </tr>
             </thead>
-
             <tbody>
-
-            <!-- Caso não tenha registros -->
-            <tr th:if="${flanges.empty}">
-                <td colspan="7" style="text-align: center;">
-                    Nenhum registro encontrado.
+            <tr th:if="${#lists.isEmpty(flanges)}">
+                <td th:colspan="${mostrarArquivadas ? 9 : (ehAdmin ? 8 : 7)}" style="text-align:center;padding:28px;">
+                    Nenhuma flange encontrada nesta consulta.
                 </td>
             </tr>
-
-            <!-- Lista de flanges -->
             <tr th:each="p : ${flanges}">
-
-                <!-- FOTO -->
                 <td>
+                    <img th:if="${p.foto != null}" th:src="@{/flange/foto/{id}(id=${p.id})}"
+                         class="foto-tabela" alt="Foto da flange">
+                    <img th:if="${p.foto == null}" th:src="@{/img/flange-placeholder.svg}"
+                         class="foto-tabela" alt="Sem foto cadastrada">
+                </td>
+                <td>
+                    <strong th:text="${p.nome_flange}">FL-001</strong>
+                    <small style="display:block;color:#94aaca;font-size:9px;"
+                           th:text="${p.tipoFlange != null ? p.tipoFlange : 'Tipo não informado'}">Tipo</small>
+                </td>
+                <td th:text="${p.localizacao}">Local</td>
+                <td>
+                    <span th:text="${p.diametroNominal != null ? p.diametroNominal : '—'}">DN</span>
+                    <small style="display:block;color:#94aaca;font-size:9px;"
+                           th:text="${p.classePressao != null ? p.classePressao.descricao : 'Classe não informada'}">Classe</small>
+                </td>
+                <td>
+                    <span th:text="${p.normaTecnica != null ? p.normaTecnica : 'Norma não informada'}">ASME B16.5</span>
+                    <small style="display:block;color:#94aaca;font-size:9px;"
+                           th:text="${p.materialFabricacao != null ? p.materialFabricacao.descricao : 'Material não informado'}">Material</small>
+                </td>
+                <td th:text="${p.data_entrada != null ? #temporals.format(p.data_entrada,'dd/MM/yyyy') : '—'}">Data</td>
+                <td th:text="${p.unidade != null ? p.unidade.nome : 'Sem unidade'}">Unidade</td>
 
-                    <img th:if="${p.foto != null}"
-                         th:src="@{/flange/foto/{id}(id=${p.id})}"
-                         class="foto-tabela">
-
-                    <img th:if="${p.foto == null}"
-                         th:src="@{/img/flange-placeholder.svg}"
-                         class="foto-tabela">
-
+                <td th:if="${mostrarArquivadas}">
+                    <strong th:text="${p.desativadaEm != null ? #temporals.format(p.desativadaEm,'dd/MM/yyyy HH:mm') : 'Data não registrada'}">Data</strong>
+                    <small style="display:block;color:#94aaca;font-size:9px;"
+                           th:text="${p.desativadaPorEmail != null ? p.desativadaPorEmail : 'Responsável não informado'}">ADMIN</small>
+                    <small style="display:block;color:#f1d59b;font-size:9px;max-width:220px;white-space:normal;"
+                           th:text="${p.motivoDesativacao != null ? p.motivoDesativacao : 'Motivo não informado'}">Motivo</small>
                 </td>
 
-                <!-- NOME -->
-                <td th:text="${p.nome_flange}"></td>
+                <td th:if="${ehAdmin}" style="white-space:nowrap;">
+                    <a th:if="${!mostrarArquivadas}" th:href="@{/flange/alterar/{id}(id=${p.id})}"
+                       class="btn btn-alter" style="margin:0 5px 5px 0;">Alterar</a>
 
-                <!-- LOCALIZAÇÃO -->
-                <td th:text="${p.localizacao}"></td>
-
-                <!-- TEMPERATURA AMBIENTE -->
-                <td th:text="${p.temp_ambiente}"></td>
-
-                <!-- DATA DE ENTRADA -->
-                <td th:text="${#temporals.format(p.data_entrada, 'dd/MM/yyyy')}"></td>
-                <td th:text="${p.unidade != null ? p.unidade.nome : 'Sem unidade'}"></td>
-
-                <!-- AÇÕES -->
-                <td style="white-space: nowrap;" th:if="${usuarioLogado.role.name() == 'ADMIN'}">
-
-                    <a th:href="@{'/flange/alterar/' + ${p.id}}"
-                       class="btn btn-alter"
-                       style="margin-right: 8px;">
-                        Alterar
-                    </a>
-
-                    <form th:action="@{'/flange/excluir/' + ${p.id}}"
-                          method="post"
-                          style="display: inline; margin: 0;">
-                        <button type="submit"
-                                class="btn btn-excluir"
-                                onclick="return confirm('Deseja realmente excluir este registro?');">
-                            Excluir
-                        </button>
+                    <form th:if="${!mostrarArquivadas}"
+                          th:action="@{/flange/arquivar/{id}(id=${p.id})}"
+                          method="post" style="display:inline-block;margin:0;"
+                          onsubmit="const motivo=prompt('Informe o motivo do arquivamento (obrigatório):');if(motivo===null||!motivo.trim()||motivo.trim().length>500)return false;this.querySelector('[name=motivo]').value=motivo.trim();return confirm('Arquivar esta flange? Sensores, manutenções e ocorrências serão preservados.');">
+                        <input type="hidden" name="motivo">
+                        <button type="submit" class="btn btn-excluir">Arquivar</button>
                     </form>
 
+                    <form th:if="${mostrarArquivadas}"
+                          th:action="@{/flange/restaurar/{id}(id=${p.id})}"
+                          method="post" style="display:inline-block;margin:0;"
+                          onsubmit="return confirm('Restaurar esta flange à operação?');">
+                        <button type="submit" class="btn btn-success">Restaurar</button>
+                    </form>
                 </td>
-                <td th:unless="${usuarioLogado.role.name() == 'ADMIN'}">
-                    <span class="badge">Somente leitura</span>
-                </td>
-
             </tr>
-
             </tbody>
-
         </table>
-
     </div>
 
+    <p style="margin-top:12px;color:#9bb1ce;font-size:10px;line-height:1.5;"
+       th:if="${ehAdmin and !mostrarArquivadas}">
+        Arquivar desativa o ativo sem apagar os dados, fotos, sensores, manutenções ou ocorrências associadas. Flanges com alertas ativos não podem ser arquivadas.
+    </p>
+    <p style="margin-top:12px;color:#9bb1ce;font-size:10px;line-height:1.5;"
+       th:if="${ehAdmin and mostrarArquivadas}">
+        As flanges arquivadas permanecem para consulta. Restaurar reativa o cadastro sem remover o histórico da desativação.
+    </p>
 </main>
 
-<!-- Footer -->
-<div th:replace="~{/fragments/footer.html :: footer}"></div>
-
+<div th:replace="~{fragments/footer :: footer}"></div>
 <script th:src="@{/menu.js}"></script>
 </body>
 </html>
