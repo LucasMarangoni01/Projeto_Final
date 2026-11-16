@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas e ocorrências | Monitoramento de Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/alertas.css}">
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+
+<main class="alerts-page">
+    <header class="alerts-header">
+        <div>
+            <span class="alerts-eyebrow">MONITORAMENTO · EVENTOS TÉRMICOS</span>
+            <h1>Alertas e ocorrências</h1>
+            <p>Ocorrências geradas a partir de leituras recebidas de sensores térmicos instalados.</p>
+        </div>
+        <a th:href="@{/}" class="alerts-back">Voltar ao painel</a>
+    </header>
+
+    <div class="alerts-feedback alerts-feedback-success"
+         th:if="${sucesso != null}" th:text="${sucesso}"></div>
+    <div class="alerts-feedback alerts-feedback-error"
+         th:if="${erro != null}" th:text="${erro}"></div>
+
+    <section class="alerts-kpis">
+        <article>
+            <span>ALERTAS ATIVOS</span>
+            <strong th:text="${totalAtivos}">0</strong>
+            <small>Ocorrências ainda não normalizadas</small>
+        </article>
+        <article>
+            <span>AGUARDANDO RECONHECIMENTO</span>
+            <strong th:text="${totalDisparados}">0</strong>
+            <small>Disparados pelo sistema</small>
+        </article>
+        <article>
+            <span>RECONHECIDOS</span>
+            <strong th:text="${totalReconhecidos}">0</strong>
+            <small>Em verificação pela equipe</small>
+        </article>
+    </section>
+
+    <section class="alerts-panel">
+        <div class="alerts-panel-heading">
+            <div>
+                <span class="alerts-section-label">AÇÃO NECESSÁRIA</span>
+                <h2>Ocorrências ativas</h2>
+                <p>Reconhecer confirma que a equipe tomou ciência. Normalizar encerra a ocorrência após verificação.</p>
+            </div>
+        </div>
+
+        <div class="alerts-empty" th:if="${#lists.isEmpty(alertasAtivos)}">
+            <span class="alerts-empty-symbol">✓</span>
+            <strong>Nenhum alerta ativo</strong>
+            <p>Não há ocorrências térmicas pendentes nas unidades às quais sua conta tem acesso.</p>
+        </div>
+
+        <div class="alerts-list" th:if="${!#lists.isEmpty(alertasAtivos)}">
+            <article class="alert-card" th:each="alerta : ${alertasAtivos}">
+                <div class="alert-card-top">
+                    <div>
+                        <span class="alert-code" th:text="${'OCORRÊNCIA #' + alerta.id}">OCORRÊNCIA #1</span>
+                        <h3 th:text="${alerta.flange.nome_flange}">Flange</h3>
+                        <p th:text="${alerta.flange.localizacao}">Localização</p>
+                    </div>
+                    <span class="alert-state"
+                          th:classappend="${alerta.statusAlarme != null ? ' alert-state-' + #strings.toLowerCase(alerta.statusAlarme.name()) : ' alert-state-disparado'}"
+                          th:text="${alerta.statusAlarme != null ? alerta.statusAlarme.descricao : 'Disparado'}">Disparado</span>
+                </div>
+
+                <div class="alert-reading-grid">
+                    <div>
+                        <span>IDENTIFICADOR DO SENSOR</span>
+                        <strong th:text="${alerta.sensor != null ? alerta.sensor.codigoIdentificacao : 'Não informado'}">SNS-FLG-01</strong>
+                    </div>
+                    <div>
+                        <span>TEMPERATURA RECEBIDA</span>
+                        <strong th:text="${alerta.temperatura != null ? #numbers.formatDecimal(alerta.temperatura,1,1) + ' °C' : 'Não informada'}">0,0 °C</strong>
+                    </div>
+                    <div>
+                        <span>PRIMEIRA DETECÇÃO</span>
+                        <strong th:text="${#temporals.format(alerta.dataHora,'dd/MM/yyyy HH:mm:ss')}">Data</strong>
+                    </div>
+                    <div>
+                        <span>TIPO DE EVENTO</span>
+                        <strong th:text="${alerta.tipoOcorrencia}">POSSIVEL_ANORMALIDADE</strong>
+                    </div>
+                </div>
+
+                <div class="alert-ack-meta" th:if="${alerta.reconhecidoEm != null}">
+                    Reconhecido por <strong th:text="${alerta.reconhecidoPorEmail}">email</strong>
+                    em <span th:text="${#temporals.format(alerta.reconhecidoEm,'dd/MM/yyyy HH:mm')}">data</span>
+                    <p th:text="${alerta.justificativaReconhecimento}">Justificativa</p>
+                </div>
+
+                <div class="alert-actions" th:if="${alerta.statusAlarme == null or alerta.statusAlarme.name() == 'DISPARADO'}">
+                    <form th:action="@{/alertas/{id}/reconhecer(id=${alerta.id})}" method="post">
+                        <label th:for="${'ack-' + alerta.id}">Justificativa do reconhecimento</label>
+                        <textarea th:id="${'ack-' + alerta.id}" name="justificativa"
+                                  rows="2" maxlength="500" required
+                                  placeholder="Ex.: alerta recebido, equipe acionada e inspeção iniciada."></textarea>
+                        <button type="submit" class="alert-button alert-button-ack">Reconhecer alerta</button>
+                    </form>
+                </div>
+
+                <div class="alert-actions alert-actions-admin"
+                     th:if="${ehAdmin and alerta.statusAlarme != null and (alerta.statusAlarme.name() == 'RECONHECIDO' or alerta.statusAlarme.name() == 'EM_MANUTENCAO')}">
+                    <form th:action="@{/alertas/{id}/normalizar(id=${alerta.id})}" method="post"
+                          onsubmit="return confirm('Confirmar que a condição foi verificada e que o alerta pode ser normalizado?');">
+                        <label th:for="${'normalizar-' + alerta.id}">Justificativa da normalização (ADMIN)</label>
+                        <textarea th:id="${'normalizar-' + alerta.id}" name="justificativa"
+                                  rows="2" maxlength="500" required
+                                  placeholder="Informe evidência de inspeção, manutenção executada ou validação técnica."></textarea>
+                        <button type="submit" class="alert-button alert-button-normalize">Normalizar ocorrência</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="alerts-panel alerts-history">
+        <div class="alerts-panel-heading">
+            <div>
+                <span class="alerts-section-label">RASTREABILIDADE</span>
+                <h2>Histórico de ocorrências normalizadas</h2>
+                <p>Os eventos encerrados continuam disponíveis para consulta e relatórios.</p>
+            </div>
+            <span class="alerts-count" th:text="${historicoAlertas.size() + ' registro(s)'}">0 registros</span>
+        </div>
+
+        <div class="alerts-empty alerts-empty-small" th:if="${#lists.isEmpty(historicoAlertas)}">
+            <strong>Nenhuma ocorrência normalizada</strong>
+        </div>
+
+        <div class="alerts-history-list" th:if="${!#lists.isEmpty(historicoAlertas)}">
+            <article class="alerts-history-row" th:each="alerta : ${historicoAlertas}">
+                <div>
+                    <strong th:text="${alerta.flange != null ? alerta.flange.nome_flange : 'Flange não disponível'}">Flange</strong>
+                    <small th:text="${alerta.flange != null ? alerta.flange.localizacao : ''}">Local</small>
+                </div>
+                <div>
+                    <span>Detecção</span>
+                    <strong th:text="${#temporals.format(alerta.dataHora,'dd/MM/yyyy HH:mm')}">Data</strong>
+                </div>
+                <div>
+                    <span>Normalização</span>
+                    <strong th:text="${alerta.normalizadoEm != null ? #temporals.format(alerta.normalizadoEm,'dd/MM/yyyy HH:mm') : '—'}">Data</strong>
+                </div>
+                <div>
+                    <span>Normalizado por</span>
+                    <strong th:text="${alerta.normalizadoPorEmail != null ? alerta.normalizadoPorEmail : 'Não informado'}">ADMIN</strong>
+                    <small th:text="${alerta.justificativaNormalizacao}">Justificativa</small>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <aside class="alerts-safety-note">
+        <strong>Importante para a segurança operacional</strong>
+        <p>Uma leitura térmica acima do limite configurado indica uma possível anormalidade, não confirma por si só um vazamento de soda cáustica. O alerta serve como apoio à inspeção e aos procedimentos de segurança da unidade; não substitui inspeção, procedimentos operacionais, EPIs ou avaliação de profissional habilitado.</p>
+    </aside>
+</main>
+
+<script th:src="@{/menu.js}"></script>
+</body>
+</html>
