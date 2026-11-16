@@ -379,13 +379,25 @@ public class FlangeController {
                     : "flange/cadastro";
         }
 
-        if (flange.getStatus() == null) {
-            flange.setStatus(
-                    StatusFlange.NORMAL
-            );
-        }
+        if (flangeExistente != null) {
+            // Atualiza somente os campos exibidos no formulário simplificado.
+            // Os dados técnicos, coordenadas, status e metadados de arquivamento
+            // permanecem preservados na entidade já persistida.
+            flangeExistente.setNomeFlange(flange.getNomeFlange());
+            flangeExistente.setLocalizacao(flange.getLocalizacao());
+            flangeExistente.setTempAmbiente(flange.getTempAmbiente());
+            flangeExistente.setDataEntrada(flange.getDataEntrada());
+            flangeExistente.setUnidade(flange.getUnidade());
+            flangeExistente.setFoto(flange.getFoto());
 
-        flangeRepository.save(flange);
+            flangeRepository.save(flangeExistente);
+        } else {
+            if (flange.getStatus() == null) {
+                flange.setStatus(StatusFlange.NORMAL);
+            }
+            flange.setAtivo(true);
+            flangeRepository.save(flange);
+        }
 
         return "redirect:/flange/listagem";
     }
