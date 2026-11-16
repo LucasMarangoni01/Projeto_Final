@@ -43,6 +43,19 @@ public class Manutencao {
     @Column(name = "registrado_em")
     private LocalDateTime registradoEm;
 
+    // Arquivamento lógico: preserva o registro e seus vínculos históricos.
+    @Column(name = "arquivada")
+    private Boolean arquivada = false;
+
+    @Column(name = "arquivada_em")
+    private LocalDateTime arquivadaEm;
+
+    @Column(name = "arquivada_por_email", length = 100)
+    private String arquivadaPorEmail;
+
+    @Column(name = "motivo_arquivamento", length = 500)
+    private String motivoArquivamento;
+
     @PrePersist
     public void antesDeCriar() {
         if (registradoEm == null) {
@@ -53,6 +66,9 @@ public class Manutencao {
         }
         if (statusAtividade == null) {
             statusAtividade = StatusAtividadeManutencao.REGISTRADA;
+        }
+        if (arquivada == null) {
+            arquivada = false;
         }
     }
 
@@ -150,5 +166,37 @@ public class Manutencao {
 
     public void setRegistradoEm(LocalDateTime registradoEm) {
         this.registradoEm = registradoEm;
+    }
+
+    public boolean isArquivada() {
+        return Boolean.TRUE.equals(arquivada);
+    }
+
+    public void setArquivada(Boolean arquivada) {
+        this.arquivada = arquivada != null && arquivada;
+    }
+
+    public LocalDateTime getArquivadaEm() {
+        return arquivadaEm;
+    }
+
+    public void setArquivadaEm(LocalDateTime arquivadaEm) {
+        this.arquivadaEm = arquivadaEm;
+    }
+
+    public String getArquivadaPorEmail() {
+        return arquivadaPorEmail;
+    }
+
+    public void setArquivadaPorEmail(String arquivadaPorEmail) {
+        this.arquivadaPorEmail = arquivadaPorEmail;
+    }
+
+    public String getMotivoArquivamento() {
+        return motivoArquivamento;
+    }
+
+    public void setMotivoArquivamento(String motivoArquivamento) {
+        this.motivoArquivamento = motivoArquivamento;
     }
 }
