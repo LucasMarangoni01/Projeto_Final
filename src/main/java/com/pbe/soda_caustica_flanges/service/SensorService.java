@@ -71,6 +71,14 @@ public class SensorService {
             );
         }
 
+        if (dados.getTipo() == TipoSensor.TEMPERATURA_SUPERFICIE
+                && dados.getStatus() == StatusSensor.INSTALADO
+                && dados.getLimiteTemperaturaAlerta() == null) {
+            throw new IllegalArgumentException(
+                    "Defina o limite térmico aprovado pelo responsável técnico para instalar o sensor."
+            );
+        }
+
         Flange flange = flangeRepository.findById(dados.getFlangeId())
                 .orElseThrow(() -> new IllegalArgumentException("A flange selecionada não existe."));
 
@@ -102,6 +110,7 @@ public class SensorService {
         sensor.setUltimaCalibracao(dados.getUltimaCalibracao());
         sensor.setProximaCalibracao(dados.getProximaCalibracao());
         sensor.setObservacoes(normalizar(dados.getObservacoes()));
+        sensor.setLimiteTemperaturaAlerta(dados.getLimiteTemperaturaAlerta());
 
         return sensorRepository.save(sensor);
     }
