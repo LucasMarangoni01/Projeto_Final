@@ -90,7 +90,8 @@
                             type="text"
                             id="localizacao"
                             th:field="*{localizacao}"
-                            placeholder="Ex.: Linha de produção"
+                            placeholder="Preenchida automaticamente pela unidade"
+                            readonly
                             required>
 
                     <div
@@ -162,7 +163,8 @@
                         <option
                                 th:each="unidade : ${unidades}"
                                 th:value="${unidade.id}"
-                                th:text="${unidade.nome}">
+                                th:text="${unidade.nome}"
+                                th:attr="data-localizacao=${unidade.localizacao}">
                         </option>
 
                     </select>
@@ -215,6 +217,7 @@
 </footer>
 
 <script th:src="@{/menu.js}"></script>
+<script th:src="@{/flange-form.js}" defer></script>
 
 </body>
 </html>
