@@ -180,6 +180,7 @@ public class HomeController {
         model.addAttribute("flanges", flanges);
         model.addAttribute("flangesMapa", flanges);
         model.addAttribute("alturaMapa", alturaMapa);
+        model.addAttribute("linhasMapa", linhasMapa);
         model.addAttribute("totalFlanges", flanges.size());
         model.addAttribute("totalNormais", totalNormais);
         model.addAttribute("totalAtencao", totalAtencao);
