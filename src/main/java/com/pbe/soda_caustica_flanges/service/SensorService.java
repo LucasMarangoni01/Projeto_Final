@@ -8,6 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.HexFormat;
 
 @Service
 public class SensorService {
@@ -98,6 +104,59 @@ public class SensorService {
         sensor.setObservacoes(normalizar(dados.getObservacoes()));
 
         return sensorRepository.save(sensor);
+    }
+
+    /**
+     * Gera uma credencial de alta entropia para um dispositivo.
+     * O valor bruto só é devolvido nesta chamada; o banco recebe somente SHA-256.
+     */
+    @Transactional
+    public String gerarTokenHardware(Long sensorId) {
+        Sensor sensor = buscarPorId(sensorId);
+
+        if (sensor.getStatus() == StatusSensor.DESATIVADO) {
+            throw new IllegalArgumentException("Não é possível gerar token para sensor desativado.");
+        }
+        if (sensor.getFlange() == null || !sensor.getFlange().isAtivo()) {
+            throw new IllegalArgumentException("A flange vinculada está arquivada ou indisponível.");
+        }
+
+        byte[] segredo = new byte[32];
+        new SecureRandom().nextBytes(segredo);
+
+        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(segredo);
+        sensor.setTokenHardwareHash(hashToken(token));
+        sensor.setTokenHardwareGeradoEm(java.time.LocalDateTime.now());
+        sensorRepository.save(sensor);
+
+        return token;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean validarTokenHardware(Sensor sensor, String tokenRecebido) {
+        if (sensor == null || tokenRecebido == null || tokenRecebido.isBlank()
+                || sensor.getTokenHardwareHash() == null
+                || sensor.getStatus() != StatusSensor.INSTALADO
+                || sensor.getFlange() == null
+                || !sensor.getFlange().isAtivo()) {
+            return false;
+        }
+
+        String hashRecebido = hashToken(tokenRecebido);
+        return MessageDigest.isEqual(
+                sensor.getTokenHardwareHash().getBytes(StandardCharsets.US_ASCII),
+                hashRecebido.getBytes(StandardCharsets.US_ASCII)
+        );
+    }
+
+    private String hashToken(String token) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 indisponível nesta JVM.", e);
+        }
     }
 
     private String normalizar(String valor) {
