@@ -45,6 +45,12 @@ public class SensorDTO {
     @Size(max = 1000, message = "As observações devem ter no máximo 1000 caracteres.")
     private String observacoes;
 
+    @jakarta.validation.constraints.DecimalMin(value = "-100.0",
+            message = "O limite térmico precisa ser igual ou maior que -100 °C.")
+    @jakarta.validation.constraints.DecimalMax(value = "400.0",
+            message = "O limite térmico não pode exceder 400 °C.")
+    private Double limiteTemperaturaAlerta;
+
     public SensorDTO() {
     }
 
@@ -61,6 +67,7 @@ public class SensorDTO {
         this.ultimaCalibracao = sensor.getUltimaCalibracao();
         this.proximaCalibracao = sensor.getProximaCalibracao();
         this.observacoes = sensor.getObservacoes();
+        this.limiteTemperaturaAlerta = sensor.getLimiteTemperaturaAlerta();
     }
 
     public Long getId() { return id; }
@@ -98,4 +105,9 @@ public class SensorDTO {
 
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
+    public Double getLimiteTemperaturaAlerta() { return limiteTemperaturaAlerta; }
+    public void setLimiteTemperaturaAlerta(Double limiteTemperaturaAlerta) {
+        this.limiteTemperaturaAlerta = limiteTemperaturaAlerta;
+    }
 }
