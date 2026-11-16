@@ -143,6 +143,83 @@
 
                 </div>
 
+                <div class="form-group">
+                    <label for="normaTecnica">Norma técnica</label>
+                    <input type="text" id="normaTecnica" th:field="*{normaTecnica}"
+                           maxlength="80" placeholder="ASME B16.5">
+                    <small>Informe a norma aplicável ao componente, conforme especificação técnica.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoFlange">Tipo de flange</label>
+                    <input type="text" id="tipoFlange" th:field="*{tipoFlange}"
+                           maxlength="30" placeholder="Ex.: pescoço, cega, sobreposta">
+                </div>
+
+                <div class="form-group">
+                    <label for="diametroNominal">Diâmetro nominal</label>
+                    <input type="text" id="diametroNominal" th:field="*{diametroNominal}"
+                           maxlength="30" placeholder="Ex.: 2 pol / DN 50">
+                </div>
+
+                <div class="form-group">
+                    <label for="classePressao">Classe de pressão</label>
+                    <select id="classePressao" th:field="*{classePressao}">
+                        <option value="">Não informada</option>
+                        <option th:each="classe : ${classesPressao}" th:value="${classe}"
+                                th:text="${classe.descricao}">150#</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoFace">Tipo de face</label>
+                    <select id="tipoFace" th:field="*{tipoFace}">
+                        <option value="">Não informada</option>
+                        <option th:each="face : ${tiposFace}" th:value="${face}"
+                                th:text="${face.descricao}">RF</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="materialFabricacao">Material / liga</label>
+                    <select id="materialFabricacao" th:field="*{materialFabricacao}">
+                        <option value="">Não informado</option>
+                        <option th:each="material : ${materiaisFlange}" th:value="${material}"
+                                th:text="${material.descricao}">Material</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoJunta">Tipo de junta</label>
+                    <select id="tipoJunta" th:field="*{tipoJunta}">
+                        <option value="">Não informada</option>
+                        <option th:each="junta : ${tiposJunta}" th:value="${junta}"
+                                th:text="${junta.descricao}">Junta</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ultimaInspecaoIntegridade">Última inspeção de integridade</label>
+                    <input type="date" id="ultimaInspecaoIntegridade" th:field="*{ultimaInspecaoIntegridade}">
+                </div>
+
+                <div class="form-group">
+                    <label for="proximaInspecaoIntegridade">Próxima inspeção de integridade</label>
+                    <input type="date" id="proximaInspecaoIntegridade" th:field="*{proximaInspecaoIntegridade}">
+                </div>
+
+                <div class="form-group">
+                    <label for="profissionalHabilitado">Profissional habilitado responsável</label>
+                    <input type="text" id="profissionalHabilitado" th:field="*{profissionalHabilitado}"
+                           maxlength="120" placeholder="Nome do responsável técnico">
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroArt">Número da ART</label>
+                    <input type="text" id="numeroArt" th:field="*{numeroArt}"
+                           maxlength="80" placeholder="Número da ART, se aplicável">
+                </div>
+
                 <div class="form-group flange-admin-field"
                      th:if="${ehAdmin}">
 
