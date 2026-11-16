@@ -54,6 +54,10 @@ public class Sensor {
     @Column(length = 1000)
     private String observacoes;
 
+    // Limite térmico definido pelo responsável técnico para este ponto monitorado.
+    @Column(name = "limite_temperatura_alerta")
+    private Double limiteTemperaturaAlerta;
+
     // Apenas o hash SHA-256 do token de hardware é persistido; o segredo puro é exibido uma única vez.
     @Column(name = "token_hardware_hash", length = 64)
     private String tokenHardwareHash;
@@ -122,6 +126,11 @@ public class Sensor {
 
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
+    public Double getLimiteTemperaturaAlerta() { return limiteTemperaturaAlerta; }
+    public void setLimiteTemperaturaAlerta(Double limiteTemperaturaAlerta) {
+        this.limiteTemperaturaAlerta = limiteTemperaturaAlerta;
+    }
 
     public String getTokenHardwareHash() { return tokenHardwareHash; }
     public void setTokenHardwareHash(String tokenHardwareHash) { this.tokenHardwareHash = tokenHardwareHash; }
