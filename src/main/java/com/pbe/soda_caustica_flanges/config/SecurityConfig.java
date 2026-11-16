@@ -126,6 +126,18 @@ public class SecurityConfig {
                         // Arquivos antigos na pasta static ficam restritos a ADMIN durante a migração.
                         .requestMatchers("/foto_flange/**").hasRole("ADMIN")
 
+                        // A consulta de alarmes é limitada à unidade pelo controller.
+                        .requestMatchers(HttpMethod.GET, "/alertas")
+                        .hasAnyRole("ADMIN", "USER")
+
+                        // USER e ADMIN podem reconhecer alertas acessíveis à própria unidade.
+                        .requestMatchers(HttpMethod.POST, "/alertas/*/reconhecer")
+                        .hasAnyRole("ADMIN", "USER")
+
+                        // Apenas ADMIN pode normalizar e restaurar o estado operacional da flange.
+                        .requestMatchers(HttpMethod.POST, "/alertas/*/normalizar")
+                        .hasRole("ADMIN")
+
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
 
