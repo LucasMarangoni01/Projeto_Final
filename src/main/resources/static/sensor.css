@@ -796,3 +796,102 @@
         width: 100%;
     }
 }
+
+
+/* Telemetria e credenciais individuais de hardware */
+.sensor-hardware-token {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1.2fr) auto;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 15px;
+    padding: 14px 16px;
+    border: 1px solid rgba(74,222,128,.28);
+    border-left: 3px solid #4ade80;
+    border-radius: 9px;
+    background: rgba(21,128,61,.13);
+}
+
+.sensor-hardware-token strong {
+    display: block;
+    color: #bbf7d0;
+    font-size: 12px;
+}
+
+.sensor-hardware-token p {
+    margin: 4px 0 0;
+    color: #d1fae5;
+    font-size: 10px;
+}
+
+.sensor-hardware-token small {
+    display: block;
+    margin-top: 5px;
+    color: #a7d7ba;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.sensor-hardware-token code {
+    display: block;
+    overflow-wrap: anywhere;
+    padding: 9px 11px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 6px;
+    background: rgba(0,0,0,.22);
+    color: #ecfdf5;
+    font: 10px var(--font-mono);
+    user-select: all;
+}
+
+.sensor-token-copy,
+.sensor-token-generate {
+    min-height: 31px;
+    padding: 7px 10px;
+    border: 1px solid rgba(96,165,250,.28);
+    border-radius: 6px;
+    background: rgba(59,130,246,.12);
+    color: #cfe3ff;
+    font: 700 9px var(--font-ui);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.sensor-token-copy:hover,
+.sensor-token-generate:hover {
+    background: rgba(59,130,246,.2);
+}
+
+.sensor-actions-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.sensor-token-generate {
+    min-height: 26px;
+    padding: 5px 8px;
+    border-color: rgba(244,196,95,.25);
+    background: rgba(244,196,95,.08);
+    color: #f5d78c;
+}
+
+.sensor-token-generate:hover {
+    background: rgba(244,196,95,.15);
+}
+
+#temperaturaLimitField[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    .sensor-hardware-token {
+        grid-template-columns: 1fr;
+    }
+
+    .sensor-token-copy {
+        width: 100%;
+    }
+}
