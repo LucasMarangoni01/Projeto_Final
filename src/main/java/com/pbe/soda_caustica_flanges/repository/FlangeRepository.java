@@ -11,9 +11,27 @@ import java.util.List;
 public interface FlangeRepository
         extends JpaRepository<Flange, Long> {
 
-    List<Flange> findByUnidadeId(Long unidadeId);
+    @Query("""
+        SELECT f FROM Flange f
+        WHERE (f.ativo = true OR f.ativo IS NULL)
+          AND f.unidade.id = :unidadeId
+        ORDER BY f.id ASC
+        """)
+    List<Flange> findAtivasPorUnidade(@Param("unidadeId") Long unidadeId);
 
-    List<Flange> findByUnidadeIdOrderByIdAsc(Long unidadeId);
+    @Query("""
+        SELECT f FROM Flange f
+        WHERE (f.ativo = true OR f.ativo IS NULL)
+        ORDER BY f.id ASC
+        """)
+    List<Flange> findAtivas();
+
+    @Query("""
+        SELECT f FROM Flange f
+        WHERE f.ativo = false
+        ORDER BY f.desativadaEm DESC
+        """)
+    List<Flange> findArquivadas();
 
     List<Flange> findByUnidadeIsNullOrderByIdAsc();
 
@@ -30,7 +48,7 @@ public interface FlangeRepository
     @Query("""
         SELECT f
         FROM Flange f
-        WHERE LOWER(f.nome_flange) LIKE LOWER(CONCAT('%', :termo, '%'))
+        WHERE LOWER(f.nomeFlange) LIKE LOWER(CONCAT('%', :termo, '%'))
            OR LOWER(f.localizacao) LIKE LOWER(CONCAT('%', :termo, '%'))
         """)
     List<Flange> buscarPorTermo(
@@ -43,7 +61,7 @@ public interface FlangeRepository
         FROM Flange f
         WHERE f.unidade.id = :unidadeId
           AND (
-                LOWER(f.nome_flange)
+                LOWER(f.nomeFlange)
                 LIKE LOWER(CONCAT('%', :termo, '%'))
                 OR LOWER(f.localizacao)
                 LIKE LOWER(CONCAT('%', :termo, '%'))
