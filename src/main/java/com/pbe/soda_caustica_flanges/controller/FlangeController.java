@@ -411,14 +411,8 @@ public class FlangeController {
             return "redirect:/flange/listagem?erro=motivo";
         }
 
-        if (incidenteRepository.existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull()) {
-            // A consulta abaixo verifica especificamente o ativo solicitado.
-            boolean possuiAlarmeAtivo = incidenteRepository
-                    .findTopByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(id)
-                    .isPresent();
-            if (possuiAlarmeAtivo) {
-                return "redirect:/flange/listagem?erro=alarme";
-            }
+        if (incidenteRepository.existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull(id)) {
+            return "redirect:/flange/listagem?erro=alarme";
         }
 
         flange.setAtivo(false);
