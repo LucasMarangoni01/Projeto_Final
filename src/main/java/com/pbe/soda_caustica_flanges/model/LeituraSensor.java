@@ -6,6 +6,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "leitura_sensor",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_leitura_codigo_mensagem",
+                columnNames = "codigo_mensagem"
+        ),
         indexes = {
                 @Index(name = "idx_leitura_sensor_data", columnList = "sensor_id, recebida_em"),
                 @Index(name = "idx_leitura_flange_data", columnList = "flange_id, recebida_em")
@@ -26,6 +30,9 @@ public class LeituraSensor {
 
     @Column(name = "recebida_em", nullable = false)
     private LocalDateTime recebidaEm;
+
+    @Column(name = "codigo_mensagem", nullable = false, length = 80)
+    private String codigoMensagem;
 
     @Column(name = "temperatura_celsius")
     private Double temperatura;
@@ -65,6 +72,8 @@ public class LeituraSensor {
     public void setFlange(Flange flange) { this.flange = flange; }
     public LocalDateTime getRecebidaEm() { return recebidaEm; }
     public void setRecebidaEm(LocalDateTime recebidaEm) { this.recebidaEm = recebidaEm; }
+    public String getCodigoMensagem() { return codigoMensagem; }
+    public void setCodigoMensagem(String codigoMensagem) { this.codigoMensagem = codigoMensagem; }
     public Double getTemperatura() { return temperatura; }
     public void setTemperatura(Double temperatura) { this.temperatura = temperatura; }
     public Double getPh() { return ph; }
