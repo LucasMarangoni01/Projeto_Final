@@ -135,7 +135,8 @@
                                 th:each="unidade : ${unidades}"
                                 th:value="${unidade.id}"
                                 th:text="${unidade.nome}"
-                                th:selected="${flange.unidade != null and flange.unidade.id == unidade.id}">
+                                th:selected="${flange.unidade != null and flange.unidade.id == unidade.id}"
+                                th:attr="data-localizacao=${unidade.localizacao}">
                         </option>
 
                     </select>
@@ -188,6 +189,7 @@
 </footer>
 
 <script th:src="@{/menu.js}"></script>
+<script th:src="@{/flange-form.js}" defer></script>
 
 </body>
 </html>
