@@ -19,6 +19,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     @EntityGraph(attributePaths = {"flange", "flange.unidade"})
     List<Sensor> findByFlange_IdIn(List<Long> flangeIds);
 
+    @EntityGraph(attributePaths = {"flange", "flange.unidade"})
     Optional<Sensor> findByCodigoIdentificacaoIgnoreCase(String codigoIdentificacao);
 
     boolean existsByCodigoIdentificacaoIgnoreCase(String codigoIdentificacao);
