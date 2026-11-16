@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,6 +64,23 @@ public class SensorController {
         } catch (IllegalArgumentException e) {
             prepararPagina(model, sensorDTO, null, e.getMessage());
             return "sensor/gestao";
+        }
+    }
+
+    @PostMapping("/token/{id}")
+    public String gerarToken(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            String token = sensorService.gerarTokenHardware(id);
+            Sensor sensor = sensorService.buscarPorId(id);
+            redirectAttributes.addFlashAttribute("tokenGerado", token);
+            redirectAttributes.addFlashAttribute("codigoSensorToken", sensor.getCodigoIdentificacao());
+            return "redirect:/sensores";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/sensores?erro=" + java.net.URLEncoder.encode(
+                    e.getMessage(), java.nio.charset.StandardCharsets.UTF_8
+            );
         }
     }
 
