@@ -125,7 +125,17 @@ public class FlangeController {
 
         Flange flange = new Flange();
 
+        // USER não escolhe a unidade: a localização vem da unidade já vinculada.
+        if (usuario.getRole() != Role.ADMIN && usuario.getUnidade() != null) {
+            flange.setLocalizacao(usuario.getUnidade().getLocalizacao());
+        }
+
         flange.setStatus(StatusFlange.NORMAL);
+
+        // Mostra a localização cadastrada na unidade atualmente vinculada.
+        if (flange.getUnidade() != null) {
+            flange.setLocalizacao(flange.getUnidade().getLocalizacao());
+        }
 
         model.addAttribute("flange", flange);
         model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
@@ -325,6 +335,8 @@ public class FlangeController {
             }
 
             flange.setUnidade(unidade);
+            // A localização da flange acompanha a localização oficial da unidade.
+            flange.setLocalizacao(unidade.getLocalizacao());
 
         } else {
 
@@ -338,9 +350,9 @@ public class FlangeController {
                 return "flange/cadastro";
             }
 
-            flange.setUnidade(
-                    usuario.getUnidade()
-            );
+            flange.setUnidade(usuario.getUnidade());
+            // Mantém o mesmo comportamento para USER, sem expor seleção de unidade.
+            flange.setLocalizacao(usuario.getUnidade().getLocalizacao());
         }
 
         try {
