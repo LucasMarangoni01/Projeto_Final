@@ -26,6 +26,19 @@ public interface FlangeRepository
         """)
     List<Flange> findAtivas();
 
+    /**
+     * Lista todas as flanges vinculadas à unidade, inclusive arquivadas.
+     * Usado na tela administrativa para permitir consultar/desvincular
+     * vínculos históricos sem reativar o ativo automaticamente.
+     */
+    @Query("""
+        SELECT f FROM Flange f
+        WHERE f.unidade.id = :unidadeId
+        ORDER BY f.id ASC
+        """)
+    List<Flange> findByUnidadeIdOrderByIdAsc(@Param("unidadeId") Long unidadeId);
+
+
     @Query("""
         SELECT f FROM Flange f
         WHERE f.ativo = false
