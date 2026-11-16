@@ -1110,10 +1110,14 @@
                     <text x="430" y="18" text-anchor="middle" font-size="9.5"
                           fill="#f59e0b" font-weight="700" letter-spacing="0.14em"
                           font-family="monospace">PLANTA BAIXA — PONTOS DE MONITORAMENTO NaOH 32%</text>
-                    <path d="M55 58 H805" stroke="rgba(59,130,246,.5)" stroke-width="8"
-                          stroke-linecap="round" fill="none"/>
-                    <path d="M55 58 H805" stroke="rgba(96,165,250,.28)" stroke-width="2"
-                          stroke-linecap="round" stroke-dasharray="12 8" fill="none"/>
+                    <g th:each="linha : ${#numbers.sequence(0, linhasMapa - 1)}">
+                        <path th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
+                              stroke="rgba(59,130,246,.5)" stroke-width="8"
+                              stroke-linecap="round" fill="none"/>
+                        <path th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
+                              stroke="rgba(96,165,250,.28)" stroke-width="2"
+                              stroke-linecap="round" stroke-dasharray="12 8" fill="none"/>
+                    </g>
                     <text x="430" y="44" text-anchor="middle" font-size="8"
                           fill="#60a5fa" font-family="monospace">LINHA / PONTOS CADASTRADOS</text>
 
