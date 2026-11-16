@@ -25,6 +25,7 @@ public class Funcionario {
 
     // Opcional para funcionários gerados automaticamente a partir de contas.
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "data_nascimento", nullable = true)
     private LocalDate data_nascimento;
 
     @ManyToOne(fetch = FetchType.LAZY)
