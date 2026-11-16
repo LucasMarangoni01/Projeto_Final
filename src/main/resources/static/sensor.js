@@ -21,6 +21,33 @@ document.addEventListener("DOMContentLoaded", function () {
         atualizarFinalidadeTipo();
     }
 
+    const statusSelect = document.getElementById("status");
+    const limiteField = document.getElementById("temperaturaLimitField");
+    const limiteInput = document.getElementById("limiteTemperaturaAlerta");
+
+    function atualizarCampoLimiteTermico() {
+        if (!tipoSelect || !statusSelect || !limiteField || !limiteInput) {
+            return;
+        }
+
+        const sensorTermico = tipoSelect.value === "TEMPERATURA_SUPERFICIE";
+        const instalado = statusSelect.value === "INSTALADO";
+        const exigirLimite = sensorTermico && instalado;
+
+        limiteField.hidden = !sensorTermico;
+        limiteInput.required = exigirLimite;
+
+        if (!sensorTermico) {
+            limiteInput.value = "";
+        }
+    }
+
+    if (tipoSelect && statusSelect) {
+        tipoSelect.addEventListener("change", atualizarCampoLimiteTermico);
+        statusSelect.addEventListener("change", atualizarCampoLimiteTermico);
+        atualizarCampoLimiteTermico();
+    }
+
     const campoBusca = document.getElementById("sensorSearch");
     const linhasSensores = Array.from(document.querySelectorAll("[data-sensor-row]"));
     const linhaSemResultado = document.getElementById("sensorSearchEmpty");
