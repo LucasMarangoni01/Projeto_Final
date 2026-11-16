@@ -27,6 +27,19 @@
         <span class="sensor-feedback-icon">✓</span>
         <span th:text="${sucesso == 'atualizado' ? 'Dados do sensor atualizados.' : 'Sensor cadastrado e associado à flange.'}">Operação concluída.</span>
     </div>
+    <section class="sensor-hardware-token" th:if="${tokenGerado != null}">
+        <div>
+            <strong>Token do dispositivo gerado</strong>
+            <p th:text="${'Sensor: ' + codigoSensorToken}">Sensor</p>
+            <small>Copie agora e configure no dispositivo. Por segurança, o token não será exibido novamente.</small>
+        </div>
+        <code id="hardwareTokenValue" th:text="${tokenGerado}">token-do-dispositivo</code>
+        <button type="button" class="sensor-token-copy"
+                onclick="navigator.clipboard.writeText(document.getElementById('hardwareTokenValue').textContent).then(() => this.textContent='Copiado').catch(() => this.textContent='Selecione e copie o token')">
+            Copiar token
+        </button>
+    </section>
+
     <div class="sensor-feedback sensor-feedback-error" th:if="${erro != null}">
         <span class="sensor-feedback-icon">!</span>
         <span th:text="${erro}">Não foi possível concluir a operação.</span>
@@ -126,6 +139,15 @@
                         </select>
                         <small>“Instalado” registra a condição informada pela equipe; não representa conexão ou leitura em tempo real.</small>
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
+                    </div>
+
+                    <div class="sensor-field sensor-field-wide" id="temperaturaLimitField">
+                        <label for="limiteTemperaturaAlerta">Limite térmico para alerta (°C)</label>
+                        <input id="limiteTemperaturaAlerta" type="number" step="0.1"
+                               min="-100" max="400" th:field="*{limiteTemperaturaAlerta}"
+                               placeholder="Definido pelo responsável técnico">
+                        <small>Obrigatório para sensor térmico instalado. Informe o limite aprovado para este ponto e processo; não existe valor universal predefinido.</small>
+                        <span class="sensor-field-error" th:if="${#fields.hasErrors('limiteTemperaturaAlerta')}" th:errors="*{limiteTemperaturaAlerta}"></span>
                     </div>
 
                     <div class="sensor-field">
@@ -254,8 +276,13 @@
                               th:text="${'Até ' + #temporals.format(sensor.proximaCalibracao, 'dd/MM/yyyy')}">Data</span>
                         <span class="sensor-calibration-missing" th:if="${sensor.proximaCalibracao == null}">Não informada</span>
                     </td>
-                    <td>
+                    <td class="sensor-actions-cell">
                         <a class="sensor-edit-link" th:href="@{/sensores/editar/{id}(id=${sensor.id})}">Editar</a>
+                        <form th:if="${sensor.status.name() == 'INSTALADO' and sensor.flange.ativo}"
+                              th:action="@{/sensores/token/{id}(id=${sensor.id})}" method="post"
+                              onsubmit="return confirm('Gerar um novo token? O token anterior será invalidado imediatamente.');">
+                            <button type="submit" class="sensor-token-generate">Gerar token</button>
+                        </form>
                     </td>
                 </tr>
                 <tr id="sensorSearchEmpty" hidden>
