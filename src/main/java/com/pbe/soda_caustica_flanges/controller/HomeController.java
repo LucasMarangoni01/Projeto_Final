@@ -189,6 +189,7 @@ public class HomeController {
         model.addAttribute("totalSensoresInstalados", totalSensoresInstalados);
         model.addAttribute("flangesSemSensor", flangesSemSensor);
         model.addAttribute("totalAlertasAtivos", alarmesAtivos.size());
+        model.addAttribute("leiturasRecentes", leituras.stream().limit(10).toList());
         model.addAttribute("ehAdmin", admin);
         model.addAttribute("nomeUnidade", usuario.getUnidade() == null
                 ? "Todas as unidades"
