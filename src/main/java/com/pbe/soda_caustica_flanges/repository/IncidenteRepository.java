@@ -16,8 +16,7 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     List<Incidente> findByAnoOrderByMesAsc(Integer ano);
 
     // Retorna o mês com mais incidentes de um ano
-    @Query("SELECT i FROM Incidente i WHERE i.ano = :ano ORDER BY i.quantidade DESC LIMIT 1")
-    Incidente findPicoByAno(@Param("ano") Integer ano);
+    Incidente findFirstByAnoOrderByQuantidadeDesc(Integer ano);
 
     // Total de incidentes de um ano
     @Query("SELECT SUM(i.quantidade) FROM Incidente i WHERE i.ano = :ano")
@@ -28,6 +27,12 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     );
 
     List<Incidente> findByDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc();
+
+    List<Incidente> findByDataHoraIsNotNullOrderByDataHoraDesc();
+
+    List<Incidente> findByFlange_Unidade_IdAndDataHoraIsNotNullOrderByDataHoraDesc(
+            Long unidadeId
+    );
 
     List<Incidente> findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(
             Long unidadeId
