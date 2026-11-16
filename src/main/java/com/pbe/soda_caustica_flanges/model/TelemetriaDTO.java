@@ -3,45 +3,40 @@ package com.pbe.soda_caustica_flanges.model;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class TelemetriaDTO {
 
-    @NotBlank(message = "O código do sensor é obrigatório.")
-    @Size(max = 60)
-    private String codigoSensor;
+    @NotBlank(message = "O token do dispositivo é obrigatório.")
+    @Size(max = 128)
+    private String token;
 
-    @DecimalMin(value = "-100.0")
-    @DecimalMax(value = "400.0")
-    private Double temperatura;
+    @NotBlank(message = "O identificador da mensagem é obrigatório.")
+    @Pattern(regexp = "^[A-Za-z0-9_-]{8,80}$",
+            message = "O identificador da mensagem precisa ter de 8 a 80 caracteres.")
+    private String idMensagem;
 
-    @DecimalMin(value = "0.0")
-    @DecimalMax(value = "14.0")
-    private Double ph;
+    @NotNull(message = "A leitura de temperatura é obrigatória.")
+    @DecimalMin(value = "-100.0", message = "Temperatura abaixo da faixa suportada.")
+    @DecimalMax(value = "400.0", message = "Temperatura acima da faixa suportada.")
+    private Double temperaturaC;
 
-    @DecimalMin(value = "0.0")
-    private Double condutividade;
-
-    @DecimalMin(value = "0.0")
-    private Double pressaoDiferencial;
-
+    // Pode ser enviado pelo firmware quando a própria lógica local detectar a condição.
     private Boolean vazamentoDetectado;
 
-    public String getCodigoSensor() { return codigoSensor; }
-    public void setCodigoSensor(String codigoSensor) { this.codigoSensor = codigoSensor; }
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 
-    public Double getTemperatura() { return temperatura; }
-    public void setTemperatura(Double temperatura) { this.temperatura = temperatura; }
+    public String getIdMensagem() { return idMensagem; }
+    public void setIdMensagem(String idMensagem) { this.idMensagem = idMensagem; }
 
-    public Double getPh() { return ph; }
-    public void setPh(Double ph) { this.ph = ph; }
-
-    public Double getCondutividade() { return condutividade; }
-    public void setCondutividade(Double condutividade) { this.condutividade = condutividade; }
-
-    public Double getPressaoDiferencial() { return pressaoDiferencial; }
-    public void setPressaoDiferencial(Double pressaoDiferencial) { this.pressaoDiferencial = pressaoDiferencial; }
+    public Double getTemperaturaC() { return temperaturaC; }
+    public void setTemperaturaC(Double temperaturaC) { this.temperaturaC = temperaturaC; }
 
     public Boolean getVazamentoDetectado() { return vazamentoDetectado; }
-    public void setVazamentoDetectado(Boolean vazamentoDetectado) { this.vazamentoDetectado = vazamentoDetectado; }
+    public void setVazamentoDetectado(Boolean vazamentoDetectado) {
+        this.vazamentoDetectado = vazamentoDetectado;
+    }
 }
