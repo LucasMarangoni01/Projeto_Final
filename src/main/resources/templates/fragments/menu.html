@@ -29,6 +29,10 @@
                         <a class="nav-link" th:href="@{/flange/listagem}">Flanges</a>
                     </li>
 
+                    <li>
+                        <a class="nav-link" th:href="@{/alertas}">Alertas</a>
+                    </li>
+
                     <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
                         <a class="nav-link" th:href="@{/sensores}">Sensores</a>
                     </li>
@@ -137,6 +141,7 @@
 
                         <a th:href="@{/}" class="mobile-menu-link">Início</a>
                         <a th:href="@{/flange/listagem}" class="mobile-menu-link">Flanges</a>
+                        <a th:href="@{/alertas}" class="mobile-menu-link">Alertas e ocorrências</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/sensores}" class="mobile-menu-link">Sensores</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
