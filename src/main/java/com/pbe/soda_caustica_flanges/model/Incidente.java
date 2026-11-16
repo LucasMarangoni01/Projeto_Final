@@ -69,6 +69,10 @@ public class Incidente {
     @Column(name = "status_alarme", length = 30)
     private StatusAlarme statusAlarme;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_flange_anterior", length = 30)
+    private StatusFlange statusFlangeAnterior;
+
     @Column(name = "reconhecido_em")
     private LocalDateTime reconhecidoEm;
 
@@ -134,6 +138,11 @@ public class Incidente {
 
     public StatusAlarme getStatusAlarme() { return statusAlarme; }
     public void setStatusAlarme(StatusAlarme statusAlarme) { this.statusAlarme = statusAlarme; }
+
+    public StatusFlange getStatusFlangeAnterior() { return statusFlangeAnterior; }
+    public void setStatusFlangeAnterior(StatusFlange statusFlangeAnterior) {
+        this.statusFlangeAnterior = statusFlangeAnterior;
+    }
 
     public LocalDateTime getReconhecidoEm() { return reconhecidoEm; }
     public void setReconhecidoEm(LocalDateTime reconhecidoEm) { this.reconhecidoEm = reconhecidoEm; }
