@@ -327,7 +327,7 @@ public class ManutencaoController {
         } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             flanges = Collections.emptyList();
         } else {
-            flanges = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
+            flanges = flangeRepository.findAtivasPorUnidade(usuario.getUnidade().getId());
         }
 
         List<Funcionario> funcionarios = listarFuncionariosPermitidos(usuario);
