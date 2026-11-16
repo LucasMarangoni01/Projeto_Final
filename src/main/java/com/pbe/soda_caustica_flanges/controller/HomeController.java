@@ -1,13 +1,9 @@
 package com.pbe.soda_caustica_flanges.controller;
 
-import com.pbe.soda_caustica_flanges.model.DashboardFlangeDTO;
-import com.pbe.soda_caustica_flanges.model.Flange;
-import com.pbe.soda_caustica_flanges.model.Role;
-import com.pbe.soda_caustica_flanges.model.StatusFlange;
-import com.pbe.soda_caustica_flanges.model.Sensor;
-import com.pbe.soda_caustica_flanges.model.StatusSensor;
-import com.pbe.soda_caustica_flanges.model.Usuario;
+import com.pbe.soda_caustica_flanges.model.*;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
+import com.pbe.soda_caustica_flanges.repository.IncidenteRepository;
+import com.pbe.soda_caustica_flanges.repository.LeituraSensorRepository;
 import com.pbe.soda_caustica_flanges.repository.SensorRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
@@ -17,11 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.joining;
 
 @Controller
@@ -31,19 +25,29 @@ public class HomeController {
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final int POSICOES_VISUAIS = 6;
+    private static final DateTimeFormatter FORMATO_LEITURA =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private static final int COLUNAS_MAPA = 4;
+    private static final double[] POSICOES_X = {110, 325, 540, 755};
 
     private final FlangeRepository flangeRepository;
     private final SensorRepository sensorRepository;
     private final UsuarioRepository usuarioRepository;
+    private final LeituraSensorRepository leituraSensorRepository;
+    private final IncidenteRepository incidenteRepository;
 
     public HomeController(
             FlangeRepository flangeRepository,
             SensorRepository sensorRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            LeituraSensorRepository leituraSensorRepository,
+            IncidenteRepository incidenteRepository) {
         this.flangeRepository = flangeRepository;
         this.sensorRepository = sensorRepository;
         this.usuarioRepository = usuarioRepository;
+        this.leituraSensorRepository = leituraSensorRepository;
+        this.incidenteRepository = incidenteRepository;
     }
 
     @GetMapping
@@ -51,17 +55,17 @@ public class HomeController {
         Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
                 .orElseThrow();
 
+        boolean admin = usuario.getRole() == Role.ADMIN;
         List<Flange> registros;
 
-        if (usuario.getRole() == Role.ADMIN) {
-            registros = flangeRepository.findAll();
+        if (admin) {
+            registros = flangeRepository.findAtivas();
         } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             registros = new ArrayList<>();
         } else {
-            registros = flangeRepository.findByUnidadeId(usuario.getUnidade().getId());
+            registros = flangeRepository.findAtivasPorUnidade(usuario.getUnidade().getId());
         }
 
-        // Ordem estável: as seis primeiras flanges ocupam as seis posições do desenho.
         registros.sort(Comparator.comparing(
                 Flange::getId,
                 Comparator.nullsLast(Comparator.naturalOrder())
@@ -69,6 +73,7 @@ public class HomeController {
 
         List<Long> idsFlanges = registros.stream()
                 .map(Flange::getId)
+                .filter(Objects::nonNull)
                 .toList();
 
         List<Sensor> sensoresDoPainel = idsFlanges.isEmpty()
@@ -76,13 +81,41 @@ public class HomeController {
                 : sensorRepository.findByFlange_IdIn(idsFlanges);
 
         Map<Long, List<Sensor>> sensoresPorFlange = sensoresDoPainel.stream()
+                .filter(sensor -> sensor.getFlange() != null)
                 .collect(Collectors.groupingBy(sensor -> sensor.getFlange().getId()));
+
+        List<LeituraSensor> leituras = idsFlanges.isEmpty()
+                ? List.of()
+                : leituraSensorRepository.findByFlange_IdInOrderByRecebidaEmDesc(idsFlanges);
+
+        // A consulta vem ordenada da mais recente para a mais antiga.
+        Map<Long, LeituraSensor> ultimaLeituraPorFlange = new HashMap<>();
+        for (LeituraSensor leitura : leituras) {
+            if (leitura.getFlange() != null) {
+                ultimaLeituraPorFlange.putIfAbsent(leitura.getFlange().getId(), leitura);
+            }
+        }
+
+        List<Incidente> alarmesAtivos = admin
+                ? incidenteRepository.findByDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc()
+                : usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
+                    ? List.of()
+                    : incidenteRepository.findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(
+                            usuario.getUnidade().getId()
+                    );
+
+        Set<Long> flangeComAlarme = alarmesAtivos.stream()
+                .filter(incidente -> incidente.getFlange() != null)
+                .map(incidente -> incidente.getFlange().getId())
+                .collect(Collectors.toSet());
+
+        int linhasMapa = Math.max(1, (int) Math.ceil(registros.size() / (double) COLUNAS_MAPA));
+        int alturaMapa = 145 + (linhasMapa - 1) * 110;
 
         List<DashboardFlangeDTO> flanges = new ArrayList<>();
 
         for (int i = 0; i < registros.size(); i++) {
             Flange flange = registros.get(i);
-            StatusFlange status = flange.getStatus();
             List<Sensor> sensoresDaFlange = sensoresPorFlange.getOrDefault(flange.getId(), List.of());
 
             int sensoresInstalados = (int) sensoresDaFlange.stream()
@@ -91,33 +124,48 @@ public class HomeController {
 
             String tiposSensores = sensoresDaFlange.stream()
                     .map(Sensor::getTipo)
-                    .filter(tipo -> tipo != null)
-                    .map(tipo -> tipo.getDescricao())
+                    .filter(Objects::nonNull)
+                    .map(TipoSensor::getDescricao)
                     .distinct()
                     .collect(joining(", "));
 
+            LeituraSensor ultimaLeitura = ultimaLeituraPorFlange.get(flange.getId());
+
+            int coluna = i % COLUNAS_MAPA;
+            int linha = i / COLUNAS_MAPA;
+
+            // Coordenadas informadas no cadastro prevalecem. Quando ausentes,
+            // o sistema organiza todos os ativos automaticamente em uma grade.
+            double mapaX = flange.getCoordenadaX() == null
+                    ? POSICOES_X[coluna]
+                    : 60 + (flange.getCoordenadaX() / 100.0) * 740;
+
+            double mapaY = flange.getCoordenadaY() == null
+                    ? 72 + linha * 110
+                    : 55 + (flange.getCoordenadaY() / 100.0) * (alturaMapa - 110);
+
             flanges.add(new DashboardFlangeDTO(
-                    i < POSICOES_VISUAIS ? i + 1 : 0,
+                    i + 1,
                     flange.getId(),
-                    flange.getNome_flange(),
+                    flange.getNomeFlange(),
                     flange.getLocalizacao(),
-                    flange.getTemp_ambiente(),
-                    flange.getData_entrada() == null
-                            ? "—"
-                            : flange.getData_entrada().format(FORMATO_DATA),
-                    status == null ? StatusFlange.NORMAL.name() : status.name(),
+                    flange.getTempAmbiente(),
+                    flange.getDataEntrada() == null ? "—" : flange.getDataEntrada().format(FORMATO_DATA),
+                    flange.getStatus().name(),
                     flange.getFoto(),
                     sensoresDaFlange.size(),
                     sensoresInstalados,
-                    tiposSensores
+                    tiposSensores,
+                    mapaX,
+                    mapaY,
+                    ultimaLeitura == null ? null : ultimaLeitura.getTemperatura(),
+                    ultimaLeitura == null || ultimaLeitura.getRecebidaEm() == null
+                            ? null
+                            : ultimaLeitura.getRecebidaEm().format(FORMATO_LEITURA),
+                    flangeComAlarme.contains(flange.getId())
             ));
         }
 
-        List<DashboardFlangeDTO> flangesMapa = flanges.stream()
-                .filter(flange -> flange.posicao() > 0)
-                .toList();
-
-        // Os indicadores abaixo vêm do status salvo no banco, não da simulação visual.
         long totalNormais = contarStatus(flanges, StatusFlange.NORMAL);
         long totalAtencao = contarStatus(flanges, StatusFlange.ATENCAO);
         long totalCriticas = contarStatus(flanges, StatusFlange.CRITICO);
@@ -126,11 +174,12 @@ public class HomeController {
                 .filter(sensor -> sensor.getStatus() == StatusSensor.INSTALADO)
                 .count();
         long flangesSemSensor = flanges.stream()
-                .filter(flange -> flange.sensoresInstalados() == 0)
+                .filter(flange -> flange.totalSensores() == 0)
                 .count();
 
         model.addAttribute("flanges", flanges);
-        model.addAttribute("flangesMapa", flangesMapa);
+        model.addAttribute("flangesMapa", flanges);
+        model.addAttribute("alturaMapa", alturaMapa);
         model.addAttribute("totalFlanges", flanges.size());
         model.addAttribute("totalNormais", totalNormais);
         model.addAttribute("totalAtencao", totalAtencao);
@@ -139,7 +188,8 @@ public class HomeController {
         model.addAttribute("totalSensores", sensoresDoPainel.size());
         model.addAttribute("totalSensoresInstalados", totalSensoresInstalados);
         model.addAttribute("flangesSemSensor", flangesSemSensor);
-        model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
+        model.addAttribute("totalAlertasAtivos", alarmesAtivos.size());
+        model.addAttribute("ehAdmin", admin);
         model.addAttribute("nomeUnidade", usuario.getUnidade() == null
                 ? "Todas as unidades"
                 : usuario.getUnidade().getNome());
