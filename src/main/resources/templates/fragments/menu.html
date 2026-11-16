@@ -49,6 +49,8 @@
                         <a class="nav-link" th:href="@{/manutencao/listagem}">Manutenções</a>
                     </li>
 
+                    <li><a class="nav-link" th:href="@{/guia}">Guia</a></li>
+
                     <li>
                         <a class="nav-link nav-link-primary" th:href="@{/manutencao/cadastro}">
                             Registrar manutenção
@@ -148,6 +150,7 @@
                            th:href="@{/analises}" class="mobile-menu-link">Análises</a>
                         <a th:href="@{/funcionario/listagem}" class="mobile-menu-link">Funcionários</a>
                         <a th:href="@{/manutencao/listagem}" class="mobile-menu-link">Manutenções</a>
+                        <a th:href="@{/guia}" class="mobile-menu-link">Guia</a>
                         <a th:href="@{/manutencao/cadastro}" class="mobile-menu-link">Registrar manutenção</a>
 
                         <div th:if="${usuarioLogado.role.name() == 'ADMIN'}">
