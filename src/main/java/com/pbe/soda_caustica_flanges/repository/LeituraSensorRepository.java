@@ -4,6 +4,8 @@ import com.pbe.soda_caustica_flanges.model.LeituraSensor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.List;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 public interface LeituraSensorRepository extends JpaRepository<LeituraSensor, Long> {
 
@@ -12,4 +14,7 @@ public interface LeituraSensorRepository extends JpaRepository<LeituraSensor, Lo
     Optional<LeituraSensor> findTopByFlange_IdOrderByRecebidaEmDesc(Long flangeId);
 
     boolean existsByCodigoMensagem(String codigoMensagem);
+
+    @EntityGraph(attributePaths = {"sensor", "flange"})
+    List<LeituraSensor> findByFlange_IdInOrderByRecebidaEmDesc(List<Long> flangeIds);
 }
