@@ -464,3 +464,125 @@
         min-width: 1080px;
     }
 }
+
+
+/* =========================================================
+   ARQUIVAMENTO DE MANUTENÇÕES · RASTREABILIDADE
+========================================================= */
+
+.maintenance-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.maintenance-archive-filter {
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border: 1px solid rgba(147,197,253,.23);
+    border-radius: 7px;
+    background: rgba(255,255,255,.055);
+    color: #d5e7ff;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .18s ease;
+}
+
+.maintenance-archive-filter:hover {
+    border-color: rgba(147,197,253,.45);
+    background: rgba(255,255,255,.1);
+}
+
+.maintenance-success {
+    margin: 0 auto 14px;
+    padding: 11px 14px;
+    border: 1px solid rgba(74,222,128,.26);
+    border-left: 3px solid #4ade80;
+    border-radius: 8px;
+    background: rgba(21,128,61,.14);
+    color: #bbf7d0;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.maintenance-row-archived td {
+    background: #263352 !important;
+    color: #c0ccdc !important;
+}
+
+.maintenance-row-archived:hover td {
+    background: #2d3c5c !important;
+}
+
+.maintenance-row-archived .maintenance-activity-cell strong {
+    color: #e0e8f3;
+}
+
+.maintenance-archive-reason {
+    max-width: 240px;
+    color: #f2d8a3 !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.maintenance-archive-form {
+    width: 100%;
+    margin: 0;
+}
+
+.maintenance-archive-button,
+.maintenance-restore-button {
+    width: 100%;
+    min-height: 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 6px;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
+}
+
+.maintenance-archive-button {
+    border: 1px solid rgba(251,191,36,.27);
+    background: rgba(245,158,11,.10);
+    color: #fde68a;
+}
+
+.maintenance-archive-button:hover {
+    border-color: rgba(251,191,36,.48);
+    background: rgba(245,158,11,.19);
+}
+
+.maintenance-restore-button {
+    border: 1px solid rgba(74,222,128,.27);
+    background: rgba(34,197,94,.10);
+    color: #bbf7d0;
+}
+
+.maintenance-restore-button:hover {
+    border-color: rgba(74,222,128,.48);
+    background: rgba(34,197,94,.18);
+}
+
+@media (max-width: 768px) {
+    .maintenance-header-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .maintenance-header-actions > a {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
