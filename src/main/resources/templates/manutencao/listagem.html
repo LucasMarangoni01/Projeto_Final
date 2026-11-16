@@ -23,19 +23,35 @@
             <p>O autor do lançamento e o funcionário executor são identificados separadamente.</p>
         </div>
 
-        <a th:href="@{/manutencao/cadastro}" class="btn btn-primary maintenance-new-button">
-            + Registrar manutenção
-        </a>
+        <div class="maintenance-header-actions">
+            <a th:if="${ehAdmin and !mostrarArquivadas}"
+               th:href="@{/manutencao/listagem(arquivadas=true)}"
+               class="maintenance-archive-filter">
+                Ver arquivadas
+            </a>
+            <a th:if="${ehAdmin and mostrarArquivadas}"
+               th:href="@{/manutencao/listagem}"
+               class="maintenance-archive-filter">
+                Ver ativas
+            </a>
+            <a th:if="${!mostrarArquivadas}"
+               th:href="@{/manutencao/cadastro}"
+               class="btn btn-primary maintenance-new-button">
+                + Registrar manutenção
+            </a>
+        </div>
     </header>
 
     <div class="maintenance-feedback" th:if="${erro != null}" th:text="${erro}"></div>
+    <div class="maintenance-success" th:if="${mensagemSucesso != null}" th:text="${mensagemSucesso}"></div>
 
     <section class="card maintenance-card">
         <div class="maintenance-card-heading">
             <div>
                 <span class="maintenance-kicker">RASTREABILIDADE OPERACIONAL</span>
-                <h2>Histórico de manutenções</h2>
+                <h2 th:text="${mostrarArquivadas ? 'Manutenções arquivadas' : 'Histórico de manutenções'}">Histórico de manutenções</h2>
                 <p th:text="${#lists.size(manutencoes) + ' registro(s) encontrado(s).'}">0 registros encontrados.</p>
+                <p th:if="${mostrarArquivadas}">Consulta administrativa. Os registros estão preservados e não participam da listagem operacional ativa.</p>
             </div>
             <div class="maintenance-heading-note">
                 <span class="maintenance-heading-dot"></span>
@@ -72,7 +88,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="maintenance-row" th:each="manutencao : ${manutencoes}">
+                <tr class="maintenance-row"
+                    th:classappend="${manutencao.arquivada ? ' maintenance-row-archived' : ''}"
+                    th:each="manutencao : ${manutencoes}">
                     <td class="maintenance-id" th:text="${'#' + manutencao.id}">#1</td>
 
                     <td class="maintenance-activity-cell">
@@ -117,22 +135,41 @@
                         <small th:text="${manutencao.registradoEm != null ? #temporals.format(manutencao.registradoEm, 'dd/MM/yy HH:mm') : 'Data não registrada'}">
                             Data
                         </small>
+                        <small th:if="${mostrarArquivadas}"
+                               th:text="${'Arquivada em: ' + (manutencao.arquivadaEm != null ? #temporals.format(manutencao.arquivadaEm, 'dd/MM/yy HH:mm') : 'Data não registrada')}">
+                            Data do arquivamento
+                        </small>
+                        <small th:if="${mostrarArquivadas}"
+                               th:text="${'Por: ' + (manutencao.arquivadaPorEmail != null ? manutencao.arquivadaPorEmail : 'Não identificado')}">
+                            Responsável pelo arquivamento
+                        </small>
+                        <small class="maintenance-archive-reason"
+                               th:if="${mostrarArquivadas}"
+                               th:text="${'Motivo: ' + (manutencao.motivoArquivamento != null ? manutencao.motivoArquivamento : 'Não informado')}">
+                            Motivo do arquivamento
+                        </small>
                     </td>
 
                     <td class="maintenance-actions">
-                        <a th:if="${ehAdmin or (manutencao.registradoPorEmail != null and manutencao.registradoPorEmail == usuarioLogado.email)}"
+                        <a th:if="${!mostrarArquivadas and (ehAdmin or (manutencao.registradoPorEmail != null and manutencao.registradoPorEmail == usuarioLogado.email))}"
                            th:href="@{/manutencao/alterar/{id}(id=${manutencao.id})}"
                            class="maintenance-edit-button">Editar</a>
 
-                        <form th:if="${ehAdmin}"
-                              th:action="@{/manutencao/excluir/{id}(id=${manutencao.id})}"
+                        <form th:if="${ehAdmin and !mostrarArquivadas}"
+                              th:action="@{/manutencao/arquivar/{id}(id=${manutencao.id})}"
                               method="post"
-                              class="maintenance-delete-form">
-                            <button type="submit"
-                                    class="maintenance-delete-button"
-                                    onclick="return confirm('Excluir definitivamente este registro de manutenção?')">
-                                Excluir
-                            </button>
+                              class="maintenance-archive-form"
+                              onsubmit="const motivo = prompt('Informe o motivo do arquivamento (obrigatório):'); if (motivo === null || !motivo.trim() || motivo.trim().length > 500) return false; this.querySelector('[name=motivo]').value = motivo.trim(); return confirm('Arquivar esta manutenção? O histórico será preservado.');">
+                            <input type="hidden" name="motivo">
+                            <button type="submit" class="maintenance-archive-button">Arquivar</button>
+                        </form>
+
+                        <form th:if="${ehAdmin and mostrarArquivadas}"
+                              th:action="@{/manutencao/restaurar/{id}(id=${manutencao.id})}"
+                              method="post"
+                              class="maintenance-archive-form"
+                              onsubmit="return confirm('Restaurar esta manutenção para a listagem ativa?');">
+                            <button type="submit" class="maintenance-restore-button">Restaurar</button>
                         </form>
 
                         <span th:if="${!ehAdmin and (manutencao.registradoPorEmail == null or manutencao.registradoPorEmail != usuarioLogado.email)}"
@@ -153,8 +190,11 @@
         <p class="maintenance-permission-note" th:if="${!ehAdmin}">
             Você pode editar os lançamentos criados pela sua própria conta. Somente o ADMIN pode colocar uma atividade como “Em andamento”.
         </p>
-        <p class="maintenance-permission-note" th:if="${ehAdmin}">
-            O ADMIN pode consultar e editar os registros de todas as unidades, além de atualizar o andamento das atividades.
+        <p class="maintenance-permission-note" th:if="${ehAdmin and !mostrarArquivadas}">
+            O ADMIN pode editar registros de todas as unidades e arquivar lançamentos com justificativa. O arquivamento não remove o registro nem seus vínculos históricos.
+        </p>
+        <p class="maintenance-permission-note" th:if="${ehAdmin and mostrarArquivadas}">
+            Os registros arquivados permanecem disponíveis para consulta. A restauração devolve o registro à listagem ativa.
         </p>
     </section>
 </main>
