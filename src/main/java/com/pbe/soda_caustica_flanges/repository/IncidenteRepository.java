@@ -34,4 +34,9 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     );
 
     boolean existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull();
+
+    boolean existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullAndIdNot(
+            Long flangeId,
+            Long incidenteId
+    );
 }
