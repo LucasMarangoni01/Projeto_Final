@@ -6,6 +6,7 @@ import com.pbe.soda_caustica_flanges.model.StatusFlange;
 import com.pbe.soda_caustica_flanges.model.Unidade;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
+import com.pbe.soda_caustica_flanges.repository.IncidenteRepository;
 import com.pbe.soda_caustica_flanges.repository.ManutencaoRepository;
 import com.pbe.soda_caustica_flanges.repository.SensorRepository;
 import com.pbe.soda_caustica_flanges.repository.UnidadeRepository;
@@ -31,6 +32,7 @@ public class FlangeController {
     private final UnidadeRepository unidadeRepository;
     private final ManutencaoRepository manutencaoRepository;
     private final SensorRepository sensorRepository;
+    private final IncidenteRepository incidenteRepository;
     private final FotoFlangeService fotoFlangeService;
 
     public FlangeController(
@@ -39,12 +41,14 @@ public class FlangeController {
             UnidadeRepository unidadeRepository,
             ManutencaoRepository manutencaoRepository,
             SensorRepository sensorRepository,
+            IncidenteRepository incidenteRepository,
             FotoFlangeService fotoFlangeService) {
         this.flangeRepository = flangeRepository;
         this.usuarioRepository = usuarioRepository;
         this.unidadeRepository = unidadeRepository;
         this.manutencaoRepository = manutencaoRepository;
         this.sensorRepository = sensorRepository;
+        this.incidenteRepository = incidenteRepository;
         this.fotoFlangeService = fotoFlangeService;
     }
 
@@ -88,40 +92,24 @@ public class FlangeController {
     @GetMapping("/flange/listagem")
     public String listagem(
             Model model,
-            Authentication authentication) {
+            Authentication authentication,
+            @RequestParam(value = "arquivadas", defaultValue = "false") boolean arquivadas) {
 
-        Usuario usuario =
-                usuarioRepository.findByEmail(
-                        authentication.getName()
-                ).orElseThrow();
+        Usuario usuario = usuarioRepository.findByEmail(authentication.getName()).orElseThrow();
+        boolean mostrarArquivadas = usuario.getRole() == Role.ADMIN && arquivadas;
 
-        if (usuario.getRole() == Role.ADMIN) {
-
-            model.addAttribute(
-                    "flanges",
-                    flangeRepository.findAll()
-            );
-
+        if (mostrarArquivadas) {
+            model.addAttribute("flanges", flangeRepository.findArquivadas());
+        } else if (usuario.getRole() == Role.ADMIN) {
+            model.addAttribute("flanges", flangeRepository.findAtivas());
+        } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
+            model.addAttribute("flanges", java.util.Collections.emptyList());
         } else {
-
-            if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
-
-                model.addAttribute(
-                        "flanges",
-                        java.util.Collections.emptyList()
-                );
-
-            } else {
-
-                model.addAttribute(
-                        "flanges",
-                        flangeRepository.findByUnidadeId(
-                                usuario.getUnidade().getId()
-                        )
-                );
-            }
+            model.addAttribute("flanges", flangeRepository.findAtivasPorUnidade(usuario.getUnidade().getId()));
         }
 
+        model.addAttribute("mostrarArquivadas", mostrarArquivadas);
+        model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
         return "flange/listagem";
     }
 
@@ -139,15 +127,9 @@ public class FlangeController {
 
         flange.setStatus(StatusFlange.NORMAL);
 
-        model.addAttribute(
-                "flange",
-                flange
-        );
-
-        model.addAttribute(
-                "ehAdmin",
-                usuario.getRole() == Role.ADMIN
-        );
+        model.addAttribute("flange", flange);
+        model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
+        adicionarOpcoesTecnicas(model);
 
         if (usuario.getRole() == Role.ADMIN) {
 
@@ -182,27 +164,20 @@ public class FlangeController {
                                 )
                         );
 
+        if (!flange.isAtivo()) {
+            return "redirect:/flange/listagem?erro=arquivada";
+        }
+
         if (usuario.getRole() != Role.ADMIN) {
-
-            if (usuario.getUnidade() == null ||
-                    flange.getUnidade() == null ||
-                    !flange.getUnidade()
-                            .getId()
-                            .equals(usuario.getUnidade().getId())) {
-
+            if (usuario.getUnidade() == null || flange.getUnidade() == null
+                    || !flange.getUnidade().getId().equals(usuario.getUnidade().getId())) {
                 return "redirect:/flange/listagem";
             }
         }
 
-        model.addAttribute(
-                "flange",
-                flange
-        );
-
-        model.addAttribute(
-                "ehAdmin",
-                usuario.getRole() == Role.ADMIN
-        );
+        model.addAttribute("flange", flange);
+        model.addAttribute("ehAdmin", usuario.getRole() == Role.ADMIN);
+        adicionarOpcoesTecnicas(model);
 
         if (usuario.getRole() == Role.ADMIN) {
 
@@ -244,6 +219,7 @@ public class FlangeController {
                     "ehAdmin",
                     usuario.getRole() == Role.ADMIN
             );
+            adicionarOpcoesTecnicas(model);
 
             if (usuario.getRole() == Role.ADMIN) {
 
@@ -270,6 +246,10 @@ public class FlangeController {
 
             if (flangeExistente == null) {
                 return "redirect:/flange/listagem";
+            }
+
+            if (!flangeExistente.isAtivo()) {
+                return "redirect:/flange/listagem?erro=arquivada";
             }
 
             if (usuario.getRole() != Role.ADMIN) {
@@ -373,6 +353,9 @@ public class FlangeController {
 
             if (flangeExistente != null) {
                 flange.setStatus(flangeExistente.getStatus());
+                flange.setAtivo(flangeExistente.isAtivo());
+            } else {
+                flange.setAtivo(true);
             }
 
         } catch (IOException | IllegalArgumentException e) {
@@ -407,46 +390,76 @@ public class FlangeController {
         return "redirect:/flange/listagem";
     }
 
-    @PostMapping("/flange/excluir/{id}")
-    public String excluir(
+    @PostMapping("/flange/arquivar/{id}")
+    public String arquivar(
             @PathVariable Long id,
+            @RequestParam("motivo") String motivo,
             Authentication authentication) {
 
-        Usuario usuario =
-                usuarioRepository.findByEmail(
-                        authentication.getName()
-                ).orElseThrow();
-
-        Flange flange =
-                flangeRepository.findById(id)
-                        .orElse(null);
-
-        if (flange == null) {
-            return "redirect:/flange/listagem";
+        Usuario usuario = usuarioRepository.findByEmail(authentication.getName()).orElseThrow();
+        if (usuario.getRole() != Role.ADMIN) {
+            return "redirect:/flange/listagem?erro=permissao";
         }
 
-        if (usuario.getRole() != Role.ADMIN) {
+        Flange flange = flangeRepository.findById(id).orElse(null);
+        if (flange == null || !flange.isAtivo()) {
+            return "redirect:/flange/listagem?erro=nao_encontrada";
+        }
 
-            if (usuario.getUnidade() == null ||
-                    flange.getUnidade() == null ||
-                    !flange.getUnidade()
-                            .getId()
-                            .equals(usuario.getUnidade().getId())) {
+        String justificativa = motivo == null ? "" : motivo.trim();
+        if (justificativa.isBlank() || justificativa.length() > 500) {
+            return "redirect:/flange/listagem?erro=motivo";
+        }
 
-                return "redirect:/flange/listagem";
+        if (incidenteRepository.existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull()) {
+            // A consulta abaixo verifica especificamente o ativo solicitado.
+            boolean possuiAlarmeAtivo = incidenteRepository
+                    .findTopByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(id)
+                    .isPresent();
+            if (possuiAlarmeAtivo) {
+                return "redirect:/flange/listagem?erro=alarme";
             }
         }
 
-        if (manutencaoRepository.countByFlange_Id(id) > 0) {
-            return "redirect:/flange/listagem?erro=historico";
-        }
+        flange.setAtivo(false);
+        flange.setDesativadaEm(java.time.LocalDateTime.now());
+        flange.setDesativadaPorEmail(usuario.getEmail());
+        flange.setMotivoDesativacao(justificativa);
+        flangeRepository.save(flange);
 
-        if (sensorRepository.countByFlange_Id(id) > 0) {
-            return "redirect:/flange/listagem?erro=sensores";
-        }
-
-        flangeRepository.delete(flange);
-
-        return "redirect:/flange/listagem?sucesso=excluida";
+        return "redirect:/flange/listagem?sucesso=arquivada";
     }
+
+    @PostMapping("/flange/restaurar/{id}")
+    public String restaurar(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Usuario usuario = usuarioRepository.findByEmail(authentication.getName()).orElseThrow();
+        if (usuario.getRole() != Role.ADMIN) {
+            return "redirect:/flange/listagem?erro=permissao";
+        }
+
+        Flange flange = flangeRepository.findById(id).orElse(null);
+        if (flange == null || flange.isAtivo()) {
+            return "redirect:/flange/listagem?erro=nao_arquivada";
+        }
+
+        if (flange.getUnidade() == null || !flange.getUnidade().isAtivo()) {
+            return "redirect:/flange/listagem?erro=unidade_inativa";
+        }
+
+        flange.setAtivo(true);
+        // Mantém os metadados da última desativação como histórico.
+        flangeRepository.save(flange);
+        return "redirect:/flange/listagem?sucesso=restaurada";
+    }
+
+    private void adicionarOpcoesTecnicas(Model model) {
+        model.addAttribute("classesPressao", com.pbe.soda_caustica_flanges.model.ClassePressaoFlange.values());
+        model.addAttribute("tiposFace", com.pbe.soda_caustica_flanges.model.TipoFaceFlange.values());
+        model.addAttribute("materiaisFlange", com.pbe.soda_caustica_flanges.model.MaterialFlange.values());
+        model.addAttribute("tiposJunta", com.pbe.soda_caustica_flanges.model.TipoJuntaFlange.values());
+    }
+}
 }
