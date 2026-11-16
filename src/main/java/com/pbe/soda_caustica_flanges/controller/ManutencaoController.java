@@ -34,25 +34,32 @@ public class ManutencaoController {
     public String listagem(
             Model model,
             Authentication authentication,
-            @RequestParam(value = "erro", required = false) String erro) {
+            @RequestParam(value = "erro", required = false) String erro,
+            @RequestParam(value = "sucesso", required = false) String sucesso,
+            @RequestParam(value = "arquivadas", defaultValue = "false") boolean arquivadas) {
 
         Usuario usuario = buscarUsuarioLogado(authentication);
         boolean admin = usuario.getRole() == Role.ADMIN;
+        boolean mostrarArquivadas = admin && arquivadas;
 
         List<Manutencao> manutencoes;
-        if (admin) {
-            manutencoes = manutencaoRepository.findAllByOrderByDataDesc();
+        if (mostrarArquivadas) {
+            manutencoes = manutencaoRepository.findByArquivadaTrueOrderByArquivadaEmDesc();
+        } else if (admin) {
+            manutencoes = manutencaoRepository.findAtivasOrderByDataDesc();
         } else if (usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()) {
             manutencoes = Collections.emptyList();
         } else {
-            manutencoes = manutencaoRepository.findByFlange_Unidade_IdOrderByDataDesc(
+            manutencoes = manutencaoRepository.findAtivasPorUnidadeOrderByDataDesc(
                     usuario.getUnidade().getId()
             );
         }
 
         model.addAttribute("manutencoes", manutencoes);
         model.addAttribute("ehAdmin", admin);
+        model.addAttribute("mostrarArquivadas", mostrarArquivadas);
         model.addAttribute("erro", mensagemErroListagem(erro));
+        model.addAttribute("mensagemSucesso", mensagemSucessoListagem(sucesso));
         return "manutencao/listagem";
     }
 
@@ -85,6 +92,10 @@ public class ManutencaoController {
 
             if (registroExistente == null) {
                 return "redirect:/manutencao/listagem?erro=nao_encontrado";
+            }
+
+            if (registroExistente.isArquivada()) {
+                return "redirect:/manutencao/listagem?erro=arquivada";
             }
 
             if (!podeEditar(registroExistente, usuario, admin)) {
@@ -203,6 +214,10 @@ public class ManutencaoController {
             return "redirect:/manutencao/listagem?erro=nao_encontrado";
         }
 
+        if (manutencao.isArquivada()) {
+            return "redirect:/manutencao/listagem?erro=arquivada";
+        }
+
         if (!podeEditar(manutencao, usuario, admin)) {
             return "redirect:/manutencao/listagem?erro=permissao";
         }
@@ -211,10 +226,69 @@ public class ManutencaoController {
         return "manutencao/cadastro";
     }
 
-    @PostMapping("/manutencao/excluir/{id}")
-    public String excluir(@PathVariable Long id) {
-        manutencaoRepository.findById(id).ifPresent(manutencaoRepository::delete);
-        return "redirect:/manutencao/listagem";
+    /**
+     * Arquiva logicamente um registro sem remover seus dados ou vínculos.
+     * A rota é ADMIN-only na SecurityConfig e a autorização é repetida aqui.
+     */
+    @PostMapping("/manutencao/arquivar/{id}")
+    public String arquivar(
+            @PathVariable Long id,
+            @RequestParam("motivo") String motivo,
+            Authentication authentication) {
+
+        Usuario usuario = buscarUsuarioLogado(authentication);
+        if (usuario.getRole() != Role.ADMIN) {
+            return "redirect:/manutencao/listagem?erro=permissao";
+        }
+
+        Manutencao manutencao = manutencaoRepository.findById(id).orElse(null);
+        if (manutencao == null) {
+            return "redirect:/manutencao/listagem?erro=nao_encontrado";
+        }
+
+        String motivoNormalizado = motivo == null ? "" : motivo.trim();
+        if (motivoNormalizado.isBlank() || motivoNormalizado.length() > 500) {
+            return "redirect:/manutencao/listagem?erro=motivo";
+        }
+
+        if (manutencao.isArquivada()) {
+            return "redirect:/manutencao/listagem?erro=ja_arquivada";
+        }
+
+        manutencao.setArquivada(true);
+        manutencao.setArquivadaEm(java.time.LocalDateTime.now());
+        manutencao.setArquivadaPorEmail(usuario.getEmail());
+        manutencao.setMotivoArquivamento(motivoNormalizado);
+        manutencaoRepository.save(manutencao);
+
+        return "redirect:/manutencao/listagem?sucesso=arquivada";
+    }
+
+    @PostMapping("/manutencao/restaurar/{id}")
+    public String restaurar(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Usuario usuario = buscarUsuarioLogado(authentication);
+        if (usuario.getRole() != Role.ADMIN) {
+            return "redirect:/manutencao/listagem?erro=permissao";
+        }
+
+        Manutencao manutencao = manutencaoRepository.findById(id).orElse(null);
+        if (manutencao == null) {
+            return "redirect:/manutencao/listagem?erro=nao_encontrado";
+        }
+
+        if (!manutencao.isArquivada()) {
+            return "redirect:/manutencao/listagem?erro=nao_arquivada";
+        }
+
+        // Mantém arquivadoEm, arquivadoPorEmail e motivoArquivamento como
+        // evidência da última operação de arquivamento.
+        manutencao.setArquivada(false);
+        manutencaoRepository.save(manutencao);
+
+        return "redirect:/manutencao/listagem?sucesso=restaurada";
     }
 
     private boolean podeEditar(Manutencao manutencao, Usuario usuario, boolean admin) {
@@ -338,6 +412,28 @@ public class ManutencaoController {
         }
         if ("nao_encontrado".equals(erro)) {
             return "O registro de manutenção solicitado não foi encontrado.";
+        }
+        if ("arquivada".equals(erro)) {
+            return "Este registro está arquivado e não pode ser editado. Restaure-o primeiro.";
+        }
+        if ("ja_arquivada".equals(erro)) {
+            return "Esta manutenção já está arquivada.";
+        }
+        if ("nao_arquivada".equals(erro)) {
+            return "Esta manutenção já está ativa.";
+        }
+        if ("motivo".equals(erro)) {
+            return "Informe um motivo de arquivamento com até 500 caracteres.";
+        }
+        return null;
+    }
+
+    private String mensagemSucessoListagem(String sucesso) {
+        if ("arquivada".equals(sucesso)) {
+            return "Manutenção arquivada. O registro e seu histórico foram preservados.";
+        }
+        if ("restaurada".equals(sucesso)) {
+            return "Manutenção restaurada e novamente disponível na listagem ativa.";
         }
         return null;
     }
