@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
@@ -21,4 +22,16 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     // Total de incidentes de um ano
     @Query("SELECT SUM(i.quantidade) FROM Incidente i WHERE i.ano = :ano")
     Integer sumQuantidadeByAno(@Param("ano") Integer ano);
+
+    Optional<Incidente> findTopByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(
+            Long flangeId
+    );
+
+    List<Incidente> findByDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc();
+
+    List<Incidente> findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(
+            Long unidadeId
+    );
+
+    boolean existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull();
 }
