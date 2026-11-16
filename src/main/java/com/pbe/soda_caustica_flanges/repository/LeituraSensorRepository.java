@@ -10,4 +10,6 @@ public interface LeituraSensorRepository extends JpaRepository<LeituraSensor, Lo
     Optional<LeituraSensor> findTopBySensor_IdOrderByRecebidaEmDesc(Long sensorId);
 
     Optional<LeituraSensor> findTopByFlange_IdOrderByRecebidaEmDesc(Long flangeId);
+
+    boolean existsByCodigoMensagem(String codigoMensagem);
 }
