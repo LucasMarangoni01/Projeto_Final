@@ -31,7 +31,7 @@ public class LeituraSensor {
     @Column(name = "recebida_em", nullable = false)
     private LocalDateTime recebidaEm;
 
-    @Column(name = "codigo_mensagem", nullable = false, length = 80)
+    @Column(name = "codigo_mensagem", length = 80)
     private String codigoMensagem;
 
     @Column(name = "temperatura_celsius")
