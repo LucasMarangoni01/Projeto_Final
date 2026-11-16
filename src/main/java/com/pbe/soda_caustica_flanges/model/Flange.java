@@ -1,11 +1,15 @@
 package com.pbe.soda_caustica_flanges.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "flange")
@@ -16,96 +20,168 @@ public class Flange {
     private Long id;
 
     @NotBlank
-    private String nome_flange;
+    @Column(name = "nome_flange", nullable = false)
+    private String nomeFlange;
 
     @NotBlank
+    @Column(nullable = false)
     private String localizacao;
 
     @NotNull
-    private Double temp_ambiente;
+    @Column(name = "temp_ambiente", nullable = false)
+    private Double tempAmbiente;
 
     @NotNull(message = "A data de entrada é obrigatória.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate data_entrada;
+    @Column(name = "data_entrada", nullable = false)
+    private LocalDate dataEntrada;
 
+    @Size(max = 180)
     private String foto;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusFlange status = StatusFlange.NORMAL;
 
+    // Dados construtivos e de integridade solicitados pela documentação.
+    @Enumerated(EnumType.STRING)
+    @Column(name = "classe_pressao", length = 20)
+    private ClassePressaoFlange classePressao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_face", length = 20)
+    private TipoFaceFlange tipoFace;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "material_fabricacao", length = 40)
+    private MaterialFlange materialFabricacao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_junta", length = 40)
+    private TipoJuntaFlange tipoJunta;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "ultima_inspecao_integridade")
+    private LocalDate ultimaInspecaoIntegridade;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "proxima_inspecao_integridade")
+    private LocalDate proximaInspecaoIntegridade;
+
+    @Size(max = 120)
+    @Column(name = "profissional_habilitado", length = 120)
+    private String profissionalHabilitado;
+
+    @Size(max = 80)
+    @Column(name = "numero_art", length = 80)
+    private String numeroArt;
+
+    // Coordenadas percentuais (0-100) da planta baixa. Opcionais para registros legados.
+    @DecimalMin("0.0")
+    @DecimalMax("100.0")
+    @Column(name = "coordenada_x")
+    private Double coordenadaX;
+
+    @DecimalMin("0.0")
+    @DecimalMax("100.0")
+    @Column(name = "coordenada_y")
+    private Double coordenadaY;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_id")
     private Unidade unidade;
 
+    // Soft delete: registros arquivados deixam de operar, mas continuam no histórico.
+    @Column(name = "ativo")
+    private Boolean ativo = true;
+
+    @Column(name = "desativada_em")
+    private LocalDateTime desativadaEm;
+
+    @Column(name = "desativada_por_email", length = 100)
+    private String desativadaPorEmail;
+
+    @Column(name = "motivo_desativacao", length = 500)
+    private String motivoDesativacao;
+
     public Flange() {
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNomeFlange() { return nomeFlange; }
+    public void setNomeFlange(String nomeFlange) { this.nomeFlange = nomeFlange; }
 
-    public String getNome_flange() {
-        return nome_flange;
-    }
+    // Compatibilidade temporária com templates e integrações existentes.
+    public String getNome_flange() { return nomeFlange; }
+    public void setNome_flange(String nomeFlange) { this.nomeFlange = nomeFlange; }
 
-    public void setNome_flange(String nome_flange) {
-        this.nome_flange = nome_flange;
-    }
+    public String getLocalizacao() { return localizacao; }
+    public void setLocalizacao(String localizacao) { this.localizacao = localizacao; }
 
-    public String getLocalizacao() {
-        return localizacao;
-    }
+    public Double getTempAmbiente() { return tempAmbiente; }
+    public void setTempAmbiente(Double tempAmbiente) { this.tempAmbiente = tempAmbiente; }
 
-    public void setLocalizacao(String localizacao) {
-        this.localizacao = localizacao;
-    }
+    public Double getTemp_ambiente() { return tempAmbiente; }
+    public void setTemp_ambiente(Double tempAmbiente) { this.tempAmbiente = tempAmbiente; }
 
-    public Double getTemp_ambiente() {
-        return temp_ambiente;
-    }
+    public LocalDate getDataEntrada() { return dataEntrada; }
+    public void setDataEntrada(LocalDate dataEntrada) { this.dataEntrada = dataEntrada; }
 
-    public void setTemp_ambiente(Double temp_ambiente) {
-        this.temp_ambiente = temp_ambiente;
-    }
+    public LocalDate getData_entrada() { return dataEntrada; }
+    public void setData_entrada(LocalDate dataEntrada) { this.dataEntrada = dataEntrada; }
 
-    public LocalDate getData_entrada() {
-        return data_entrada;
-    }
-
-    public void setData_entrada(LocalDate data_entrada) {
-        this.data_entrada = data_entrada;
-    }
-
-    public String getFoto() {
-        return foto;
-    }
-
-    public void setFoto(String foto) {
-        this.foto = foto;
-    }
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
 
     public StatusFlange getStatus() {
-        if (status == null) {
-            return StatusFlange.NORMAL;
-        }
-
-        return status;
+        return status == null ? StatusFlange.NORMAL : status;
     }
+    public void setStatus(StatusFlange status) { this.status = status; }
 
-    public void setStatus(StatusFlange status) {
-        this.status = status;
-    }
+    public ClassePressaoFlange getClassePressao() { return classePressao; }
+    public void setClassePressao(ClassePressaoFlange classePressao) { this.classePressao = classePressao; }
 
-    public Unidade getUnidade() {
-        return unidade;
-    }
+    public TipoFaceFlange getTipoFace() { return tipoFace; }
+    public void setTipoFace(TipoFaceFlange tipoFace) { this.tipoFace = tipoFace; }
 
-    public void setUnidade(Unidade unidade) {
-        this.unidade = unidade;
-    }
+    public MaterialFlange getMaterialFabricacao() { return materialFabricacao; }
+    public void setMaterialFabricacao(MaterialFlange materialFabricacao) { this.materialFabricacao = materialFabricacao; }
+
+    public TipoJuntaFlange getTipoJunta() { return tipoJunta; }
+    public void setTipoJunta(TipoJuntaFlange tipoJunta) { this.tipoJunta = tipoJunta; }
+
+    public LocalDate getUltimaInspecaoIntegridade() { return ultimaInspecaoIntegridade; }
+    public void setUltimaInspecaoIntegridade(LocalDate ultimaInspecaoIntegridade) { this.ultimaInspecaoIntegridade = ultimaInspecaoIntegridade; }
+
+    public LocalDate getProximaInspecaoIntegridade() { return proximaInspecaoIntegridade; }
+    public void setProximaInspecaoIntegridade(LocalDate proximaInspecaoIntegridade) { this.proximaInspecaoIntegridade = proximaInspecaoIntegridade; }
+
+    public String getProfissionalHabilitado() { return profissionalHabilitado; }
+    public void setProfissionalHabilitado(String profissionalHabilitado) { this.profissionalHabilitado = profissionalHabilitado; }
+
+    public String getNumeroArt() { return numeroArt; }
+    public void setNumeroArt(String numeroArt) { this.numeroArt = numeroArt; }
+
+    public Double getCoordenadaX() { return coordenadaX; }
+    public void setCoordenadaX(Double coordenadaX) { this.coordenadaX = coordenadaX; }
+
+    public Double getCoordenadaY() { return coordenadaY; }
+    public void setCoordenadaY(Double coordenadaY) { this.coordenadaY = coordenadaY; }
+
+    public Unidade getUnidade() { return unidade; }
+    public void setUnidade(Unidade unidade) { this.unidade = unidade; }
+
+    public boolean isAtivo() { return ativo == null || ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public LocalDateTime getDesativadaEm() { return desativadaEm; }
+    public void setDesativadaEm(LocalDateTime desativadaEm) { this.desativadaEm = desativadaEm; }
+
+    public String getDesativadaPorEmail() { return desativadaPorEmail; }
+    public void setDesativadaPorEmail(String desativadaPorEmail) { this.desativadaPorEmail = desativadaPorEmail; }
+
+    public String getMotivoDesativacao() { return motivoDesativacao; }
+    public void setMotivoDesativacao(String motivoDesativacao) { this.motivoDesativacao = motivoDesativacao; }
 }
