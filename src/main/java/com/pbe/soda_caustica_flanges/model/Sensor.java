@@ -54,6 +54,13 @@ public class Sensor {
     @Column(length = 1000)
     private String observacoes;
 
+    // Apenas o hash SHA-256 do token de hardware é persistido; o segredo puro é exibido uma única vez.
+    @Column(name = "token_hardware_hash", length = 64)
+    private String tokenHardwareHash;
+
+    @Column(name = "token_hardware_gerado_em")
+    private LocalDateTime tokenHardwareGeradoEm;
+
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
@@ -115,6 +122,12 @@ public class Sensor {
 
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
+    public String getTokenHardwareHash() { return tokenHardwareHash; }
+    public void setTokenHardwareHash(String tokenHardwareHash) { this.tokenHardwareHash = tokenHardwareHash; }
+
+    public LocalDateTime getTokenHardwareGeradoEm() { return tokenHardwareGeradoEm; }
+    public void setTokenHardwareGeradoEm(LocalDateTime tokenHardwareGeradoEm) { this.tokenHardwareGeradoEm = tokenHardwareGeradoEm; }
 
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public LocalDateTime getAtualizadoEm() { return atualizadoEm; }
