@@ -456,4 +456,3 @@ public class FlangeController {
         model.addAttribute("tiposJunta", com.pbe.soda_caustica_flanges.model.TipoJuntaFlange.values());
     }
 }
-}
