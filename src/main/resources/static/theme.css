@@ -1,0 +1,64 @@
+/* Temas compartilhados do sistema de monitoramento de flanges. */
+html[data-theme="light"]{
+ color-scheme:light;
+ --bg-base:#f3f6fc;--bg-card:#fff;--bg-card-2:#edf2fa;--bg-hover:#e7eef9;
+ --bg-tr:#fff;--bg-text-h1:#23589c;--bg-text-h2:#23589c;
+ --text-primary:#172b48;--text-secondary:#354b68;--text-dim:#805600;
+ --border:rgba(28,61,107,.15);--border-strong:rgba(28,61,107,.25);
+ --shadow-card:0 4px 18px rgba(25,50,90,.1);--shadow-lift:0 10px 24px rgba(25,50,90,.15);
+ --menu-bg:rgba(255,255,255,.97);--menu-bg-solid:#fff;--menu-panel:#fff;
+ --menu-hover:rgba(40,105,190,.1);--menu-text:#1b3559;--menu-muted:#526c8f;
+ --menu-border:rgba(26,58,104,.15);--menu-shadow:0 12px 34px rgba(25,55,100,.16);
+ --bg:#f3f6fc;--bg2:#eaf1fb;--surface:#fff;--surface-2:#edf2fa;
+ --text:#172b48;--muted:#566e8c;--text-muted:#526682;--text-hint:#7184a1;
+ --border-md:rgba(26,58,104,.24);
+}
+html[data-theme="dark"]{color-scheme:dark}
+.theme-toggle{
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+ min-height:36px;padding:7px 11px;border:1px solid rgba(147,197,253,.28);
+ border-radius:9px;background:rgba(80,130,200,.15);color:#f1f6ff;
+ font:700 12px 'IBM Plex Sans','Segoe UI',sans-serif;white-space:nowrap;
+ cursor:pointer;transition:background .18s ease;
+}
+.theme-toggle:hover{background:rgba(96,165,250,.23)}
+.theme-toggle:focus-visible{outline:3px solid #e3af3c;outline-offset:2px}
+.theme-toggle-floating{position:fixed;top:14px;right:14px;z-index:9999;background:#16345f;box-shadow:0 4px 18px #0004}
+html[data-theme="light"] .theme-toggle{background:#edf3fb;color:#16365f;border-color:#b9cbe4}
+html[data-theme="light"] .theme-toggle:hover{background:#dceafb}
+html[data-theme="light"] .theme-toggle-floating{background:#fff;box-shadow:0 4px 18px #16365f24}
+html[data-theme="light"] .main-nav{border-bottom-color:#dce5f1;box-shadow:0 5px 16px #28416417}
+html[data-theme="light"] .nav-brand-copy strong,
+html[data-theme="light"] .nav-account-copy strong,
+html[data-theme="light"] .nav-link,
+html[data-theme="light"] .nav-dropdown>summary,
+html[data-theme="light"] .nav-account-profile{color:#173459!important}
+html[data-theme="light"] .nav-brand-copy small,
+html[data-theme="light"] .nav-account-copy small{color:#586f90!important}
+html[data-theme="light"] .nav-dropdown-panel>a,
+html[data-theme="light"] .nav-dropdown-panel strong{color:#173459!important}
+html[data-theme="light"] .nav-dropdown-panel small{color:#536b8e!important}
+html[data-theme="light"] .nav-account{border-left-color:#d3dfef}
+html[data-theme="light"] .mobile-menu-content{background:#fff;color:#173459}
+html[data-theme="light"] .mobile-menu-link{color:#173459!important}
+html[data-theme="light"] body{background:#f3f6fc;color:#172b48}
+html[data-theme="light"] body::before{opacity:.08}
+html[data-theme="light"] :is(input,select,textarea){background-color:#fff;color:#172b48;border-color:#b9cbe1}
+html[data-theme="light"] :is(input,textarea)::placeholder{color:#6c809d}
+html[data-theme="light"] :is(td,th){color:#213958;border-color:#dce5f1}
+html[data-theme="light"] :is(.card,.panel,.stat-card,.metric-card,.kpi,.info-card){color:#213958;border-color:#dce5f1}
+html[data-theme="light"] .login-section,
+html[data-theme="light"] .register-section{background:#f3f6fc}
+html[data-theme="light"] .login-card,
+html[data-theme="light"] .register-card{background:#fff;color:#213958}
+html[data-theme="light"] .topbar{background:rgba(255,255,255,.97);border-bottom-color:#d7e3f1}
+html[data-theme="light"] .sidebar{background:#eaf1fb;border-right-color:#d7e3f1}
+html[data-theme="light"] .app-shell{background:#f3f6fc}
+html[data-theme="light"] .brand-mark{background:#e7f0fb;border-color:#b9cce4}
+html[data-theme="light"] .btn:not(.btn-primary){background:#e7eef9;color:#1a3b65;border-color:#c8d9ed}
+html[data-theme="dark"] body:has(.fl-header){
+ --bg:#08182e;--surface:#122b48;--surface-2:#173453;--text:#f3f7ff;
+ --text-muted:#aac0d9;--text-hint:#89a5c5;--border:rgba(255,255,255,.14);
+ --border-md:rgba(255,255,255,.22);background:#08182e;color:#f3f7ff
+}
+@media(max-width:960px){.mobile-account-actions .theme-toggle{width:100%}}
