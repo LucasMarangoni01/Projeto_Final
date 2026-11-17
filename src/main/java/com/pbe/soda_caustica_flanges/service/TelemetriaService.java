@@ -68,7 +68,7 @@ public class TelemetriaService {
 
         if (sensor.getTipo() != TipoSensor.TEMPERATURA_SUPERFICIE) {
             throw new IllegalArgumentException(
-                    "Este contrato de telemetria está habilitado para sensores térmicos."
+                    "Leituras de gás ainda não estão habilitadas. O modelo e o gás-alvo precisam ser validados; o contrato MQTT atual é legado térmico."
             );
         }
 
