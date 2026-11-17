@@ -30,7 +30,7 @@
     <div class="alerts-feedback alerts-feedback-error"
          th:if="${erro != null}" th:text="${erro}"></div>
 
-    <div class="monitoramento-auto" id="monitoramento-auto">
+    <div class="monitoramento-auto" id="monitoramento-auto" th:attr="data-alertas=${totalAtivos}">
         <span id="monitoramento-status" aria-live="polite">Consultando novas leituras e alertas...</span>
         <a id="monitoramento-novidade" th:href="@{/alertas}" hidden>Há dados novos. Atualizar alertas</a>
     </div>
