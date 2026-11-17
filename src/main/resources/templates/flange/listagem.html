@@ -14,16 +14,16 @@
 <body>
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main class="flange-list-page" style="max-width:1600px;margin:0 auto;padding:24px 18px 55px;">
-    <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+<main class="flange-list-page">
+    <header class="flange-list-header">
         <div>
-            <span style="color:#f4c45f;font:800 9px 'JetBrains Mono',monospace;letter-spacing:.1em;">GESTÃO DE ATIVOS · NAOH</span>
-            <h1 style="margin:5px 0;color:#fff;font-size:26px;"
+            <span class="flange-list-kicker">GESTÃO DE ATIVOS · NaOH 32%</span>
+            <h1
                 th:text="${mostrarArquivadas ? 'Flanges arquivadas' : 'Flanges monitoradas'}">Flanges monitoradas</h1>
-            <p style="margin:0;color:#a8bad5;font-size:11px;"
+            <p class="flange-list-count"
                th:text="${#lists.size(flanges) + ' registro(s) nesta consulta.'}">0 registros</p>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="flange-list-actions">
             <a th:if="${ehAdmin and !mostrarArquivadas}" th:href="@{/flange/listagem(arquivadas=true)}"
                class="btn btn-alter">Ver arquivadas</a>
             <a th:if="${ehAdmin and mostrarArquivadas}" th:href="@{/flange/listagem}"
@@ -47,8 +47,8 @@
         Operação concluída.
     </div>
 
-    <div class="table-container" style="overflow-x:auto;">
-        <table style="min-width:1100px;width:100%;">
+    <div class="table-container flange-table-wrap">
+        <table class="flange-table">
             <thead>
             <tr>
                 <th>Foto</th>
@@ -77,7 +77,7 @@
                 </td>
                 <td>
                     <strong th:text="${p.nome_flange}">FL-001</strong>
-                    <small style="display:block;color:#94aaca;font-size:9px;"
+                    <small class="flange-table-muted"
                            th:text="${p.tipoFlange != null ? p.tipoFlange : 'Tipo não informado'}">Tipo</small>
                 </td>
                 <td th:text="${p.localizacao}">Local</td>
