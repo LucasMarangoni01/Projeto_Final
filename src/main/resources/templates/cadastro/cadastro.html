@@ -177,6 +177,20 @@
                     method="post"
                     class="register-form">
 
+                <!-- Código necessário apenas para o primeiro ADMIN em produção. -->
+                <div class="form-group" th:if="${exigirCodigoInstalacao}">
+                    <label for="codigoInstalacao">Código de instalação</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">◆</span>
+                        <input type="password" id="codigoInstalacao"
+                               name="codigoInstalacao"
+                               placeholder="Código fornecido pelo responsável"
+                               autocomplete="off" required>
+                    </div>
+                    <div class="field-hint">
+                        Necessário somente na criação da primeira conta administradora.
+                    </div>
+                </div>
 
                 <!-- NOME -->
 

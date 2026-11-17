@@ -4,6 +4,11 @@ import com.pbe.soda_caustica_flanges.model.CadastroDTO;
 import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.service.UsuarioService;
+import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,11 +20,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class CadastroController {
 
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
+    private final boolean codigoInicialObrigatorio;
+    private final String codigoInicial;
 
     public CadastroController(
-            UsuarioService usuarioService
+            UsuarioService usuarioService,
+            UsuarioRepository usuarioRepository,
+            @Value("${app.security.bootstrap-required:false}") boolean codigoInicialObrigatorio,
+            @Value("${app.security.bootstrap-key:}") String codigoInicial
     ) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
+        this.codigoInicialObrigatorio = codigoInicialObrigatorio;
+        this.codigoInicial = codigoInicial;
+    }
+
+    private boolean exigeCodigoInicial() {
+        return codigoInicialObrigatorio && usuarioRepository.count() == 0;
+    }
+
+    private boolean codigoInicialValido(String informado) {
+        return informado != null && !codigoInicial.isBlank()
+                && MessageDigest.isEqual(
+                    codigoInicial.getBytes(StandardCharsets.UTF_8),
+                    informado.getBytes(StandardCharsets.UTF_8));
     }
 
     // ==============================
@@ -33,6 +58,7 @@ public class CadastroController {
                 new CadastroDTO()
         );
 
+        model.addAttribute("exigirCodigoInstalacao", exigeCodigoInicial());
         return "cadastro/cadastro";
     }
 
@@ -43,8 +69,16 @@ public class CadastroController {
     public String cadastrar(
             @Valid CadastroDTO cadastroDTO,
             BindingResult result,
+            @RequestParam(value = "codigoInstalacao", required = false) String codigoInstalacao,
             Model model
     ) {
+        boolean primeiroAcesso = exigeCodigoInicial();
+        model.addAttribute("exigirCodigoInstalacao", primeiroAcesso);
+        if (primeiroAcesso && !codigoInicialValido(codigoInstalacao)) {
+            model.addAttribute("erro", "O primeiro cadastro exige o código de instalação configurado pelo responsável.");
+            return "cadastro/cadastro";
+        }
+
 
         // ==============================
         // ERROS DE VALIDAÇÃO

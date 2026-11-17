@@ -1,5 +1,7 @@
 package com.pbe.soda_caustica_flanges.service;
 
+import com.pbe.soda_caustica_flanges.model.ImagemPrivada;
+import com.pbe.soda_caustica_flanges.repository.ImagemPrivadaRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.util.Iterator;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,10 +32,16 @@ public class FotoPerfilService {
             Pattern.compile("^[a-f0-9-]{36}\\.(jpg|png)$");
 
     private final Path diretorio;
+    private final boolean armazenarNoBanco;
+    private final ImagemPrivadaRepository imagens;
 
     public FotoPerfilService(
-            @Value("${app.upload.profile-dir:uploads/perfil}") String diretorio) {
+            @Value("${app.upload.profile-dir:uploads/perfil}") String diretorio,
+            @Value("${app.upload.storage:filesystem}") String armazenamento,
+            ImagemPrivadaRepository imagens) {
         this.diretorio = Paths.get(diretorio).toAbsolutePath().normalize();
+        this.armazenarNoBanco = "database".equalsIgnoreCase(armazenamento);
+        this.imagens = imagens;
     }
 
     public String salvar(MultipartFile arquivo) throws IOException {
@@ -95,28 +104,44 @@ public class FotoPerfilService {
             }
         }
 
-        Files.createDirectories(diretorio);
-
         String nomeArquivo = UUID.randomUUID().toString().toLowerCase(Locale.ROOT) + extensao;
         Path destino = resolverCaminho(nomeArquivo);
         String formato = extensao.equals(".png") ? "png" : "jpg";
 
-        if (!ImageIO.write(imagem, formato, destino.toFile())) {
-            throw new IOException("Não foi possível processar a imagem enviada.");
+        if (armazenarNoBanco) {
+            try (ByteArrayOutputStream saida = new ByteArrayOutputStream()) {
+                if (!ImageIO.write(imagem, formato, saida)) {
+                    throw new IOException("Não foi possível processar a imagem enviada.");
+                }
+                imagens.save(new ImagemPrivada("perfil:" + nomeArquivo,
+                        extensao.equals(".png") ? "image/png" : "image/jpeg",
+                        saida.toByteArray()));
+            }
+        } else {
+            Files.createDirectories(diretorio);
+            if (!ImageIO.write(imagem, formato, destino.toFile())) {
+                throw new IOException("Não foi possível processar a imagem enviada.");
+            }
         }
-
         return nomeArquivo;
     }
 
     public FotoCarregada carregar(String nomeArquivo) throws IOException {
         Path arquivo = resolverCaminho(nomeArquivo);
+        MediaType tipo = nomeArquivo.toLowerCase(Locale.ROOT).endsWith(".png")
+                ? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+
+        if (armazenarNoBanco) {
+            ImagemPrivada registro = imagens.findById("perfil:" + nomeArquivo)
+                    .orElse(null);
+            if (registro != null) {
+                return new FotoCarregada(registro.getDados(), tipo);
+            }
+        }
+
         if (!Files.isRegularFile(arquivo)) {
             throw new FileNotFoundException("Foto de perfil não encontrada.");
         }
-
-        MediaType tipo = nomeArquivo.toLowerCase(Locale.ROOT).endsWith(".png")
-                ? MediaType.IMAGE_PNG
-                : MediaType.IMAGE_JPEG;
 
         return new FotoCarregada(Files.readAllBytes(arquivo), tipo);
     }
@@ -126,7 +151,12 @@ public class FotoPerfilService {
             return;
         }
 
-        Files.deleteIfExists(resolverCaminho(nomeArquivo));
+        Path arquivo = resolverCaminho(nomeArquivo);
+        if (armazenarNoBanco) {
+            imagens.deleteById("perfil:" + nomeArquivo);
+        } else {
+            Files.deleteIfExists(arquivo);
+        }
     }
 
     private Path resolverCaminho(String nomeArquivo) throws IOException {

@@ -1,0 +1,14 @@
+.git
+.github
+.vercel
+.env
+.env.*
+!.env.example
+target
+uploads
+**/.DS_Store
+.idea
+.vscode
+*.iml
+*.log
+src/src.7z

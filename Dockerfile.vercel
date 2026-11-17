@@ -1,0 +1,16 @@
+# Contêiner HTTP Java 21 para o runtime Container da Vercel.
+# Dependencias e credenciais de producao sao definidas apenas em tempo de execucao.
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+COPY pom.xml ./
+COPY src ./src
+RUN mvn -B -ntp -Pvercel -DskipTests package
+
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+COPY --from=build /workspace/target/*.jar /app/app.jar
+
+ENV SPRING_PROFILES_ACTIVE=prod,vercel
+ENV JAVA_TOOL_OPTIONS="-Djava.awt.headless=true -XX:MaxRAMPercentage=70.0"
+EXPOSE 80
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

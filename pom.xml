@@ -148,4 +148,16 @@
         </plugins>
     </build>
 
+    <!-- Dependencias de sessao persistente apenas na imagem de implantacao. -->
+    <profiles>
+        <profile>
+            <id>vercel</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-session-jdbc</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

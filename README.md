@@ -167,3 +167,11 @@ Execute os testes unitários com Java 21 e Maven:
 No Windows, utilize `mvnw.cmd test`. O fluxo de integração contínua em `.github/workflows/maven-build.yml` agora executa `mvn verify` **sem pular os testes**.
 
 Os testes unitários cobrem regras de habilitação de contas ADMIN/USER, aceitação de leituras MQTT, prevenção de mensagens repetidas, alarmes críticos e presença dos arquivos de tema em todas as páginas. Eles foram desenhados para não exigir um servidor MySQL em execução. Isso **não substitui** testes de integração com banco, conferência visual em navegador nem validação de sensores físicos em ambiente controlado.
+
+---
+
+## Implantacao na Vercel
+
+A Vercel disponibiliza o runtime **Container (beta)** para aplicacoes Spring Boot. O projeto inclui `Dockerfile.vercel`, `vercel.json` e o perfil `vercel`. O banco de dados MySQL precisa estar hospedado externamente, acessivel pelo container.
+
+Consulte **[docs/VERCEL.md](docs/VERCEL.md)** antes de publicar. O tutorial inclui variaveis `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, cuidados com cadastro inicial, persistencia de sessoes e fotos, e as limitacoes da integracao MQTT em funcoes que escalam para zero. Nenhuma senha deve ser enviada ao GitHub.
