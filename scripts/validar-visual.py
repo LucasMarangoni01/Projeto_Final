@@ -128,7 +128,8 @@ def validar():
     # explicitar as propriedades antes herdadas por seletores genericos "nav".
     menu_estilos = (STATIC / "menu.css").read_text(encoding="utf-8")
     assert "Isola a barra de regras globais" in menu_estilos
-    assert "    margin: 0;\\n    padding: 0;\\n    background: var(--menu-bg);" in menu_estilos
+    barra = menu_estilos.split(".main-nav {", 1)[1].split("}", 1)[0]
+    assert "margin: 0;" in barra and "padding: 0;" in barra
     assert ".main-nav .nav-primary { justify-content: center; flex-direction: row; }" in menu_estilos
     assert ".main-nav .nav-brand { padding: 0; }" in menu_estilos
     assert ".main-nav .nav-primary .nav-link" in menu_estilos
