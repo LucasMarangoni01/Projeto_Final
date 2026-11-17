@@ -1065,6 +1065,7 @@
     <link rel="apple-touch-icon" th:href="@{/favicon.svg}">
     <script src="/theme.js"></script>
     <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" th:href="@{/monitoramento-atualizacao.css}">
 </head>
 <body>
 
@@ -1079,11 +1080,15 @@
                 <div class="topbar-title">Ambiente industrial com soda cáustica</div>
                 <div class="topbar-unit" th:text="${'Unidade: ' + nomeUnidade}">Unidade</div>
                 <div class="topbar-sub"
-                     th:text="${'Painel operacional · ' + totalFlanges + ' flange(s) cadastrada(s) · estados demonstrativos'}">
-                    Painel operacional · estados demonstrativos
+                     th:text="${'Painel operacional · ' + totalFlanges + ' flange(s) cadastrada(s) · dados persistidos'}">
+                    Painel operacional · dados persistidos
                 </div>
                 <div class="dashboard-data-note">
-                    Demonstração visual: alertas e alterações de status nesta tela são simulados no navegador. A quantidade de sensores representa o inventário cadastrado; não há leitura automática de hardware nesta etapa.
+                    Os status e alertas refletem registros do banco. Sensores cadastrados ou instalados não significam comunicação ativa; sem leitura recente não é possível concluir que a flange esteja segura. Integração com hardware exige MQTT e validação.
+                </div>
+                <div class="monitoramento-auto" id="monitoramento-auto">
+                    <span id="monitoramento-status" aria-live="polite">Consultando novas leituras e alertas...</span>
+                    <a id="monitoramento-novidade" th:href="@{/}" hidden>Atualização disponível. Abrir painel atualizado</a>
                 </div>
             </div>
             <a class="badge" id="badge"
@@ -1358,6 +1363,7 @@
     document.addEventListener('DOMContentLoaded', initializeFlangeSearch);
 </script>
 
+<script src="/monitoramento-atualizacao.js"></script>
 <script src="/menu.js"></script>
 </body>
 </html>
