@@ -175,3 +175,11 @@ Os testes unitários cobrem regras de habilitação de contas ADMIN/USER, aceita
 A Vercel disponibiliza o runtime **Container (beta)** para aplicacoes Spring Boot. O projeto inclui `Dockerfile.vercel`, `vercel.json` e o perfil `vercel`. O banco de dados MySQL precisa estar hospedado externamente, acessivel pelo container.
 
 Consulte **[docs/VERCEL.md](docs/VERCEL.md)** antes de publicar. O tutorial inclui variaveis `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, cuidados com cadastro inicial, persistencia de sessoes e fotos, e as limitacoes da integracao MQTT em funcoes que escalam para zero. Nenhuma senha deve ser enviada ao GitHub.
+
+---
+
+## Página inicial no GitHub Pages
+
+O endereço da apresentação estática do TCC é **https://lucasmarangoni01.github.io/Projeto_Final/**. A entrada é o arquivo **`/index.html` na raiz da branch `main`**, correspondente à configuração Pages **Deploy from a branch → main → /(root)**.
+
+Essa página é apenas uma apresentação pública. A aplicação real é o projeto Java Spring Boot/Thymeleaf, cuja rota inicial é `/` (definida em `HomeController`) e cuja tela fica em `src/main/resources/templates/home/index.html`. GitHub Pages não executa Spring Boot, autenticação, consultas ao banco MySQL nem MQTT.
