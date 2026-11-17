@@ -130,6 +130,29 @@ O módulo de contas oferece recursos de identificação, controle de acesso e ra
 
 A alteração de e-mail de acesso não é oferecida no autoatendimento: o e-mail funciona como identificador único e deve ser tratado como dado administrativo. O histórico é uma trilha operacional da aplicação, não substitui um sistema corporativo de auditoria com retenção, imutabilidade e controles de acesso dedicados.
 
+## Relatórios operacionais (TAP e TCC oficiais)
+
+A página autenticada `/relatorios` permite exportar arquivos CSV UTF-8 para:
+
+- Flanges (incluindo arquivadas);
+- Funcionários operacionais por unidade;
+- Manutenções, inclusive arquivadas;
+- Ocorrências e registros históricos;
+- Alertas, reconhecimento e normalização;
+- Leituras de sensores recebidas pelo sistema.
+
+ADMIN pode exportar informações de todas as unidades. USER só visualiza e exporta
+registros vinculados à sua unidade ativa. Os históricos não são modificados pela
+exportação e células de texto são protegidas contra fórmulas em aplicativos de
+planilhas. Os arquivos trazem leituras e possíveis anormalidades; nunca devem ser
+usados como confirmação automática de vazamento.
+
+A matriz de rastreabilidade dos requisitos dos dois documentos oficiais fica em
+[`docs/MATRIZ-REQUISITOS-OFICIAIS.md`](docs/MATRIZ-REQUISITOS-OFICIAIS.md).
+O sistema não equivale a um sistema de proteção industrial certificado.
+
+---
+
 ## Configuração do ambiente local
 
 Cada integrante utiliza seu próprio MySQL local. A aplicação conecta usando o usuário de banco com privilégios restritos `soda_app`; não utiliza a conta administrativa `root`.
