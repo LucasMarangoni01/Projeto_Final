@@ -180,6 +180,6 @@ Consulte **[docs/VERCEL.md](docs/VERCEL.md)** antes de publicar. O tutorial incl
 
 ## Página inicial no GitHub Pages: acesso ao sistema
 
-O endereço **https://lucasmarangoni01.github.io/Projeto_Final/** abre a tela de login estática em **https://lucasmarangoni01.github.io/Projeto_Final/login/**. A entrada fica no `/index.html` da branch `main` (Pages: `main` → `/(root)`).
+O endereço **https://lucasmarangoni01.github.io/Projeto_Final/** mostra diretamente a tela de login estática, sem redirecionamento. A entrada fica no `/index.html` da branch `main` (Pages: `main` → `/(root)`). Há também um endereço alternativo em `/login/` e um `404.html` para orientar acessos a caminhos incorretos.
 
 A cópia estática está em `login/index.html` e usa os estilos da aplicação. **Não recebe senhas nem autentica:** o formulário fica desabilitado, porque o GitHub Pages não executa Java, sessões ou MySQL. Para acesso funcional, é necessário hospedar o Spring Boot em servidor próprio e apontar a entrada do Pages para o endereço real `/login` desse servidor. A tela real do Spring Boot segue em `src/main/resources/templates/login/login.html`.
