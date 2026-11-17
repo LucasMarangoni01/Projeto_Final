@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Guia de uso do Sistema de Monitoramento e Gerenciamento de Flanges em ambientes industriais com soda cáustica.">
   <title>Guia do Sistema | Monitoramento de Flanges</title>
+  <link rel="stylesheet" th:href="@{/menu.css}">
   <style>
 :root{--bg:#06182f;--bg2:#0a2444;--surface:#0d2a4d;--border:#244a74;--text:#f3f7ff;--muted:#a7bdd8;--blue:#7b9aff;--green:#38dea4;--gold:#f6c157}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:94px}body{margin:0;color:var(--text);background:linear-gradient(135deg,#06172e 0%,#0a264a 65%,#07172d 100%);font:15px/1.65 "Segoe UI",Arial,sans-serif}a{color:inherit;text-decoration:none}button,input{font:inherit}button{cursor:pointer}a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #aad0ff;outline-offset:3px}.skip-link{position:absolute;top:-80px;left:12px;background:white;color:#071629;z-index:80;padding:7px 15px}.skip-link:focus{top:10px}.reading-progress{position:fixed;top:0;left:0;width:0;height:3px;background:var(--green);z-index:100}
@@ -44,21 +45,23 @@ const progress=document.getElementById('readingProgress');const setProgress=()=>
 document.getElementById('printGuide').addEventListener('click',()=>window.print());
 });</script>
     <script src="/theme.js"></script>
-    <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" th:href="@{/theme.css}">
+    <link rel="stylesheet" th:href="@{/guia-nav.css}">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
   <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
-  <header class="topbar">
-    <a class="brand" href="#visao-geral" aria-label="Voltar ao início do Guia do Sistema">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36" width="30" height="30" fill="none"><path d="m18 3 13 6v10c0 8-5 11.5-13 14-8-2.5-13-6-13-14V9L18 3Z" stroke="#E8F2FF" stroke-width="2"/><path d="m12 18 4 4 8-9" stroke="#4DD8A4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <span class="brand-text"><strong>Monitoramento de Flanges</strong><small>Documentação e orientação</small></span>
-    </a>
-    <div class="header-actions">
+  <div th:replace="~{fragments/menu :: menu}"></div>
+  <header class="topbar guide-utilitybar" aria-label="Ferramentas do guia">
+    <div class="guide-utilitybar-heading">
+      <span class="guide-utilitybar-eyebrow">DOCUMENTAÇÃO DO SISTEMA</span>
+      <strong>Guia de utilização</strong>
+      <small>Consulte as orientações e navegue pelos 14 tópicos do projeto.</small>
+    </div>
+    <div class="header-actions guide-utilitybar-actions">
       <span class="header-chip"><span class="status-dot"></span> GUIA DO SISTEMA</span>
-      <button type="button" class="btn btn-quiet no-print" id="printGuide" aria-label="Imprimir o guia"><span aria-hidden="true">⎙</span> <span class="hide-small">Imprimir</span></button>
-      <a class="btn btn-ghost" href="/" id="backToSystem">Voltar ao sistema <span aria-hidden="true">↗</span></a>
-      <button class="btn btn-menu no-print" type="button" id="openMenu" aria-label="Abrir índice" aria-controls="guideSidebar" aria-expanded="false">☰</button>
+      <button type="button" class="btn btn-quiet no-print" id="printGuide" aria-label="Imprimir o guia"><span aria-hidden="true">⎙</span> <span>Imprimir</span></button>
+      <button class="btn btn-menu no-print" type="button" id="openMenu" aria-label="Abrir índice do guia" aria-controls="guideSidebar" aria-expanded="false">☰ Índice do guia</button>
     </div>
   </header>
   <div class="mobile-overlay" id="mobileOverlay" hidden></div>
@@ -383,5 +386,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   dialog.addEventListener('close',()=>{image.removeAttribute('src')});
 });
 </script>
+<script th:src="@{/menu.js}"></script>
 </body>
 </html>
