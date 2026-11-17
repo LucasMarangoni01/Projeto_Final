@@ -1,0 +1,27 @@
+.relatorios-page{width:min(1350px,100%);margin:0 auto;padding:clamp(18px,3vw,36px);color:#eef5ff;font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.relatorios-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.13)}
+.relatorios-kicker,.relatorios-tag{font:800 10px 'JetBrains Mono',Consolas,monospace;letter-spacing:.10em;color:#f4c45f}
+.relatorios-header h1{font-size:clamp(25px,3vw,37px);margin:7px 0;color:#fff}
+.relatorios-header p{font-size:13px;color:#b2c5df;line-height:1.55;margin:0}
+.relatorios-voltar{padding:11px 16px;border-radius:9px;border:1px solid rgba(255,255,255,.17);color:#e7f0ff;text-decoration:none;font-size:13px}
+.relatorios-escopo{margin:22px 0;padding:14px 18px;border:1px solid rgba(96,165,250,.22);border-radius:10px;background:rgba(59,130,246,.08);font-size:13px;line-height:1.6;color:#cfe2fd}
+.relatorios-escopo strong{color:#fff}
+.relatorios-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.relatorios-grid article{display:flex;flex-direction:column;gap:10px;min-height:230px;padding:21px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:linear-gradient(140deg,rgba(16,40,120,.85),rgba(7,29,75,.92))}
+.relatorios-grid h2{font-size:19px;margin:2px 0;color:#fff}
+.relatorios-grid p{font-size:13px;line-height:1.55;color:#b5c9e0;flex:1;margin:0}
+.relatorios-grid a{align-self:flex-start;background:#f4c45f;color:#142742;padding:10px 13px;border-radius:8px;font-size:12px;font-weight:800;text-decoration:none}
+.relatorios-grid a:hover{background:#ffe099}
+.relatorios-grid a:focus-visible,.relatorios-voltar:focus-visible{outline:3px solid #f4c45f;outline-offset:3px}
+.relatorios-aviso{padding-top:17px;color:#a9bedb;font-size:12px;line-height:1.6}
+html[data-theme="light"] .relatorios-page{color:#172b48}
+html[data-theme="light"] .relatorios-header{border-color:#d0dff0}
+html[data-theme="light"] .relatorios-header h1,html[data-theme="light"] .relatorios-grid h2{color:#1d426f}
+html[data-theme="light"] .relatorios-header p,html[data-theme="light"] .relatorios-grid p,html[data-theme="light"] .relatorios-aviso{color:#566c88}
+html[data-theme="light"] .relatorios-grid article{background:#fff;border-color:#d7e2f1}
+html[data-theme="light"] .relatorios-voltar{color:#21518b;border-color:#cedbef}
+html[data-theme="light"] .relatorios-escopo{background:#edf3fc;color:#385778;border-color:#d2e1f3}
+html[data-theme="light"] .relatorios-escopo strong{color:#1d426f}
+html[data-theme="light"] .relatorios-kicker,html[data-theme="light"] .relatorios-tag{color:#865800}
+@media(max-width:980px){.relatorios-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.relatorios-grid{grid-template-columns:1fr}.relatorios-grid article{min-height:0}.relatorios-page{padding:16px}}
