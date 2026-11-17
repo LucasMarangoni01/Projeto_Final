@@ -542,3 +542,55 @@
     font-weight: 800;
     vertical-align: middle;
 }
+
+
+/* Autoatendimento profissional para administradores (sem editar role/unidade/status). */
+.perfil-admin-self-form {
+    margin-top: 22px;
+    padding: clamp(16px,2vw,24px);
+    border: 1px solid rgba(147,197,253,.22);
+    border-radius: 12px;
+    background: rgba(8,28,66,.48);
+}
+.perfil-admin-self-head h3 {
+    margin: 5px 0 7px;
+    color: #f2f7ff;
+    font-size: 19px;
+}
+.perfil-admin-self-head p,.perfil-admin-self-actions p {
+    color: #b7c9e4;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.perfil-admin-self-grid {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 15px;
+    margin-top: 17px;
+}
+.perfil-admin-self-actions {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-top:20px;
+}
+.perfil-admin-self-actions .perfil-primary-button {
+    min-height:44px;
+    flex:0 0 auto;
+}
+html[data-theme="light"] .perfil-admin-self-form {
+    background:#f4f8fd;
+    border-color:#ccdaeb;
+}
+html[data-theme="light"] .perfil-admin-self-head h3 { color:#173c6c; }
+html[data-theme="light"] .perfil-admin-self-head p,
+html[data-theme="light"] .perfil-admin-self-actions p { color:#506984; }
+@media(max-width:900px) {
+    .perfil-admin-self-grid {grid-template-columns:1fr 1fr;}
+}
+@media(max-width:650px) {
+    .perfil-admin-self-grid {grid-template-columns:1fr;}
+    .perfil-admin-self-actions .perfil-primary-button {width:100%;}
+}
