@@ -42,6 +42,10 @@
                     </li>
 
                     <li>
+                        <a class="nav-link" th:href="@{/relatorios}">Relatórios</a>
+                    </li>
+
+                    <li>
                         <a class="nav-link" th:href="@{/funcionario/listagem}">Funcionários</a>
                     </li>
 
@@ -148,6 +152,7 @@
                            th:href="@{/sensores}" class="mobile-menu-link">Sensores</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/analises}" class="mobile-menu-link">Análises</a>
+                        <a th:href="@{/relatorios}" class="mobile-menu-link">Relatórios</a>
                         <a th:href="@{/funcionario/listagem}" class="mobile-menu-link">Funcionários</a>
                         <a th:href="@{/manutencao/listagem}" class="mobile-menu-link">Manutenções</a>
                         <a th:href="@{/guia}" class="mobile-menu-link">Guia</a>
