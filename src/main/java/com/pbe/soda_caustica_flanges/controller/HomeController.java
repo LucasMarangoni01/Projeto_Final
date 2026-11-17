@@ -84,13 +84,16 @@ public class HomeController {
                 .filter(sensor -> sensor.getFlange() != null)
                 .collect(Collectors.groupingBy(sensor -> sensor.getFlange().getId()));
 
-        List<LeituraSensor> leituras = idsFlanges.isEmpty()
+        // Consultas limitadas: o dashboard não carrega o histórico inteiro.
+        List<LeituraSensor> ultimasLeituras = idsFlanges.isEmpty()
                 ? List.of()
-                : leituraSensorRepository.findByFlange_IdInOrderByRecebidaEmDesc(idsFlanges);
+                : leituraSensorRepository.findUltimasPorFlanges(idsFlanges);
+        List<LeituraSensor> leiturasRecentes = idsFlanges.isEmpty()
+                ? List.of()
+                : leituraSensorRepository.findTop10ByFlange_IdInOrderByRecebidaEmDesc(idsFlanges);
 
-        // A consulta vem ordenada da mais recente para a mais antiga.
         Map<Long, LeituraSensor> ultimaLeituraPorFlange = new HashMap<>();
-        for (LeituraSensor leitura : leituras) {
+        for (LeituraSensor leitura : ultimasLeituras) {
             if (leitura.getFlange() != null) {
                 ultimaLeituraPorFlange.putIfAbsent(leitura.getFlange().getId(), leitura);
             }
@@ -190,7 +193,7 @@ public class HomeController {
         model.addAttribute("totalSensoresInstalados", totalSensoresInstalados);
         model.addAttribute("flangesSemSensor", flangesSemSensor);
         model.addAttribute("totalAlertasAtivos", alarmesAtivos.size());
-        model.addAttribute("leiturasRecentes", leituras.stream().limit(10).toList());
+        model.addAttribute("leiturasRecentes", leiturasRecentes);
         model.addAttribute("ehAdmin", admin);
         model.addAttribute("nomeUnidade", usuario.getUnidade() == null
                 ? "Todas as unidades"
