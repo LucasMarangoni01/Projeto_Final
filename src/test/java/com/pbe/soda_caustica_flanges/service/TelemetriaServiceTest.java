@@ -95,6 +95,20 @@ class TelemetriaServiceTest {
     }
 
     @Test
+    void rejeitaMensagemTermicaDeSensorDeGasSemCriarLeituraOuAlerta() {
+        sensor.setTipo(TipoSensor.DETECCAO_GAS);
+        TelemetriaDTO dados = mensagem("evento_gas_0001", 25.0);
+        habilitarDispositivo(dados);
+
+        IllegalArgumentException erro = assertThrows(IllegalArgumentException.class,
+                () -> service.processar("SENSOR_01", dados));
+
+        assertTrue(erro.getMessage().contains("Leituras de gás ainda não estão habilitadas"));
+        verify(leituras, never()).save(any(LeituraSensor.class));
+        verify(incidentes, never()).save(any(Incidente.class));
+    }
+
+    @Test
     void temperaturaAltaCriaAlertaEDeixaFlangeCritica() {
         TelemetriaDTO dados = mensagem("evento_00003", 92.0);
         habilitarDispositivo(dados);

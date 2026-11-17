@@ -41,6 +41,15 @@ public class SensorService {
 
     @Transactional
     public Sensor salvar(SensorDTO dados) {
+        // Nova fase do protótipo: somente sensores de gás podem ser cadastrados.
+        // Os tipos anteriores permanecem no enum para ler registros já existentes.
+        if (dados.getId() == null && dados.getTipo() != TipoSensor.DETECCAO_GAS) {
+            throw new IllegalArgumentException(
+                    "Novos cadastros aceitam somente sensores de gás. "
+                            + "Sensores anteriores são mantidos para histórico."
+            );
+        }
+
         String codigo = dados.getCodigoIdentificacao().trim().toUpperCase(Locale.ROOT);
 
         boolean codigoDuplicado = dados.getId() == null
@@ -122,6 +131,15 @@ public class SensorService {
     @Transactional
     public String gerarTokenHardware(Long sensorId) {
         Sensor sensor = buscarPorId(sensorId);
+
+        // O contrato de telemetria de gas depende do gas-alvo e do modelo validado.
+        // Nao emitir credencial que possa ser confundida com integracao funcional.
+        if (sensor.getTipo() == TipoSensor.DETECCAO_GAS) {
+            throw new IllegalArgumentException(
+                    "A integração do sensor de gás ainda não está homologada. "
+                            + "Defina o gás-alvo e o modelo antes de habilitar a comunicação."
+            );
+        }
 
         if (sensor.getStatus() == StatusSensor.DESATIVADO) {
             throw new IllegalArgumentException("Não é possível gerar token para sensor desativado.");

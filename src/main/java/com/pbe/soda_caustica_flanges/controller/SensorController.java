@@ -159,7 +159,16 @@ public class SensorController {
                         && flange.getId().equals(sensorDTO.getFlangeId())))
                 .toList());
         model.addAttribute("coberturaFlanges", cobertura);
-        model.addAttribute("tiposSensor", TipoSensor.values());
+        // Não apagar tipos antigos do enum: o banco pode conter sensores históricos.
+        // Para novos registros e conversões, apresentar apenas o tipo de gás.
+        List<TipoSensor> tiposPermitidos = new ArrayList<>();
+        tiposPermitidos.add(TipoSensor.DETECCAO_GAS);
+        if (sensorDTO.getId() != null
+                && sensorDTO.getTipo() != null
+                && sensorDTO.getTipo() != TipoSensor.DETECCAO_GAS) {
+            tiposPermitidos.add(sensorDTO.getTipo());
+        }
+        model.addAttribute("tiposSensor", tiposPermitidos);
         model.addAttribute("statusSensores", StatusSensor.values());
         model.addAttribute("totalSensores", sensores.size());
         model.addAttribute("sensoresInstalados", sensoresInstalados);

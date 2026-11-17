@@ -4,6 +4,11 @@
 - `TAP-Flangens.docx` (Termo de Abertura do Projeto, versão oficial enviada pelo autor).
 - `TCC - Soda Caustica.docx` (TCC oficial, seções 3.3 a 3.6).
 
+**Decisão posterior ao TAP/TCC:** o escopo do protótipo foi alterado em
+17/11/2026 para **somente sensor de gás nos novos cadastros**. Os documentos
+oficiais anteriores citam sensor térmico; esta mudança precisa de registro e
+alinhamento com o orientador. Ver `docs/ESCOPO-SENSOR-GAS.md`.
+
 Este documento identifica o que existe **no código**. A presença de classes não comprova
 que um dispositivo físico, o banco de produção ou um navegador tenha sido testado.
 Situações: **implementado no código**, **parcial**, **pendente de validação**.
@@ -16,9 +21,9 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | RF02 | Consultar flanges | Implementado no código | `FlangeController`, `FlangeRepository` |
 | RF03 | Editar flanges | Implementado no código | `FlangeController` |
 | RF04 | Excluir flanges | Implementado como arquivamento lógico para preservar histórico (RN08); validar expectativa da banca | `FlangeController`, `Flange.ativo` |
-| RF05 | Receber dados dos sensores | Implementado no código MQTT; **hardware real não validado** | `MqttTelemetriaSubscriber`, `TelemetriaService` |
-| RF06 | Processar dados dos sensores | Implementado no código para sensor térmico | `TelemetriaService` |
-| RF07 | Identificar condições de possível vazamento | Parcial: sinal do hardware e limite térmico configurável; não comprova vazamento | `TelemetriaService`, `Sensor` |
+| RF05 | Receber dados dos sensores | Contrato MQTT legado térmico implementado; **telemetria de gás ainda não implementada** | `MqttTelemetriaSubscriber`, `TelemetriaService` |
+| RF06 | Processar dados dos sensores | Processamento térmico legado presente; **processamento de gás ainda pendente de especificação** | `TelemetriaService` |
+| RF07 | Identificar condições de possível vazamento | Parcial: condições térmicas legadas; gás-alvo, modelo do sensor e validade para NaOH ainda não definidos | `TelemetriaService`, `Sensor` |
 | RF08 | Emitir alertas | Implementado no código; tempo e LED físico pendentes de teste | `Incidente`, `AlertaController` |
 | RF09 | Apresentar sensores no painel | Implementado no código; validar navegador e dados reais | `HomeController`, `home/index.html` |
 | RF10 | Registrar ocorrências | Implementado no código | `TelemetriaService`, `IncidenteRepository` |
@@ -58,7 +63,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | CRUD de flanges, funcionários e manutenções | Implementado no código |
 | Fotos das flanges com acesso restrito | Implementado no código; testar permissões e persistência após implantação |
 | Dashboard de monitoramento | Implementado; verificação periódica de alertas por unidade e consulta de leituras limitada; validação em navegador pendente |
-| Sensores térmicos/Arduino | Software MQTT presente; integração e ensaio **físico** pendentes |
+| Sensores térmicos/Arduino | Proposta original do TAP. Escopo revisado para gás; cadastro de gás implementado, **integração física e telemetria não implementadas** |
 | LED de alerta | **Pendente:** demonstração/testes com circuito de Arduino |
 | Alertas visuais e histórico | Implementado no código |
 | **Relatórios detalhados** | Integrado à branch main: exportações CSV por escopo; validação de uso real pendente |

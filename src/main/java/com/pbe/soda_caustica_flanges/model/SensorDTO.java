@@ -16,7 +16,7 @@ public class SensorDTO {
     private String codigoIdentificacao;
 
     @NotNull(message = "Selecione o tipo de sensor.")
-    private TipoSensor tipo;
+    private TipoSensor tipo = TipoSensor.DETECCAO_GAS;
 
     @Size(max = 100, message = "O fabricante deve ter no máximo 100 caracteres.")
     private String fabricante;

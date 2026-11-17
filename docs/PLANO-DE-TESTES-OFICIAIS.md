@@ -22,6 +22,25 @@ Nenhuma linha abaixo deve ser marcada como aprovada sem execução observada.
 | TC13 | RNF01–RNF02 | Realizar tarefas com operador/professor | Compreensão dos controles e alertas, feedback anotado | Pendente |
 | TC14 | RNF09 | Medir sinal de anormalidade até alerta visível | Tempo aferido e avaliado pela equipe | Pendente |
 
+## Atualização de escopo — sensor de gás
+
+A decisão de 17/11/2026 substitui os **novos cadastros de sensor térmico**
+por **sensor de gás (protótipo)**. O contrato MQTT disponível no código
+ainda é térmico e não representa detecção real de gás.
+
+Para validar a interface enquanto o hardware específico não for definido:
+- [ ] Cadastrar novo sensor de gás com código único e referência de flange.
+- [ ] Confirmar que novo sensor de tipo diferente é rejeitado pelo backend.
+- [ ] Verificar que sensores antigos continuam listados e editáveis.
+- [ ] Garantir que dados térmicos não sejam aceitos como dados de gás.
+- [ ] Definir gás-alvo, modelo do sensor e critério de leitura com orientador.
+- [ ] Revisar a documentação TAP/TCC antes de tratar a mudança como validada.
+
+**Os passos abaixo descrevem o procedimento legado para sensores térmicos**
+e ficam registrados somente como referência histórica; **não** devem ser
+executados ou divulgados como comprovação da nova integração de gás.
+Ver `docs/ESCOPO-SENSOR-GAS.md`.
+
 ## Integração acadêmica do protótipo
 
 Somente **bancada didática de baixa tensão**, supervisionada pela instituição.

@@ -2,6 +2,15 @@ package com.pbe.soda_caustica_flanges.model;
 
 public enum TipoSensor {
 
+    /*
+     * Único tipo permitido para novos cadastros na nova fase do TCC.
+     * Não implica detecção de soda cáustica ou validação industrial.
+     */
+    DETECCAO_GAS(
+            "Sensor de gás (protótipo)",
+            "Monitora um gás-alvo ainda a ser especificado. Um sensor de gás comum não detecta vazamentos de soda cáustica líquida."
+    ),
+
     DETECCAO_VAZAMENTO(
             "Detecção de vazamento (NaOH)",
             "Identifica presença de líquido no ponto monitorado. O elemento sensor deve ser compatível com soda cáustica."
