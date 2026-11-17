@@ -25,7 +25,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | RF11 | Consultar histórico de ocorrências | Implementado no código | `AlertaController`, `alerta/listagem.html` |
 | RF12 | Registrar manutenções | Implementado no código | `ManutencaoController` |
 | RF13 | Consultar histórico de manutenções | Implementado no código, inclusive arquivadas | `ManutencaoRepository` |
-| RF14 | Armazenar dados em banco | Implementado com JPA/MySQL; testar persistência em ambiente real | `repository/`, `application.properties` |
+| RF14 | Armazenar dados em banco | JPA/MySQL implementado; integração automatizada com MySQL descartável no CI; ainda falta validar ambiente de implantação | `repository/`, `application.properties` |
 | RF15 | Visualizar situação atual das flanges | Implementado no código | `HomeController`, `DashboardFlangeDTO` |
 
 ## Requisitos não funcionais (TCC, RNF01–RNF09)
@@ -35,7 +35,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | RNF01 | Interface simples | Páginas presentes; realizar teste de usabilidade com operadores/avaliadores |
 | RNF02 | Informações claras | Dashboard, alertas e análises presentes; conferir contraste e nomenclaturas |
 | RNF03 | Tempo de resposta adequado | Dashboard otimizado para consultas de última leitura e 10 recentes; **pendente:** medir em carga real |
-| RNF04 | Integridade dos dados | Relacionamentos e histórico no código; **pendente:** testes com MySQL, recuperação e backup |
+| RNF04 | Integridade dos dados | Testes de consultas e isolamento por unidade com MySQL descartável no CI; **pendente:** restauração de backup e validação da instalação real |
 | RNF05 | Usar banco de dados | Implementado no código com MySQL |
 | RNF06 | Tecnologias web adequadas | Spring Boot, Thymeleaf, HTML/CSS/JS |
 | RNF07 | Código de fácil manutenção | Divisão em controllers/services/repositories; revisar padrões e cobertura |
@@ -62,7 +62,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | LED de alerta | **Pendente:** demonstração/testes com circuito de Arduino |
 | Alertas visuais e histórico | Implementado no código |
 | **Relatórios detalhados** | Integrado à branch main: exportações CSV por escopo; validação de uso real pendente |
-| Testes unitários e integração | Há testes; expandir testes com MySQL/hardware e registrar resultados |
+| Testes unitários e integração | Maven e testes automatizados com MySQL descartável no CI; hardware, navegador e aceite continuam pendentes |
 | Segurança de acesso | Spring Security com ADMIN/USER; ampliar testes de isolamento entre unidades |
 | Backup e recuperação | Scripts Windows e procedimento documentados em `docs/BACKUP-E-RECUPERACAO.md`; **execução, agendamento e restauração real pendentes** |
 | Desempenho e disponibilidade | **Pendente:** medição e validação em ambiente de implantação |
