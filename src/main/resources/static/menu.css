@@ -34,6 +34,9 @@
     z-index: 1000;
     width: 100%;
     min-height: 68px;
+    /* Isola a barra de regras globais "nav" de outras paginas. */
+    margin: 0;
+    padding: 0;
     background: var(--menu-bg);
     border-bottom: 1px solid rgba(147, 197, 253, 0.13);
     box-shadow: 0 7px 24px rgba(0, 12, 36, 0.22);
@@ -67,6 +70,10 @@
 .nav-brand {
     min-width: 190px;
     flex: 0 0 auto;
+    /* style.css aplica padding a "nav a"; a marca deve seguir o mesmo
+       alinhamento tanto no Guia quanto no Dashboard. */
+    width: auto;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -137,6 +144,10 @@
     width: 100%;
     display: flex;
     align-items: center;
+    /* Antes o dashboard herdava "nav ul { justify-content:center }"
+       e o Guia usava o default flex-start. */
+    justify-content: center;
+    flex-direction: row;
     gap: 5px;
     margin: 0;
     padding: 0;
@@ -1209,6 +1220,17 @@
     }
 }
 
+
+/* Normalizacao das ancora do menu institucional: sem receber
+   largura/padding de seletores globais "nav a" de outras paginas. */
+.main-nav .nav-brand,
+.main-nav .nav-account-profile,
+.main-nav .nav-primary .nav-link {
+    width: auto;
+    text-decoration: none;
+}
+.main-nav .nav-brand { padding: 0; }
+.main-nav .nav-primary { justify-content: center; flex-direction: row; }
 
 /* =========================================================
    NAV FINAL · ACESSOS DIRETOS E MARCA DO PROJETO
