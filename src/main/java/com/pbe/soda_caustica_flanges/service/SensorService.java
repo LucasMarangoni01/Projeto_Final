@@ -41,6 +41,15 @@ public class SensorService {
 
     @Transactional
     public Sensor salvar(SensorDTO dados) {
+        // Nova fase do protótipo: somente sensores de gás podem ser cadastrados.
+        // Os tipos anteriores permanecem no enum para ler registros já existentes.
+        if (dados.getId() == null && dados.getTipo() != TipoSensor.DETECCAO_GAS) {
+            throw new IllegalArgumentException(
+                    "Novos cadastros aceitam somente sensores de gás. "
+                            + "Sensores anteriores são mantidos para histórico."
+            );
+        }
+
         String codigo = dados.getCodigoIdentificacao().trim().toUpperCase(Locale.ROOT);
 
         boolean codigoDuplicado = dados.getId() == null
