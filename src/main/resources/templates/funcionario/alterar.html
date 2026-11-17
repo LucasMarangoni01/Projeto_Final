@@ -13,20 +13,19 @@
 <body>
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main style="display: flex; justify-content: center; align-items: flex-start; min-height: calc(100vh - 120px); padding: 40px 10px;">
+<main class="operador-form-page">
 
-    <div class="card" style="width: 100%; max-width: 700px;">
+    <div class="card operador-form-card">
         <div class="topbar-eyebrow">Alteração de Dados</div>
-        <h2 style="margin-bottom: 20px;">Alterar Cadastro do Operador</h2>
+        <h1 class="operador-form-title">Editar funcionário</h1>
+        <p class="operador-form-description">Revise os dados do profissional. Os registros de manutenção vinculados serão preservados.</p>
 
         <form id="form-cadastro" th:action="@{/funcionario/salvar}" th:object="${funcionario}" method="post">
 
             <input type="hidden" th:field="*{id}">
             <div th:if="${#fields.hasGlobalErrors()}" class="msg-erro" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></div>
 
-            <h3 style="font-size: 1.1rem; color: #9ca3af; margin-bottom: 15px; border-bottom: 1px solid #374151; padding-bottom: 5px;">
-                Informações Pessoais
-            </h3>
+            <h2 class="operador-form-section">Informações pessoais</h2>
 
             <div class="form-grid">
                 <div class="form-group" style="grid-column: 1 / -1;">
