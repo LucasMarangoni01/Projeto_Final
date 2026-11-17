@@ -47,6 +47,21 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 ---
 
+## Escopo atualizado — sensor de gás
+
+A fase atual do protótipo prevê **somente sensores de gás para novos cadastros**.
+As funcionalidades legadas de sensor térmico permanecem apenas para integridade
+dos registros e histórico. **Não há detecção de gás homologada**: antes de integrar
+hardware, a equipe precisa definir qual gás será monitorado, escolher um modelo
+compatível e validar a telemetria. Um sensor de gás genérico **não detecta
+automaticamente vazamento de soda cáustica líquida e não o impede**.
+
+Consulte [a decisão de escopo e pendências](docs/ESCOPO-SENSOR-GAS.md).
+Esta alteração de hardware deve ser refletida formalmente na documentação
+do TAP/TCC, que ainda cita sensores térmicos.
+
+---
+
 ## Funcionalidades
 
 ### Flanges
