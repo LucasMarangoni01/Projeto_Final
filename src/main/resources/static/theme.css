@@ -607,3 +607,257 @@ html[data-theme="light"] .perfil-feedback-error {color:#962d37;background:#fff0f
 @media(max-width:650px) {
  html[data-theme="light"] .main-nav .nav-brand-copy small {white-space:normal;}
 }
+
+
+/* ================================================================
+   FLANGEGUARD — MODO CLARO CINZA-ACO
+   Reduz branco puro e adapta o mapa vetorial ao tema do dashboard.
+   Escopo exclusivo do modo claro; o tema escuro nao e modificado.
+   ================================================================ */
+html[data-theme="light"] {
+    --bg-base:#cfd8e4;
+    --bg-card:#e3e9f1;
+    --bg-card-2:#d6e0eb;
+    --bg-tr:#dde5ef;
+    --bg-hover:#c9d8e8;
+    --bg-text-h1:#1d416f;
+    --bg-text-h2:#1d416f;
+    --text-primary:#1a3456;
+    --text-secondary:#385471;
+    --text-dim:#795315;
+    --border:rgba(52,79,113,.17);
+    --border-strong:rgba(52,79,113,.27);
+    --shadow-card:0 4px 16px rgba(33,56,88,.10);
+    --shadow-lift:0 10px 26px rgba(33,56,88,.16);
+    --menu-bg:#dbe3ed;
+    --menu-bg-solid:#dbe3ed;
+    --menu-panel:#e5ebf3;
+    --menu-hover:rgba(35,84,151,.12);
+    --menu-text:#1b395f;
+    --menu-muted:#496685;
+    --menu-border:#b7c6d8;
+    --bg:#cfd8e4;
+    --bg2:#d6dfea;
+    --surface:#e3eaf2;
+    --surface-2:#d6e0eb;
+    --text:#1a3456;
+    --muted:#425f7f;
+    --text-muted:#486585;
+    --text-hint:#587391;
+    --border-md:#b0c1d5;
+    --bg-main:#cfd8e4;
+    --bg-panel:#dce5f0;
+    --bg-input:#edf2f7;
+    --analytics-bg:#cfd8e4;
+    --analytics-card:#e3eaf2;
+    --analytics-card-alt:#d8e2ed;
+    --analytics-border:#b8c8db;
+    --fg-panel:#e0e7f0;
+    --fg-panel-raised:#e7edf4;
+    --fg-panel-soft:#d6e0eb;
+    --fg-outline:#b8c8da;
+    --fg-content:#193654;
+    --fg-secondary:#425f80;
+    --fg-highlight:#85591a;
+    --fg-elevation:0 6px 18px rgba(31,55,85,.10);
+}
+html[data-theme="light"] body,
+html[data-theme="light"] body:has(.main-nav),
+html[data-theme="light"] body:has(.app-shell) {
+    background:#cfd8e4;
+    color:#193654;
+}
+/* Menus claros ficam cinza-azulados, nao branco puro. */
+html[data-theme="light"] .main-nav {
+    background:#dbe3ed !important;
+    border-bottom-color:#b6c5d7 !important;
+    box-shadow:0 4px 15px rgba(24,46,73,.12);
+}
+html[data-theme="light"] .main-nav .nav-dropdown-panel,
+html[data-theme="light"] .main-nav .mobile-menu-content {
+    background:#e5ebf3;
+    border-color:#b8c8db;
+}
+html[data-theme="light"] .main-nav :is(.theme-toggle,.btn-trocar-conta,.mobile-menu>summary) {
+    background:#d0ddeb;
+    color:#183f6e;
+    border-color:#b1c4db;
+}
+html[data-theme="light"] .main-nav :is(.nav-link.is-current,.nav-dropdown.has-current>summary) {
+    background:#c9d8ea;
+    border-color:#adc3dc;
+    color:#143b6b !important;
+}
+/* Componentes comuns: tons de cinza, em vez de blocos brancos. */
+html[data-theme="light"] body:has(.main-nav) main .card,
+html[data-theme="light"] body:has(.main-nav) .operador-form-card,
+html[data-theme="light"] body:has(.main-nav) :is(
+    .alerts-panel,.alerts-kpis article,.sensor-panel,.sensor-metric,
+    .analises-section,.analises-panel,.analise-kpi,.maintenance-card,
+    .usuarios-panel,.usuarios-summary-card,.unidade-panel,.unidade-sidebar-panel,
+    .unidade-card-modern,.unidade-overview-card,.perfil-panel,.perfil-hero,
+    .perfil-admin-panel,.flange-form-card
+) {
+    background:#e3eaf2;
+    border-color:#b8c8da;
+    color:#1a3758;
+    box-shadow:0 6px 18px rgba(29,51,83,.09);
+}
+html[data-theme="light"] :is(
+    .analises-mes-card,.analises-sensor-summary>div,.sensor-coverage-item,
+    .sensor-table,.sensor-integration-note,.usuarios-permission-row,
+    .usuarios-table tbody tr,.unidade-member-row,.unidade-registration-card,
+    .unidade-metrics>div,.perfil-admin-item,.maintenance-readonly
+) {
+    background:#d8e2ed;
+    border-color:#b7c9db;
+}
+html[data-theme="light"] :is(
+    .maintenance-table-wrap,.maintenance-table tbody td,.maintenance-table thead th,
+    .sensor-table th,.table-container,.funcionarios-page .table-container
+) {
+    background:#e3eaf2;
+    border-color:#b8c8da;
+}
+html[data-theme="light"] body:has(.main-nav) main :is(
+    .form-group input:not([type="checkbox"]):not([type="radio"]),
+    .form-group select,.form-group textarea,.sensor-field input,
+    .sensor-field select,.sensor-field textarea,.perfil-field input:not(:disabled),
+    .unidade-form-field input,.unidade-form-field textarea
+) {
+    background:#f0f3f7;
+    color:#1c385c;
+    border-color:#aebfd2;
+}
+/* Dashboard: a area superior, o painel lateral e os indicadores seguem o cinza-aco. */
+html[data-theme="light"] .dash .topbar {
+    background:#dde5ee;
+    border:1px solid #b8c8da;
+    border-radius:13px;
+    padding:17px 19px;
+}
+html[data-theme="light"] .dash .topbar-title,
+html[data-theme="light"] .dash .map-card-heading strong,
+html[data-theme="light"] .dash .dashboard-section-heading h2 {
+    color:#193654;
+}
+html[data-theme="light"] .dash :is(.topbar-sub,.topbar-unit,.map-card-hint,.dashboard-data-source) {
+    color:#486683;
+}
+html[data-theme="light"] .dash .topbar-eyebrow {
+    color:#865b1b;
+}
+html[data-theme="light"] .dash .dashboard-data-note {
+    color:#73501d;
+    background:#eee2ca;
+    border-left:3px solid #b98b3a;
+    border-radius:6px;
+    padding:8px 11px;
+    line-height:1.55;
+}
+html[data-theme="light"] .dash :is(
+    .map-card,.flange-panel,.sc,.log-box,.legend-content
+) {
+    background:#e3eaf2;
+    border-color:#b8c8da;
+    box-shadow:0 7px 20px rgba(27,52,82,.11);
+}
+html[data-theme="light"] .dash .flange-panel-header {
+    background:#d5dfeb;
+    border-bottom-color:#b7c8db;
+}
+html[data-theme="light"] .dash .flange-panel-title,
+html[data-theme="light"] .dash .flange-panel-count {
+    color:#294969;
+}
+html[data-theme="light"] .dash .flange-search {
+    background:#d0dbe8;
+    border-color:#aebed2;
+}
+html[data-theme="light"] .dash .flange-search :is(input,kbd) {
+    color:#1e416d;
+    background:transparent;
+}
+html[data-theme="light"] .dash .flange-search input::placeholder {
+    color:#52708e;
+}
+html[data-theme="light"] .dash :is(.flange-search-meta,.fc-details,.fc-overflow-note,.fc-empty span) {
+    color:#4a6888;
+}
+html[data-theme="light"] .dash .fc {
+    background:#d8e2ed;
+    border-color:#bbcadb;
+}
+html[data-theme="light"] .dash .fc:hover {
+    background:#cad9e8;
+}
+html[data-theme="light"] .dash .fc-code,
+html[data-theme="light"] .dash .sv {
+    color:#18385e;
+}
+html[data-theme="light"] .dash :is(.fc-loc,.sl,.log-row,.legend-item) {
+    color:#415e7e;
+}
+html[data-theme="light"] .dash .ok-b,
+html[data-theme="light"] .dash .fc-pill.fc-status-normal {
+    color:#126b46;
+    background:#cde9d9;
+    border-color:#82c7a2;
+}
+html[data-theme="light"] .dash .fc-pill.fc-status-warning {
+    color:#8b5c07;
+    background:#f5e5b6;
+    border-color:#e2bb69;
+}
+html[data-theme="light"] .dash .fc-pill.fc-status-critical {
+    color:#a72b3a;
+    background:#f5d7dd;
+    border-color:#dda2ae;
+}
+html[data-theme="light"] .dash .fc-pill.fc-status-maintenance {
+    color:#1d5590;
+    background:#d1e1f4;
+    border-color:#a4c2e5;
+}
+html[data-theme="light"] .dash .status-normal-number {color:#177e54 !important;}
+html[data-theme="light"] .dash .status-warning-number {color:#986414 !important;}
+html[data-theme="light"] .dash .status-critical-number {color:#bf3c4b !important;}
+html[data-theme="light"] .dash .status-maintenance-number {color:#3267a5 !important;}
+/* Mapa do processo: cinza claro nos dois temas, com tubulacao azul visivel no claro. */
+html[data-theme="light"] .dash .map-viewport {
+    background:#ccd8e5;
+    border-radius:9px;
+}
+html[data-theme="light"] .dash .map-svg .plant-background {
+    fill:#cedae8;
+    stroke:#aebed1;
+}
+html[data-theme="light"] .dash .map-svg .plant-heading {fill:#84591e;}
+html[data-theme="light"] .dash .map-svg .plant-pipe {stroke:#7292b8;}
+html[data-theme="light"] .dash .map-svg .plant-pipe-detail {stroke:#afc4da;}
+html[data-theme="light"] .dash .map-svg .plant-line-label {fill:#315c88;}
+html[data-theme="light"] .dash .map-svg .plant-connector {stroke:#7890ad;}
+html[data-theme="light"] .dash .map-svg .plant-node-core {fill:#214b7b;stroke:#d8e6f6;}
+html[data-theme="light"] .dash .map-svg .plant-node-cross {stroke:#f1f6fd;}
+html[data-theme="light"] .dash .map-svg .plant-node-name {fill:#193b65;}
+html[data-theme="light"] .dash .map-svg .plant-node-status {fill:#23476e;}
+html[data-theme="light"] .dash .map-svg .plant-node-reading {fill:#4d6a89;}
+html[data-theme="light"] .dash .map-svg .plant-footer {fill:#566e8d;}
+/* A central de relatorios e o Guia acompanham o mesmo cinza. */
+html[data-theme="light"] .relatorios-page {
+    --rp-text:#1a3759;--rp-muted:#4a6581;--rp-border:#b6c7db;
+}
+html[data-theme="light"] .relatorios-section {background:#d6e0eb;}
+html[data-theme="light"] .relatorios-summary-primary,
+html[data-theme="light"] .relatorios-summary-indicator,
+html[data-theme="light"] .relatorios-grid .relatorios-card {
+    background:#e4ebf3;
+    border-color:#b7c7d9;
+}
+html[data-theme="light"] :is(.guide-section,.hero,.mini-card,.key-message,.bullet-box,
+    .notice,.concept,.tech-scheme>div,.faq-item,.future-block,.workflow-card) {
+    background:#e3eaf2;
+    border-color:#b8c8da;
+}
+html[data-theme="light"] .sidebar {background:#dbe4ee;border-color:#b7c7d9;}
+html[data-theme="light"] .guide-utilitybar.topbar {background:#dbe4ee;}
