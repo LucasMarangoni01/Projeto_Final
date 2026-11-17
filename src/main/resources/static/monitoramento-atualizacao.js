@@ -22,21 +22,22 @@
             if (!resposta.ok) throw new Error('Consulta indisponível');
             const dados = await resposta.json();
             const estado = JSON.stringify([dados.alertasAtivos, dados.ultimaLeituraEm]);
-            if (referencia !== null && referencia !== estado) {
-                if (badge) {
-                    const total = Number(dados.alertasAtivos) || 0;
-                    badge.textContent = total === 0
-                        ? 'Nenhum alerta ativo'
-                        : total + (total === 1 ? ' alerta ativo' : ' alertas ativos');
-                    badge.classList.toggle('al-b', total > 0);
-                    badge.classList.toggle('ok-b', total === 0);
-                }
-                if (aviso) {
-                    aviso.hidden = false;
-                    aviso.textContent = Number(dados.alertasAtivos) > 0
-                        ? 'Novas informações de monitoramento. Abrir painel atualizado'
-                        : 'Dados atualizados. Recarregar painel';
-                }
+            const total = Number(dados.alertasAtivos) || 0;
+            const inicial = Number(area.dataset.alertas || 0);
+            const mudou = referencia === null ? total !== inicial : referencia !== estado;
+            // Sempre alinhar a contagem com o servidor, inclusive na primeira consulta.
+            if (badge) {
+                badge.textContent = total === 0
+                    ? 'Nenhum alerta ativo'
+                    : total + (total === 1 ? ' alerta ativo' : ' alertas ativos');
+                badge.classList.toggle('al-b', total > 0);
+                badge.classList.toggle('ok-b', total === 0);
+            }
+            if (mudou && aviso) {
+                aviso.hidden = false;
+                aviso.textContent = total > 0
+                    ? 'Novas informações de monitoramento. Abrir painel atualizado'
+                    : 'Dados atualizados. Recarregar painel';
             }
             referencia = estado;
             if (indicador) indicador.textContent =
