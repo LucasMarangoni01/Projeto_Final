@@ -1,0 +1,148 @@
+/* Menu institucional reutilizado na pagina Guia.
+   O indice lateral continua sendo uma navegacao independente dos modulos. */
+
+/* A barra do sistema e a mesma do dashboard, com os mesmos links e permissoes.
+   A faixa do Guia abaixo e apenas contextual; nao cria um segundo menu global. */
+body:has(.guide-utilitybar) .main-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.guide-utilitybar.topbar {
+    position: relative;
+    top: auto;
+    z-index: 20;
+    width: 100%;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 13px clamp(16px,3vw,44px);
+    border-bottom: 1px solid rgba(147,197,253,.18);
+    background: rgba(5,27,67,.92);
+    text-align: left;
+}
+
+.guide-utilitybar-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.guide-utilitybar-eyebrow {
+    color: #f4c45f;
+    font: 800 10px/1.4 'JetBrains Mono', Consolas, monospace;
+    letter-spacing: .11em;
+}
+.guide-utilitybar-heading strong {
+    color: #f1f7ff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+.guide-utilitybar-heading small {
+    color: #b7cbe5;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.guide-utilitybar-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.guide-utilitybar .btn {
+    min-height: 40px;
+    padding: 8px 13px;
+    font-family: 'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    border-color: rgba(147,197,253,.22);
+    border-radius: 9px;
+}
+.guide-utilitybar .btn:hover {
+    border-color: rgba(147,197,253,.48);
+}
+.guide-utilitybar .btn-menu {
+    display: none;
+    background: #123d7a;
+    color: #eaf4ff;
+}
+.guide-utilitybar .header-chip {
+    color: #b4f3d9;
+    border-color: rgba(74,222,128,.28);
+}
+
+/* Mantem indice lateral abaixo da barra fixa do sistema. */
+body:has(.guide-utilitybar) .sidebar {
+    position: sticky;
+    top: 78px;
+    height: calc(100vh - 78px);
+}
+body:has(.guide-utilitybar) .guide-section {
+    scroll-margin-top: 89px;
+}
+body:has(.guide-utilitybar) .reading-progress {
+    top: 0;
+    z-index: 1001;
+}
+html[data-theme="light"] .guide-utilitybar.topbar {
+    background: #fff;
+    border-bottom-color: #d5e1ef;
+}
+html[data-theme="light"] .guide-utilitybar-heading strong { color: #1a3c65; }
+html[data-theme="light"] .guide-utilitybar-heading small { color: #526d8e; }
+html[data-theme="light"] .guide-utilitybar-eyebrow { color: #986916; }
+html[data-theme="light"] .guide-utilitybar .btn {
+    background: #eaf2fd;
+    border-color: #c4d6eb;
+    color: #1b497c;
+}
+html[data-theme="light"] .guide-utilitybar .header-chip {
+    color: #156245;
+    background: #edf9f2;
+    border-color: #b7e5cd;
+}
+
+@media (max-width: 980px) {
+    body:has(.guide-utilitybar) .sidebar {
+        position: fixed;
+        z-index: 35;
+        top: 64px;
+        bottom: 0;
+        height: auto;
+    }
+    body:has(.guide-utilitybar) .mobile-overlay:not([hidden]) {
+        position: fixed;
+        top: 64px;
+        bottom: 0;
+        z-index: 34;
+    }
+    .guide-utilitybar .btn-menu { display: inline-flex; }
+}
+@media (max-width: 650px) {
+    .guide-utilitybar.topbar {
+        min-height: 64px;
+        padding: 10px 13px;
+        gap: 11px;
+    }
+    .guide-utilitybar-heading strong { font-size: 15px; }
+    .guide-utilitybar-heading small,
+    .guide-utilitybar .header-chip { display: none; }
+    .guide-utilitybar-actions { gap: 7px; }
+    .guide-utilitybar .btn { min-height: 38px; padding: 7px 10px; }
+    body:has(.guide-utilitybar) .sidebar { top: 60px; }
+    body:has(.guide-utilitybar) .mobile-overlay:not([hidden]) { top: 60px; }
+}
+@media (max-width: 390px) {
+    .guide-utilitybar-heading small,
+    .guide-utilitybar-eyebrow { display: none; }
+    .guide-utilitybar-heading strong { font-size: 14px; }
+    .guide-utilitybar .btn { font-size: 11px; }
+}
+@media print {
+    .main-nav,
+    .guide-utilitybar,
+    .mobile-overlay { display: none !important; }
+    body:has(.guide-utilitybar) .sidebar { display: none !important; }
+}
