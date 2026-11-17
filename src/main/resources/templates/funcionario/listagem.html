@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funcionários | Monitoramento de Flanges</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <link rel="stylesheet" th:href="@{/menu.css}">
@@ -38,14 +39,17 @@
 
 <div th:replace="~{fragments/menu :: menu}"></div>
 
-<main>
-    <div class="listagem-topbar">
+<main class="funcionarios-page">
+    <header class="listagem-topbar funcionarios-header">
         <div class="listagem-meta">
-            <div class="topbar-eyebrow">Recursos Humanos · Planta Industrial</div>
-            <div class="topbar-title">Listagem de Funcionários</div>
+            <span class="topbar-eyebrow">EQUIPE OPERACIONAL · PLANTA INDUSTRIAL</span>
+            <h1 class="topbar-title">Funcionários</h1>
+            <p>Consulte as pessoas vinculadas às unidades e responsáveis pelo histórico operacional.</p>
         </div>
-        <a th:if="${ehAdmin}" th:href="@{/funcionario/cadastro}" class="btn btn-primary" style="width: auto; padding: 0 24px;">+ Novo Cadastro</a>
-    </div>
+        <a th:if="${ehAdmin}" th:href="@{/funcionario/cadastro}" class="btn btn-primary funcionarios-new">
+            + Cadastrar funcionário
+        </a>
+    </header>
 
     <div th:if="${erro == 'conta'}" class="alerta-erro" style="margin-bottom: 20px;">
         Este funcionário está vinculado a uma conta de usuário. Para removê-lo da operação, altere ou desative a conta em Usuários.
@@ -58,8 +62,8 @@
     </div>
     <div th:if="${mensagem}" class="badge ok-b" style="margin-bottom: 24px;" th:text="${mensagem}"></div>
 
-    <div class="table-container">
-        <table>
+    <div class="table-container funcionarios-table-wrap">
+        <table class="funcionarios-table">
             <thead>
             <tr>
                 <th>ID</th>
@@ -77,7 +81,7 @@
                 <td th:text="${f.id}" style="font-family: var(--font-mono); color: var(--amber);"></td>
                 <td th:text="${f.nome_funcionario}" style="font-weight: 700;"></td>
                 <td th:text="${f.unidade != null ? f.unidade.nome : 'Sem unidade'}"></td>
-                <td><span class="fc-pill" th:text="${f.funcionario_flange}"></span></td>
+                <td><span class="fc-pill" th:text="${f.funcionario_flange != null and !#strings.isEmpty(f.funcionario_flange) ? f.funcionario_flange : 'Não designada'}"></span></td>
                 <td th:if="${ehAdmin}"
                     th:text="${f.usuario != null ? f.usuario.email + ' · ' + f.usuario.role : 'Cadastro operacional'}"></td>
                 <td th:if="${ehAdmin}" th:text="${f.idade}"></td>

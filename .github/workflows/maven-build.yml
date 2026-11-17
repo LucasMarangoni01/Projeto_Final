@@ -28,6 +28,12 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Validate UI templates and navigation
+        run: |
+          python3 scripts/validar-visual.py
+          node --check src/main/resources/static/menu.js
+          node --check src/main/resources/static/monitoramento-atualizacao.js
+
       - name: Compile and verify project
         run: mvn -B -ntp -Pvercel verify
 
