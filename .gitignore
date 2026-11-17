@@ -39,3 +39,7 @@ build/
 
 # Arquivos privados enviados pelos usuários
 uploads/
+
+# Backups locais/temporarios: dados operacionais nunca devem ir para o GitHub
+backups/
+*.sql.part
