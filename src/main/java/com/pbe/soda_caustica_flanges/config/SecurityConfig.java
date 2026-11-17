@@ -92,6 +92,8 @@ public class SecurityConfig {
                                 "/sensor.js",
                                 "/analises.css",
                                 "/relatorios.css",
+                                "/monitoramento-atualizacao.css",
+                                "/monitoramento-atualizacao.js",
                                 "/analises.js",
                                 "/manutencao.css",
                                 "/js/**",
@@ -146,6 +148,10 @@ public class SecurityConfig {
                         // Apenas ADMIN pode normalizar e restaurar o estado operacional da flange.
                         .requestMatchers(HttpMethod.POST, "/alertas/*/normalizar")
                         .hasRole("ADMIN")
+
+                        // Resumo periódico disponível somente para perfis autenticados.
+                        .requestMatchers(HttpMethod.GET, "/api/monitoramento/resumo")
+                        .hasAnyRole("ADMIN", "USER")
 
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
