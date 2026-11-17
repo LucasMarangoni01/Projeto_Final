@@ -15,6 +15,8 @@ public interface LeituraSensorRepository extends JpaRepository<LeituraSensor, Lo
 
     boolean existsByCodigoMensagem(String codigoMensagem);
 
+    List<LeituraSensor> findByFlange_Unidade_IdOrderByRecebidaEmDesc(Long unidadeId);
+
     @EntityGraph(attributePaths = {"sensor", "flange"})
     List<LeituraSensor> findByFlange_IdInOrderByRecebidaEmDesc(List<Long> flangeIds);
 }
