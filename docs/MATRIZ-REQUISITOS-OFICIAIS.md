@@ -1,8 +1,8 @@
 # Matriz de rastreabilidade — documentação oficial FlangeGuard
 
 **Fontes válidas:**
-- `TAP-Flangens.pdf` (Termo de Abertura do Projeto, enviado em 16/11/2026).
-- `TCC - Soda Caustica.pdf` (TCC, seção 3.3 a 3.6).
+- `TAP-Flangens.docx` (Termo de Abertura do Projeto, versão oficial enviada pelo autor).
+- `TCC - Soda Caustica.docx` (TCC oficial, seções 3.3 a 3.6).
 
 Este documento identifica o que existe **no código**. A presença de classes não comprova
 que um dispositivo físico, o banco de produção ou um navegador tenha sido testado.
@@ -34,13 +34,13 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | --- | --- | --- |
 | RNF01 | Interface simples | Páginas presentes; realizar teste de usabilidade com operadores/avaliadores |
 | RNF02 | Informações claras | Dashboard, alertas e análises presentes; conferir contraste e nomenclaturas |
-| RNF03 | Tempo de resposta adequado | **Pendente:** medir consultas e renderização com volume real |
+| RNF03 | Tempo de resposta adequado | Dashboard otimizado para consultas de última leitura e 10 recentes; **pendente:** medir em carga real |
 | RNF04 | Integridade dos dados | Relacionamentos e histórico no código; **pendente:** testes com MySQL, recuperação e backup |
 | RNF05 | Usar banco de dados | Implementado no código com MySQL |
 | RNF06 | Tecnologias web adequadas | Spring Boot, Thymeleaf, HTML/CSS/JS |
 | RNF07 | Código de fácil manutenção | Divisão em controllers/services/repositories; revisar padrões e cobertura |
 | RNF08 | Navegadores compatíveis | **Pendente:** executar testes visuais/funcionais nos navegadores-alvo |
-| RNF09 | Alertas rápidos | Fluxo implementado; **pendente:** medir latência MQTT → tela com hardware |
+| RNF09 | Alertas rápidos | Consulta periódica a cada 7 s no navegador implementada; **pendente:** medir latência MQTT → tela com hardware |
 
 ## Regras de negócio (TCC, RN01–RN08)
 
@@ -57,18 +57,18 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | --- | --- |
 | CRUD de flanges, funcionários e manutenções | Implementado no código |
 | Fotos das flanges com acesso restrito | Implementado no código; testar permissões e persistência após implantação |
-| Dashboard de monitoramento | Implementado no código |
+| Dashboard de monitoramento | Implementado; verificação periódica de alertas por unidade e consulta de leituras limitada; validação em navegador pendente |
 | Sensores térmicos/Arduino | Software MQTT presente; integração e ensaio **físico** pendentes |
 | LED de alerta | **Pendente:** demonstração/testes com circuito de Arduino |
 | Alertas visuais e histórico | Implementado no código |
-| **Relatórios detalhados** | **Adicionado na branch do módulo de relatórios:** exportações CSV por escopo |
+| **Relatórios detalhados** | Integrado à branch main: exportações CSV por escopo; validação de uso real pendente |
 | Testes unitários e integração | Há testes; expandir testes com MySQL/hardware e registrar resultados |
 | Segurança de acesso | Spring Security com ADMIN/USER; ampliar testes de isolamento entre unidades |
-| Backup e recuperação | **Pendente:** procedimento verificado de backup/restauração do MySQL |
+| Backup e recuperação | Scripts Windows e procedimento documentados em `docs/BACKUP-E-RECUPERACAO.md`; **execução, agendamento e restauração real pendentes** |
 | Desempenho e disponibilidade | **Pendente:** medição e validação em ambiente de implantação |
 | Manual/guia de uso | `docs/GUIA-DO-SISTEMA.md` e página `/guia` existentes; revisar coerência com novas telas |
-| Testes de aceitação | **Pendente:** sessões registradas com operador, professor ou usuário simulado |
-| Documentação arquitetural e diagramas | Diagramas no TCC; conferir correspondência com as entidades reais e integrações |
+| Testes de aceitação | Casos e evidências esperadas em `docs/PLANO-DE-TESTES-OFICIAIS.md`; sessões presenciais pendentes |
+| Documentação arquitetural e diagramas | Fluxo e arquitetura de código documentados em `docs/ARQUITETURA-E-INTEGRACAO.md`; diagramas acadêmicos do TCC ainda precisam de revisão |
 | Evidência de implantação em produção | **Pendente:** comprovação funcional do backend, banco e autenticação |
 
 ### Observações da documentação
@@ -92,6 +92,17 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
    sem exposição à soda cáustica).
 4. Definir e exercitar backup/recuperação do banco e validar política de retenção.
 5. Registrar resultados dos testes de desempenho, aceitação, navegadores e implantação.
+
+## Entregas de software da rodada de validação
+
+- Endpoint seguro `/api/monitoramento/resumo` com escopo por unidade (RF09,
+  RF11 e RNF09). A página apresenta mudança de estado e sugere atualização.
+- Otimização das leituras para dashboard (RNF03), sem descarregar todo o histórico.
+- Testes de unidade do endpoint e do carregamento do dashboard.
+- Plano verificável de aceite, procedimento de backup/restauração e
+  documentação arquitetural.
+- **Ainda pendentes:** integração real com hardware/LED, teste com MySQL
+  separado, backup agendado, validação de navegadores e hospedagem funcional.
 
 **Regra de atualização:** ajustar esta matriz após cada entrega implementada,
 sem marcar como validado algo que só existe no código.
