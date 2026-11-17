@@ -30,3 +30,6 @@ jobs:
 
       - name: Compile and verify project
         run: mvn -B -ntp -Pvercel verify
+
+      - name: Build Vercel container image
+        run: docker build --file Dockerfile.vercel --tag projeto-final-vercel:ci .
