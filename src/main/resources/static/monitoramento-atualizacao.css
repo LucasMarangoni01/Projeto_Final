@@ -1,0 +1,7 @@
+.monitoramento-auto{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-top:12px;padding:9px 12px;border:1px solid rgba(147,197,253,.25);
+    border-radius:9px;background:rgba(59,130,246,.08);color:#aec8e9;font:600 12px 'Segoe UI',sans-serif}
+.monitoramento-auto a{color:#fde68a;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.monitoramento-auto a[hidden]{display:none}
+html[data-theme="light"] .monitoramento-auto{color:#315877;background:#eaf3ff;border-color:#c3d8f2}
+html[data-theme="light"] .monitoramento-auto a{color:#775400}
