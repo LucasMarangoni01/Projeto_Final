@@ -97,7 +97,23 @@ def validar():
     # Regressões reais reportadas: barra azul com texto escuro e
     # formulários azuis com títulos invisíveis quando o tema está claro.
     assert 'html[data-theme="light"] .main-nav' in tema
+    # A cor final do menu deve ser cinza-azulada, e nao o branco
+    # introduzido pela revisao anterior. A ordem importa no CSS.
     assert 'background:#ffffff !important' in tema
+    assert tema.rfind('background:#dbe3ed !important') > tema.rfind(
+        'background:#ffffff !important'
+    )
+    assert 'FLANGEGUARD — MODO CLARO CINZA-ACO' in tema
+    assert 'background:#cfd8e4' in tema
+    assert 'fill:#cedae8' in tema
+    # O mapa vetorial precisa de classes que respeitem as duas paletas;
+    # as cores originais continuam funcionando no modo escuro.
+    dashboard = (TEMPLATES / "home/index.html").read_text(encoding="utf-8")
+    for classe in ("plant-background", "plant-pipe", "plant-pipe-detail",
+                   "plant-node-name", "plant-node-status", "plant-footer"):
+        assert f'class="{classe}"' in dashboard, (
+            f"Mapa sem identidade tematizavel: {classe}"
+        )
     assert 'html[data-theme="light"] body:has(.main-nav) main .card' in tema
     assert 'html[data-theme="light"] body:has(.main-nav) main .form-group label' in tema
     assert 'background:#fff8e8' in tema

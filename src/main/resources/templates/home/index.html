@@ -1112,40 +1112,40 @@
                 <div class="map-viewport" tabindex="0" role="region" aria-label="Mapa horizontal da planta de flanges">
                 <svg class="map-svg" th:attr="viewBox=${'0 0 860 ' + alturaMapa}" xmlns="http://www.w3.org/2000/svg" role="img"
                      aria-label="Mapa esquemático de todas as flanges ativas">
-                    <rect x="0" y="0" width="860" th:attr="height=${alturaMapa}"
+                    <rect class="plant-background" x="0" y="0" width="860" th:attr="height=${alturaMapa}"
                           rx="8" fill="#002456" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                    <text x="430" y="18" text-anchor="middle" font-size="9.5"
+                    <text class="plant-heading" x="430" y="18" text-anchor="middle" font-size="9.5"
                           fill="#f59e0b" font-weight="700" letter-spacing="0.14em"
                           font-family="monospace">PLANTA BAIXA — PONTOS DE MONITORAMENTO NaOH 32%</text>
                     <g th:each="linha : ${#numbers.sequence(0, linhasMapa - 1)}">
-                        <path th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
+                        <path class="plant-pipe" th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
                               stroke="rgba(59,130,246,.5)" stroke-width="8"
                               stroke-linecap="round" fill="none"/>
-                        <path th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
+                        <path class="plant-pipe-detail" th:attr="d=${'M55 ' + (58 + linha * 110) + ' H805'}"
                               stroke="rgba(96,165,250,.28)" stroke-width="2"
                               stroke-linecap="round" stroke-dasharray="12 8" fill="none"/>
                     </g>
-                    <text x="430" y="44" text-anchor="middle" font-size="8"
+                    <text class="plant-line-label" x="430" y="44" text-anchor="middle" font-size="8"
                           fill="#60a5fa" font-family="monospace">LINHA / PONTOS CADASTRADOS</text>
 
                     <g th:each="flange : ${flangesMapa}"
                        th:attr="transform=${'translate(' + flange.mapaX + ',' + flange.mapaY + ')'}">
-                        <line x1="0" y1="-25" x2="0" y2="-7"
+                        <line class="plant-connector" x1="0" y1="-25" x2="0" y2="-7"
                               stroke="rgba(148,163,184,.75)" stroke-width="4"/>
                         <circle cx="0" cy="0" r="19"
                                 th:attr="fill=${flange.alarmeAtivo ? '#ef4444' : (flange.status == 'CRITICO' ? '#ef4444' : (flange.status == 'ATENCAO' ? '#f59e0b' : (flange.status == 'MANUTENCAO' ? '#60a5fa' : '#22c55e')))}"
                                 stroke="#dbeafe" stroke-width="1.2"/>
-                        <circle cx="0" cy="0" r="11" fill="#0b2453" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
-                        <path d="M-7 0 H7 M0 -7 V7" stroke="#dceafe" stroke-width="1.4" stroke-linecap="round"/>
-                        <text x="0" y="-31" text-anchor="middle" font-size="10" fill="#f8fbff"
+                        <circle class="plant-node-core" cx="0" cy="0" r="11" fill="#0b2453" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
+                        <path class="plant-node-cross" d="M-7 0 H7 M0 -7 V7" stroke="#dceafe" stroke-width="1.4" stroke-linecap="round"/>
+                        <text class="plant-node-name" x="0" y="-31" text-anchor="middle" font-size="10" fill="#f8fbff"
                               font-weight="700" font-family="monospace" th:text="${flange.nomeFlange}">FL-001</text>
-                        <text x="0" y="32" text-anchor="middle" font-size="8.5" fill="#c9d9ef"
+                        <text class="plant-node-status" x="0" y="32" text-anchor="middle" font-size="8.5" fill="#c9d9ef"
                               th:text="${flange.alarmeAtivo ? 'ALERTA ATIVO' : (flange.status == 'CRITICO' ? 'CRÍTICO' : (flange.status == 'ATENCAO' ? 'ATENÇÃO' : (flange.status == 'MANUTENCAO' ? 'MANUTENÇÃO' : 'NORMAL')))}">NORMAL</text>
-                        <text x="0" y="45" text-anchor="middle" font-size="7.5" fill="#8fa8c9"
+                        <text class="plant-node-reading" x="0" y="45" text-anchor="middle" font-size="7.5" fill="#8fa8c9"
                               th:text="${flange.ultimaTemperatura != null ? #numbers.formatDecimal(flange.ultimaTemperatura,1,1) + ' °C' : 'SEM LEITURA'}">SEM LEITURA</text>
                     </g>
 
-                    <text x="430" th:attr="y=${alturaMapa - 12}" text-anchor="middle"
+                    <text class="plant-footer" x="430" th:attr="y=${alturaMapa - 12}" text-anchor="middle"
                           font-size="7.5" fill="#8aa4c8" font-family="monospace">
                         Posições cadastradas ou distribuídas automaticamente; não representa planta de engenharia.
                     </text>
