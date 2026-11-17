@@ -50,6 +50,7 @@ def validar():
         "alerta/listagem.html",
         "analises/index.html",
         "relatorios/index.html",
+        "guia.html",
     ]
     for arquivo in paginas:
         path = TEMPLATES / arquivo
@@ -65,6 +66,21 @@ def validar():
             f"Exportacao {tipo} ausente"
         )
 
+    # O Guia deve ter exatamente a mesma navegacao autenticada de outras telas,
+    # preservando sua barra contextual, indice lateral, busca e impressao.
+    guia = (TEMPLATES / "guia.html").read_text(encoding="utf-8")
+    assert 'th:replace="~{fragments/menu :: menu}"' in guia, (
+        "Guia sem menu compartilhado com o dashboard"
+    )
+    for elemento in ('id="guideSidebar"', 'id="openMenu"', 'id="printGuide"',
+                     'id="guideSearch"', 'id="mobileOverlay"'):
+        assert elemento in guia, f"Guia perdeu controle {elemento}"
+    for arquivo in ('menu.css', 'menu.js', 'theme.css', 'theme.js', 'guia-nav.css'):
+        assert arquivo in guia, f"Guia sem o recurso compartilhado {arquivo}"
+    assert 'class="brand" href="#visao-geral"' not in guia, (
+        "Guia voltou a apresentar menu superior duplicado"
+    )
+
     menu = (TEMPLATES / "fragments/menu.html").read_text(encoding="utf-8")
     for rota in ("/flange/listagem", "/alertas", "/sensores", "/analises",
                  "/relatorios", "/funcionario/listagem", "/manutencao/listagem",
@@ -74,7 +90,8 @@ def validar():
 
     tema = (STATIC / "theme.css").read_text(encoding="utf-8")
     report = (STATIC / "relatorios.css").read_text(encoding="utf-8")
-    for nome, css in (("theme.css", tema), ("relatorios.css", report)):
+    for nome, css in (("theme.css", tema), ("relatorios.css", report),
+                      ("guia-nav.css", (STATIC / "guia-nav.css").read_text(encoding="utf-8"))):
         assert css.count("{") == css.count("}"), f"{nome}: blocos CSS desbalanceados"
     assert 'html[data-theme="light"]' in tema and 'html[data-theme="dark"]' in tema
     assert '.relatorios-card' in report and '.relatorios-summary' in report
