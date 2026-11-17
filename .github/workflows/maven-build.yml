@@ -33,3 +33,41 @@ jobs:
 
       - name: Build Vercel container image
         run: docker build --file Dockerfile.vercel --tag projeto-final-vercel:ci .
+
+  mysql-integration:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: flangeguard_ci
+          MYSQL_USER: fg_ci
+          MYSQL_PASSWORD: only_ephemeral_ci_database
+          MYSQL_ROOT_PASSWORD: only_ephemeral_ci_root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      # Credenciais de um container descartavel criado somente neste job.
+      # Nao sao as credenciais de nenhum banco do usuario.
+      DB_URL: jdbc:mysql://127.0.0.1:3306/flangeguard_ci
+      DB_USERNAME: fg_ci
+      DB_PASSWORD: only_ephemeral_ci_database
+      TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/flangeguard_ci
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Validate data persistence and queries on disposable MySQL
+        run: mvn -B -ntp -Dtest=MySqlPersistenceIntegrationTest test

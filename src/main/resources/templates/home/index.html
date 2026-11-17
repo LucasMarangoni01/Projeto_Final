@@ -1086,7 +1086,7 @@
                 <div class="dashboard-data-note">
                     Os status e alertas refletem registros do banco. Sensores cadastrados ou instalados não significam comunicação ativa; sem leitura recente não é possível concluir que a flange esteja segura. Integração com hardware exige MQTT e validação.
                 </div>
-                <div class="monitoramento-auto" id="monitoramento-auto">
+                <div class="monitoramento-auto" id="monitoramento-auto" th:attr="data-alertas=${totalAlertasAtivos}">
                     <span id="monitoramento-status" aria-live="polite">Consultando novas leituras e alertas...</span>
                     <a id="monitoramento-novidade" th:href="@{/}" hidden>Atualização disponível. Abrir painel atualizado</a>
                 </div>

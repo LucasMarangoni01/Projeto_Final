@@ -166,6 +166,22 @@ Para melhorar a performance, o dashboard busca apenas a leitura mais recente
 de cada flange e até 10 leituras para o histórico curto exibido, sem trazer todo
 o histórico de sensores para a memória.
 
+## Teste de integração com MySQL descartável
+
+O GitHub Actions contém dois jobs: build Java/Docker e `mysql-integration`.
+O segundo job sobe um container **MySQL 8.4 efêmero**, configura um banco
+exclusivo de testes e verifica, pelo Spring Boot/JPA, as consultas de últimas
+leituras, limite de dez registros, contagem de incidentes e isolamento por unidade.
+
+A classe `MySqlPersistenceIntegrationTest` é ignorada no computador local
+quando a variável `TEST_MYSQL_URL` não estiver definida. Nunca aponte
+esses testes para o banco real: ela usa `ddl-auto=create-drop` e modifica
+dados da instância configurada. No CI, as credenciais são exclusivamente
+de um container temporário e não dão acesso a dados externos.
+
+Passar nesse teste não equivale a provar integração com Arduino nem
+a validar um banco de produção.
+
 ## Testes, arquitetura e backups previstos na documentação oficial
 
 - [Plano de testes e aceite](docs/PLANO-DE-TESTES-OFICIAIS.md) — casos de uso,
