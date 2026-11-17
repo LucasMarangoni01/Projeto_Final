@@ -24,18 +24,20 @@
                     <li><a class="nav-link" th:href="@{/}">Início</a></li>
                     <li><a class="nav-link" th:href="@{/flange/listagem}">Flanges</a></li>
                     <li><a class="nav-link" th:href="@{/alertas}">Alertas</a></li>
-                    <li><a class="nav-link" th:href="@{/manutencao/listagem}">Manutenções</a></li>
                     <li><a class="nav-link" th:href="@{/relatorios}">Relatórios</a></li>
-                    <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
+                    <li>
                         <details class="nav-dropdown">
-                            <summary>Monitoramento <span class="nav-chevron"></span></summary>
+                            <summary>Operação <span class="nav-chevron"></span></summary>
                             <div class="nav-dropdown-panel">
-                                <a th:href="@{/sensores}">Gestão de sensores</a>
-                                <a th:href="@{/analises}">Análises e indicadores</a>
+                                <a th:href="@{/manutencao/listagem}">Histórico de manutenções</a>
+                                <a th:href="@{/funcionario/listagem}">Equipe operacional</a>
+                                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                                   th:href="@{/sensores}">Gestão de sensores</a>
+                                <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
+                                   th:href="@{/analises}">Análises e indicadores</a>
                             </div>
                         </details>
                     </li>
-                    <li><a class="nav-link" th:href="@{/funcionario/listagem}">Funcionários</a></li>
                     <li><a class="nav-link" th:href="@{/guia}">Guia</a></li>
                     <li th:if="${usuarioLogado.role.name() == 'ADMIN'}">
                         <details class="nav-dropdown">
