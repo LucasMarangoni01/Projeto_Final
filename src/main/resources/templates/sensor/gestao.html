@@ -18,9 +18,9 @@
 <main class="sensor-main">
     <header class="sensor-page-header">
         <div>
-            <span class="sensor-eyebrow">INSTRUMENTAÇÃO · NAOH 32%</span>
+            <span class="sensor-eyebrow">NOVA FASE DO PROTÓTIPO · SENSOR DE GÁS</span>
             <h1>Gestão de sensores</h1>
-            <p>Cadastre os dispositivos, identifique cada unidade e associe cada sensor ao ponto de flange que ele acompanha.</p>
+            <p>O novo cadastro aceita somente sensores de gás. Identifique o equipamento e a flange associada; sensores anteriores continuam no histórico.</p>
         </div>
         <a th:href="@{/}" class="sensor-header-link">← Voltar ao dashboard</a>
     </header>
@@ -47,11 +47,19 @@
         <span th:text="${erro}">Não foi possível concluir a operação.</span>
     </div>
 
+    <aside class="sensor-integration-note" role="note" aria-label="Limites do protótipo de sensor de gás">
+        <strong>Escopo atualizado: sensor de gás</strong>
+        <p>O sistema organizará somente novos sensores de gás. O gás-alvo e o modelo do detector
+            ainda precisam ser definidos antes de habilitar leituras reais.
+            <strong>Um detector genérico de gás não identifica vazamento de soda cáustica líquida
+            e não impede vazamentos.</strong> Nenhum alerta substitui a avaliação de segurança.</p>
+    </aside>
+
     <section class="sensor-metrics" aria-label="Resumo do inventário de sensores">
         <article class="sensor-metric">
             <span>SENSORES CADASTRADOS</span>
             <strong th:text="${totalSensores}">0</strong>
-            <small>Dispositivos no inventário</small>
+            <small>Inclui registros anteriores preservados</small>
         </article>
         <article class="sensor-metric sensor-metric-green">
             <span>INSTALADOS</span>
@@ -81,7 +89,7 @@
                 <div>
                     <span class="sensor-panel-kicker">INVENTÁRIO</span>
                     <h2 th:text="${sensorDTO.id == null ? 'Adicionar sensor' : 'Editar sensor'}">Adicionar sensor</h2>
-                    <p>Identificação e vínculo físico no processo.</p>
+                    <p>Inventário do protótipo. Novos dispositivos: somente sensores de gás.</p>
                 </div>
                 <span class="sensor-panel-icon" aria-hidden="true">⌁</span>
             </div>
@@ -99,13 +107,13 @@
                     </div>
 
                     <div class="sensor-field sensor-field-wide">
-                        <label for="tipo">Tipo de sensor *</label>
+                        <label for="tipo">Sensor previsto para novos cadastros *</label>
                         <select id="tipo" th:field="*{tipo}" required>
                             <option value="">Selecione o tipo</option>
                             <option th:each="tipo : ${tiposSensor}" th:value="${tipo}" th:text="${tipo.descricao}"
                                     th:attr="data-finalidade=${tipo.finalidade}">Tipo</option>
                         </select>
-                        <small id="sensorTypeHelp">Selecione a grandeza ou condição acompanhada pelo dispositivo.</small>
+                        <small id="sensorTypeHelp">Somente o tipo gás está disponível para novos cadastros. Outros tipos aparecem apenas ao editar registros antigos.</small>
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></span>
                     </div>
 
@@ -124,13 +132,13 @@
                     </div>
 
                     <div class="sensor-field sensor-field-wide">
-                        <label for="flangeId">Flange monitorada *</label>
+                        <label for="flangeId">Flange de referência *</label>
                         <select id="flangeId" th:field="*{flangeId}" required>
                             <option value="">Selecione a flange</option>
                             <option th:each="flange : ${flangesDisponiveis}" th:value="${flange.id}"
                                     th:text="${flange.nome_flange + ' · ' + (flange.unidade != null ? flange.unidade.nome : 'Sem unidade')}">Flange</option>
                         </select>
-                        <small>Um sensor fica vinculado a uma flange. Uma flange pode receber vários sensores.</small>
+                        <small>Vínculo cadastral para rastreabilidade. A associação não comprova detecção de vazamento.</small>
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('flangeId')}" th:errors="*{flangeId}"></span>
                     </div>
 
@@ -143,12 +151,13 @@
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
                     </div>
 
-                    <div class="sensor-field sensor-field-wide" id="temperaturaLimitField">
+                    <div class="sensor-field sensor-field-wide" id="temperaturaLimitField"
+                         th:if="${sensorDTO.id != null and sensorDTO.tipo.name() == 'TEMPERATURA_SUPERFICIE'}">
                         <label for="limiteTemperaturaAlerta">Limite térmico para alerta (°C)</label>
                         <input id="limiteTemperaturaAlerta" type="number" step="0.1"
                                min="-100" max="400" th:field="*{limiteTemperaturaAlerta}"
                                placeholder="Definido pelo responsável técnico">
-                        <small>Obrigatório para sensor térmico instalado. Informe o limite aprovado para este ponto e processo; não existe valor universal predefinido.</small>
+                        <small>Campo legado de sensores térmicos históricos; não se aplica aos novos cadastros de gás.</small>
                         <span class="sensor-field-error" th:if="${#fields.hasErrors('limiteTemperaturaAlerta')}" th:errors="*{limiteTemperaturaAlerta}"></span>
                     </div>
 
