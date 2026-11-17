@@ -861,3 +861,212 @@ html[data-theme="light"] :is(.guide-section,.hero,.mini-card,.key-message,.bulle
 }
 html[data-theme="light"] .sidebar {background:#dbe4ee;border-color:#b7c7d9;}
 html[data-theme="light"] .guide-utilitybar.topbar {background:#dbe4ee;}
+
+
+/* ==========================================================
+   NAVEGACAO GLOBAL UNIFICADA (todas as paginas autenticadas)
+   O fragmento do menu e a unica fonte de markup; estas regras
+   normalizam a apresentacao independente do CSS de cada tela.
+   ========================================================== */
+.main-nav, .main-nav * { box-sizing:border-box; }
+.main-nav {
+    font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    font-size:13px;
+    line-height:1.4;
+}
+.main-nav .nav-shell {
+    width:100%;
+    max-width:none;
+    min-height:68px;
+    margin:0 auto;
+    padding:8px clamp(16px,2vw,30px);
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    gap:14px;
+}
+.main-nav .nav-brand {
+    flex:0 0 auto;
+    min-width:220px;
+    max-width:260px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+}
+.main-nav .nav-brand-logo {
+    display:block;
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    object-fit:contain;
+}
+.main-nav .nav-brand-copy strong {
+    font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    font-size:12px;
+    font-weight:800;
+    line-height:1.3;
+    letter-spacing:0;
+}
+.main-nav .nav-brand-copy small {
+    font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    font-size:9px;
+    font-weight:500;
+    line-height:1.3;
+    letter-spacing:0;
+}
+.main-nav .nav-desktop {flex:1 1 auto;min-width:0;}
+.main-nav .nav-primary {
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    gap:2px;
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+.main-nav .nav-primary>li {list-style:none;margin:0;padding:0;flex:0 0 auto;}
+.main-nav .nav-link,
+.main-nav .nav-dropdown>summary {
+    min-height:40px;
+    padding:0 10px;
+    font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.25;
+    white-space:nowrap;
+    border-radius:8px;
+}
+.main-nav .nav-link-primary {padding-inline:12px;}
+.main-nav .nav-account {
+    flex:0 0 auto;
+    gap:7px;
+    padding-left:12px;
+}
+.main-nav .nav-account-profile {
+    max-width:175px;
+    min-height:40px;
+    gap:7px;
+}
+.main-nav .nav-account-copy strong {
+    max-width:115px;
+    font-size:10px;
+}
+.main-nav .nav-account-copy small {font-size:9px;}
+.main-nav .btn-trocar-conta,
+.main-nav .btn-sair {
+    min-height:36px;
+    padding:0 10px;
+    font-size:10px;
+    font-weight:700;
+}
+@media(max-width:1380px) and (min-width:1241px) {
+    .main-nav .nav-shell {gap:9px;padding-inline:16px;}
+    .main-nav .nav-brand {min-width:205px;}
+    .main-nav .nav-link,.main-nav .nav-dropdown>summary {padding-inline:7px;font-size:10px;}
+    .main-nav .nav-account {gap:5px;padding-left:8px;}
+}
+@media(max-width:1240px) {
+    .main-nav .nav-desktop,.main-nav .nav-account {display:none;}
+    .main-nav .nav-mobile {display:block;}
+    .main-nav .nav-shell {min-height:64px;justify-content:space-between;}
+    .main-nav .nav-brand {min-width:0;max-width:min(74vw,330px);}
+}
+@media(max-width:520px) {
+    .main-nav .nav-shell {min-height:60px;padding:7px 12px;}
+    .main-nav .nav-brand-logo {width:38px;height:38px;flex-basis:38px;}
+    .main-nav .nav-brand-copy strong {font-size:11px;}
+    .main-nav .nav-brand-copy small {font-size:8px;}
+}
+
+/* ==========================================================
+   MENU MODO CLARO | azul claro sobre fundo cinza-azulado
+   Fonte unica para dashboard, Guia e todas as telas internas.
+   ========================================================== */
+html[data-theme="light"] {
+    --menu-bg:#cadcf3;
+    --menu-bg-solid:#cadcf3;
+    --menu-panel:#e1ebf7;
+    --menu-hover:rgba(25,74,139,.12);
+    --menu-text:#173a65;
+    --menu-muted:#496887;
+    --menu-border:#acc2dc;
+    --menu-shadow:0 6px 18px rgba(27,55,88,.12);
+}
+html[data-theme="light"] .main-nav {
+    background:linear-gradient(180deg,#d4e4f7 0%,#c7dbf3 100%) !important;
+    color:#173a65;
+    border-bottom:1px solid #afc3db !important;
+    box-shadow:0 5px 18px rgba(29,54,83,.12) !important;
+}
+html[data-theme="light"] .main-nav :is(
+    .nav-brand-copy strong,.nav-account-copy strong,
+    .nav-link,.nav-dropdown>summary,.nav-account-profile
+) {color:#173a65 !important;}
+html[data-theme="light"] .main-nav :is(
+    .nav-brand-copy small,.nav-account-copy small
+) {color:#496887 !important;}
+html[data-theme="light"] .main-nav .nav-link:hover,
+html[data-theme="light"] .main-nav .nav-dropdown>summary:hover,
+html[data-theme="light"] .main-nav .nav-dropdown[open]>summary {
+    background:#b8cee9 !important;
+    border-color:#9db7d7 !important;
+    color:#103960 !important;
+}
+html[data-theme="light"] .main-nav :is(
+    .nav-link.is-current,.nav-dropdown.has-current>summary
+) {
+    background:#b5cde9 !important;
+    border:1px solid #94b3d7 !important;
+    color:#123b66 !important;
+}
+html[data-theme="light"] .main-nav .nav-link-primary,
+html[data-theme="light"] .main-nav .nav-link-primary.is-current {
+    background:#ffecbe !important;
+    border:1px solid #d7b66d !important;
+    color:#70470b !important;
+}
+html[data-theme="light"] .main-nav .nav-link-primary:hover {
+    background:#ffe29e !important;
+    border-color:#cba457 !important;
+    color:#573604 !important;
+}
+html[data-theme="light"] .main-nav .nav-chevron {border-color:#345c86;}
+html[data-theme="light"] .main-nav .nav-account {border-left-color:#aabed6;}
+html[data-theme="light"] .main-nav .user-avatar {
+    background:#d3e3f5;
+    border-color:#9cb8d6;
+}
+html[data-theme="light"] .main-nav :is(
+    .theme-toggle,.btn-trocar-conta,.mobile-menu>summary
+) {
+    background:#dce9f8 !important;
+    border-color:#a9c1de !important;
+    color:#173e70 !important;
+}
+html[data-theme="light"] .main-nav .btn-sair {
+    background:#f5e3e7 !important;
+    border-color:#daaeb8 !important;
+    color:#9b2c3d !important;
+}
+html[data-theme="light"] .main-nav .btn-sair:hover {
+    background:#edcfd6 !important;
+}
+html[data-theme="light"] .main-nav .nav-dropdown-panel,
+html[data-theme="light"] .main-nav .mobile-menu-content {
+    background:#e1ebf7 !important;
+    color:#173a65 !important;
+    border:1px solid #a9bfd9 !important;
+    box-shadow:0 12px 28px rgba(25,52,82,.15);
+}
+html[data-theme="light"] .main-nav :is(
+    .nav-dropdown-panel>a,.mobile-menu-link,.mobile-profile
+) {color:#173a65 !important;}
+html[data-theme="light"] .main-nav .nav-dropdown-panel>a:hover,
+html[data-theme="light"] .main-nav .mobile-menu-link:hover {
+    background:#cbdcf0 !important;
+    color:#113d70 !important;
+}
+html[data-theme="light"] .main-nav :is(
+    .nav-dropdown-panel a.is-current,.mobile-menu-link.is-current
+) {background:#c3d6ef !important;color:#103e75 !important;}
+html[data-theme="light"] .main-nav .menu-icon i {background:#234b79;}
