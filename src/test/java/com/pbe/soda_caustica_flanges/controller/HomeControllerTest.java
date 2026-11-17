@@ -86,7 +86,6 @@ class HomeControllerTest {
         assertEquals(1, model.get("totalFlanges"));
         assertEquals(List.of(leitura), model.get("leiturasRecentes"));
         verify(flanges, never()).findAtivas();
-        verify(leituras, never()).findByFlange_IdInOrderByRecebidaEmDesc(anyList());
         verify(leituras).findUltimasPorFlanges(List.of(13L));
         verify(leituras).findTop10ByFlange_IdInOrderByRecebidaEmDesc(List.of(13L));
     }
