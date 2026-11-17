@@ -43,6 +43,8 @@ active(location.hash.slice(1)||'visao-geral');
 const progress=document.getElementById('readingProgress');const setProgress=()=>{const total=document.documentElement.scrollHeight-innerHeight;progress.style.width=(total>0?Math.max(0,Math.min(100,scrollY/total*100)):100)+'%'};window.addEventListener('scroll',setProgress,{passive:true});window.addEventListener('resize',setProgress);setProgress();
 document.getElementById('printGuide').addEventListener('click',()=>window.print());
 });</script>
+    <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
