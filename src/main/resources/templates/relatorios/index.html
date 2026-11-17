@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios | Monitoramento de Flanges</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
+    <link rel="stylesheet" th:href="@{/relatorios.css}">
+    <link rel="stylesheet" th:href="@{/theme.css}">
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <script th:src="@{/theme.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/menu :: menu}"></div>
+<main class="relatorios-page">
+    <header class="relatorios-header">
+        <div>
+            <span class="relatorios-kicker">HISTÓRICO OPERACIONAL · RELATÓRIOS</span>
+            <h1>Relatórios do monitoramento</h1>
+            <p>Exporte os dados cadastrados e os históricos preservados no sistema.</p>
+        </div>
+        <a class="relatorios-voltar" th:href="@{/}">Voltar ao painel</a>
+    </header>
+    <div class="relatorios-escopo">
+        <strong>Escopo permitido:</strong> <span th:text="${escopoRelatorio}">Unidade</span>.
+        Todos os arquivos são gerados com os registros disponíveis para sua conta.
+    </div>
+    <section class="relatorios-grid" aria-label="Tipos de relatórios disponíveis">
+        <article>
+            <span class="relatorios-tag">ATIVOS</span>
+            <h2>Flanges</h2>
+            <p>Identificação, localização, unidade, status, parâmetros técnicos e histórico de arquivamento.</p>
+            <a th:href="@{/relatorios/exportar/flanges}">Exportar CSV de flanges</a>
+        </article>
+        <article>
+            <span class="relatorios-tag">PESSOAS</span>
+            <h2>Funcionários</h2>
+            <p>Cadastro operacional dos funcionários e sua unidade de atuação.</p>
+            <a th:href="@{/relatorios/exportar/funcionarios}">Exportar CSV de funcionários</a>
+        </article>
+        <article>
+            <span class="relatorios-tag">MANUTENÇÃO</span>
+            <h2>Manutenções</h2>
+            <p>Serviços registrados, datas, responsáveis, equipamentos, estado e registros arquivados.</p>
+            <a th:href="@{/relatorios/exportar/manutencoes}">Exportar CSV de manutenções</a>
+        </article>
+        <article>
+            <span class="relatorios-tag">OCORRÊNCIAS</span>
+            <h2>Ocorrências</h2>
+            <p>Histórico de eventos individuais e registros agregados legados, quando acessíveis.</p>
+            <a th:href="@{/relatorios/exportar/ocorrencias}">Exportar CSV de ocorrências</a>
+        </article>
+        <article>
+            <span class="relatorios-tag">ALARMES</span>
+            <h2>Alertas</h2>
+            <p>Disparos, reconhecimento, normalização, responsáveis e justificativas.</p>
+            <a th:href="@{/relatorios/exportar/alertas}">Exportar CSV de alertas</a>
+        </article>
+        <article>
+            <span class="relatorios-tag">SENSORES</span>
+            <h2>Leituras dos sensores</h2>
+            <p>Valores recebidos, data da leitura, origem, flange monitorada e indicação de anomalia.</p>
+            <a th:href="@{/relatorios/exportar/leituras}">Exportar CSV de leituras</a>
+        </article>
+    </section>
+    <p class="relatorios-aviso">Os alertas térmicos indicam possíveis anormalidades,
+        não a confirmação de um vazamento. Os registros exportados não substituem
+        inspeções nem procedimentos de segurança industrial. A exportação não altera
+        ou exclui o histórico.</p>
+</main>
+<script th:src="@{/menu.js}"></script>
+</body>
+</html>
