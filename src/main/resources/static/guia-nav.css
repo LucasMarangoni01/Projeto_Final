@@ -146,3 +146,30 @@ html[data-theme="light"] .guide-utilitybar .header-chip {
     .mobile-overlay { display: none !important; }
     body:has(.guide-utilitybar) .sidebar { display: none !important; }
 }
+
+/* FAQ do Guia: resposta expandida participa do fluxo normal,
+   empurrando as próximas perguntas sem sobreposição. */
+.faq-list {display:flex;flex-direction:column;gap:10px;align-items:stretch;}
+.faq-list details.faq-item {
+    display:block;
+    position:relative;
+    width:100%;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+    flex:0 0 auto;
+    margin:0;
+}
+.faq-list details.faq-item>summary {
+    display:flex;
+    gap:12px;
+    min-height:52px;
+    align-items:center;
+    justify-content:space-between;
+}
+.faq-list details.faq-item[open]>p {
+    display:block;
+    position:static;
+    height:auto;
+    white-space:normal;
+}
