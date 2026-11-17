@@ -10,6 +10,7 @@
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <script src="/theme.js"></script>
     <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" th:href="@{/monitoramento-atualizacao.css}">
 </head>
 <body>
 <div th:replace="~{fragments/menu :: menu}"></div>
@@ -28,6 +29,11 @@
          th:if="${sucesso != null}" th:text="${sucesso}"></div>
     <div class="alerts-feedback alerts-feedback-error"
          th:if="${erro != null}" th:text="${erro}"></div>
+
+    <div class="monitoramento-auto" id="monitoramento-auto">
+        <span id="monitoramento-status" aria-live="polite">Consultando novas leituras e alertas...</span>
+        <a id="monitoramento-novidade" th:href="@{/alertas}" hidden>Há dados novos. Atualizar alertas</a>
+    </div>
 
     <section class="alerts-kpis">
         <article>
@@ -169,5 +175,6 @@
 </main>
 
 <script th:src="@{/menu.js}"></script>
+<script th:src="@{/monitoramento-atualizacao.js}"></script>
 </body>
 </html>

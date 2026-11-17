@@ -38,6 +38,10 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
             Long unidadeId
     );
 
+    long countByDataHoraIsNotNullAndNormalizadoEmIsNull();
+
+    long countByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull(Long unidadeId);
+
     boolean existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull(Long flangeId);
 
     boolean existsByFlange_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullAndIdNot(

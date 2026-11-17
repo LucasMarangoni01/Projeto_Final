@@ -153,6 +153,35 @@ O sistema não equivale a um sistema de proteção industrial certificado.
 
 ---
 
+## Consulta periódica de alertas e desempenho do dashboard
+
+O dashboard e a tela de alertas consultam `/api/monitoramento/resumo` em intervalos
+de **7 segundos** quando a aba está visível. O endpoint retorna somente a contagem
+de alertas ativos e a última leitura para a unidade do USER; ADMIN vê dados globais.
+Quando há novos dados, a interface informa a atualização e oferece recarregamento.
+A consulta não substitui alertas industriais certificados, não garante latência máxima
+em redes reais e **não significa que o sensor esteja conectado**.
+
+Para melhorar a performance, o dashboard busca apenas a leitura mais recente
+de cada flange e até 10 leituras para o histórico curto exibido, sem trazer todo
+o histórico de sensores para a memória.
+
+## Testes, arquitetura e backups previstos na documentação oficial
+
+- [Plano de testes e aceite](docs/PLANO-DE-TESTES-OFICIAIS.md) — casos de uso,
+  segurança, desempenho, hardware didático e evidências pendentes.
+- [Arquitetura e integração MQTT](docs/ARQUITETURA-E-INTEGRACAO.md) — módulos,
+  relacionamentos e fluxo de alerta.
+- [Backup e recuperação MySQL](docs/BACKUP-E-RECUPERACAO.md) — scripts Windows
+  `scripts/backup-mysql.cmd` e `scripts/restaurar-mysql.cmd`.
+- [Matriz de requisitos oficiais](docs/MATRIZ-REQUISITOS-OFICIAIS.md).
+
+Os scripts de banco não são executados automaticamente. A restauração é limitada
+a um banco de **testes isolado** e exige confirmação. Não armazenar dumps no
+repositório, nem tratar testes automatizados como prova de hardware real.
+
+---
+
 ## Configuração do ambiente local
 
 Cada integrante utiliza seu próprio MySQL local. A aplicação conecta usando o usuário de banco com privilégios restritos `soda_app`; não utiliza a conta administrativa `root`.
