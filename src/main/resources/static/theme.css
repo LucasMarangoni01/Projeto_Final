@@ -62,3 +62,84 @@ html[data-theme="dark"] body:has(.fl-header){
  --border-md:rgba(255,255,255,.22);background:#08182e;color:#f3f7ff
 }
 @media(max-width:960px){.mobile-account-actions .theme-toggle{width:100%}}
+
+/* Revisao de contraste do modo claro - estilos especificos dos modulos. */
+html[data-theme="light"] {
+  --bg-main: #f3f6fc; --bg-panel: #e8f0fa; --bg-input: #ffffff;
+  --title: #22549c; --analytics-bg: #f3f6fc; --analytics-card: #fff;
+  --analytics-card-alt: #edf3fb; --analytics-text: #173253;
+  --analytics-muted: #536a88; --analytics-dim: #657b98;
+  --analytics-border: #d9e3f0; --analytics-blue: #235cb0;
+  --analytics-cyan: #087d94; --analytics-amber: #926000;
+  --analytics-green: #16805c; --analytics-purple: #6a49b7;
+}
+/* Cabecalhos e componentes de navegacao. */
+html[data-theme="light"] .mobile-menu>summary,
+html[data-theme="light"] .mobile-profile { color: #173459 !important; background: #f3f6fc; border-color:#d2dfef; }
+html[data-theme="light"] .mobile-account-actions { border-top-color: #d2dfef; }
+html[data-theme="light"] .mobile-switch-account { color: #214f86; }
+html[data-theme="light"] .logout-modal { background: #fff; border-color: #d4e0ed; }
+html[data-theme="light"] .logout-modal h2 { color: #173253; }
+html[data-theme="light"] .logout-modal p { color: #516b89; }
+.nav-account .theme-toggle { width:36px; height:36px; min-height:36px; padding:0; font-size:19px; }
+.mobile-account-actions .theme-toggle { grid-column: 1/-1; width:100%; }
+.header-actions .theme-toggle, .fl-header .theme-toggle { font-size:12px; }
+/* Login e cadastro: manter o painel institucional escuro e clarear os formularios. */
+html[data-theme="light"] .login-info,
+html[data-theme="light"] .register-info { color: #f5f8ff; }
+html[data-theme="light"] .login-section { background: #f3f6fc; }
+html[data-theme="light"] .login-card { background: #fff; border-color: #d1deed; box-shadow:0 15px 40px #1b3c6422; }
+html[data-theme="light"] .login-header h2,
+html[data-theme="light"] .register-header h2 { color: #173253; }
+html[data-theme="light"] .login-header p,
+html[data-theme="light"] .register-header p { color: #556d8b; }
+html[data-theme="light"] .login-form .form-group label,
+html[data-theme="light"] .register-form .form-group label { color: #213b60; }
+html[data-theme="light"] .login-form .form-group input,
+html[data-theme="light"] .register-form .input-wrapper input { background: #fff; color: #172b48; border-color: #bdcde0; }
+html[data-theme="light"] .login-form .form-group input:focus,
+html[data-theme="light"] .register-form .input-wrapper input:focus { background: #fff; }
+html[data-theme="light"] .register-section { background: #f3f6fc; }
+html[data-theme="light"] .register-info :is(h1,p,.information-item strong,.security-message strong) { color:#f1f7ff; }
+html[data-theme="light"] .register-header h2 { color: #173253; }
+html[data-theme="light"] .register-form .field-hint { color: #526b89; }
+/* Painel de alertas e monitoramento. */
+html[data-theme="light"] :is(.alerts-page,.sensor-main,.analises-main,.maintenance-page,.usuarios-main,.unidades-main,.perfil-main) { color: #173253; }
+html[data-theme="light"] :is(.alerts-kpis article,.alerts-panel,.sensor-metric,.sensor-panel,.analise-kpi,.analises-section,.analises-panel,.usuarios-summary-card,.usuarios-panel,.usuarios-identity-card,.usuarios-edit-card,.unidade-card,.unidade-form-card,.unidade-overview-card,.unidade-detail-metrics article,.unidade-panel,.unidade-sidebar-panel,.maintenance-card,.perfil-card,.perfil-hero,.perfil-admin-panel) {
+ background: #fff; color: #173253; border-color: #d4e0ef; box-shadow:0 4px 16px #1c406412;
+}
+html[data-theme="light"] :is(.alerts-page,.sensor-main,.analises-main,.maintenance-page,.usuarios-main,.unidades-main,.perfil-main) :is(h1,h2,h3) { color: #173d70; }
+html[data-theme="light"] :is(.analise-kpi>strong,.analises-section-heading h2,.analises-panel-heading h2,.analises-mes-heading strong,.analises-serie-label strong,.analises-panel-total,.analises-ranking-label strong,.analises-distribution-label span,.usuarios-summary-card strong,.usuarios-panel-header h2,.usuarios-count strong,.unidade-info h2,.unidade-card-modern .unidade-info h3,.unidade-panel-heading h2,.unidade-detail-metrics article strong) { color: #173253; }
+html[data-theme="light"] :is(.alerts-header p,.alerts-panel-heading p,.sensor-page-header p,.analises-header p,.analises-section-heading p,.usuarios-panel-header p,.unidade-info p,.unidade-panel-heading p,.maintenance-header p,.perfil-header p) { color:#506884; }
+html[data-theme="light"] :is(.analises-mes-card,.analises-sensor-summary>div,.sensor-coverage-item,.sensor-table,.sensor-integration-note,.usuarios-permission-row,.usuarios-table tbody tr,.unidade-member-row,.unidade-registration-card,.unidade-metrics>div,.perfil-admin-item,.maintenance-readonly) { background:#f3f6fb; border-color:#d6e2f0; color:#173253; }
+html[data-theme="light"] .analises-filter :is(select,button),
+html[data-theme="light"] .sensor-field :is(input,select,textarea),
+html[data-theme="light"] .sensor-inventory-tools input,
+html[data-theme="light"] .usuarios-edit-form select,
+html[data-theme="light"] .usuarios-professional-fields input,
+html[data-theme="light"] .unidade-form-field :is(input,textarea),
+html[data-theme="light"] .unidade-sidebar-search-field input,
+html[data-theme="light"] .perfil-field :is(input,select) { background:#fff; color:#173253; border-color:#b9cce1; }
+html[data-theme="light"] :is(.unidade-search,.usuarios-search,.unidade-sidebar-search-field) { background:#fff; color:#173253; border-color:#c8d8e9; }
+html[data-theme="light"] :is(.usuarios-search input,.unidade-search input,.unidade-sidebar-search-field input) { color:#173253; }
+html[data-theme="light"] :is(.maintenance-table-wrap,.maintenance-table tbody td,.maintenance-table thead th,.sensor-table th) { background:#fff; color:#213958; border-color:#d5e1ef; }
+html[data-theme="light"] .maintenance-table tbody tr:hover td { background:#eaf2fd; }
+html[data-theme="light"] .maintenance-row-archived td { background:#eff2f7!important; }
+html[data-theme="light"] .maintenance-row-archived:hover td { background:#e2e8f1!important; }
+html[data-theme="light"] .usuarios-table tbody tr:hover { background:#eaf2fb; }
+html[data-theme="light"] .unidade-card-modern { background:#fff; }
+html[data-theme="light"] :is(.perfil-field-company input:disabled,.perfil-field input:disabled) { background:#e5ecf5; }
+/* Guia: a identidade visual escura original e convertida para cartoes claros. */
+html[data-theme="light"] body:has(.app-shell) { background:#f3f6fc; color:#173253; }
+html[data-theme="light"] :is(.guide-section,.hero,.mini-card,.key-message,.bullet-box,.notice,.concept,.tech-scheme>div,.faq-item,.future-block,.workflow-card) { background:#fff; color:#173253; border-color:#d2dfef; box-shadow:0 4px 16px #143c6412; }
+html[data-theme="light"] .search-wrap { background:#fff; border-color:#c5d6e9; }
+html[data-theme="light"] .search-wrap input { background:transparent; color:#173253; }
+html[data-theme="light"] .sidebar-item a:hover,
+html[data-theme="light"] .sidebar-item a.active { background:#dceafa; border-color:#a8c4e7; color:#173253; }
+html[data-theme="light"] .hero-visual,
+html[data-theme="light"] .module-preview { background:#e4edf9; }
+html[data-theme="light"] .screenshot { background:#fff; }
+html[data-theme="light"] .mini-icon { background:#e4edf9; }
+@media(max-width:960px) {
+ .mobile-account-actions .theme-toggle { grid-column:1/-1; }
+}

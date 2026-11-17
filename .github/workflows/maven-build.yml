@@ -29,4 +29,4 @@ jobs:
           cache: maven
 
       - name: Compile and verify project
-        run: mvn -B -ntp -DskipTests verify
+        run: mvn -B -ntp verify

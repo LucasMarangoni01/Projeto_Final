@@ -12,7 +12,7 @@ function sync(){
     b.setAttribute('aria-label',dark?'Ativar modo claro':'Ativar modo escuro');
     b.title=dark?'Ativar modo claro':'Ativar modo escuro';
     b.setAttribute('aria-pressed',String(dark));
-    b.textContent=dark?'☀ Modo claro':'☾ Modo escuro';
+    b.textContent=b.closest('.nav-account')?(dark?'☀':'☾'):(dark?'☀ Modo claro':'☾ Modo escuro');
   });
 }
 function toggle(){
@@ -35,7 +35,10 @@ function init(){
   if(desktop) desktop.prepend(button());
   if(mobile) mobile.prepend(button());
   if(!desktop&&!mobile){
-    const b=button(); b.classList.add('theme-toggle-floating'); document.body.appendChild(b);
+    const actions=document.querySelector('.header-actions')||document.querySelector('.fl-header');
+    const b=button();
+    if(actions) actions.appendChild(b);
+    else { b.classList.add('theme-toggle-floating'); document.body.appendChild(b); }
   }
   sync();
 }

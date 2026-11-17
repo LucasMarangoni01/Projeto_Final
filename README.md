@@ -149,3 +149,21 @@ Em um banco sem usuários, o primeiro cadastro feito pelo formulário público r
 ### Rotação de credenciais expostas
 
 Uma credencial que já foi incluída em um repositório público deve ser considerada comprometida, mesmo depois de removida do arquivo atual. Faça a rotação da senha do usuário MySQL anteriormente utilizado e de qualquer outro segredo que tenha sido publicado. A aplicação passa a usar `soda_app`, com privilégios limitados ao banco do projeto.
+
+---
+
+## Modos claro e escuro
+
+O sistema oferece **Modo escuro** e **Modo claro**. O botão de alternância aparece na barra de navegação e, nas telas independentes (login, cadastro e guia), em local próprio. A escolha fica salva no armazenamento local do navegador e é reaplicada ao abrir outras telas. Os arquivos compartilhados são `static/theme.js` e `static/theme.css`.
+
+## Testes automatizados
+
+Execute os testes unitários com Java 21 e Maven:
+
+```bash
+./mvnw test
+```
+
+No Windows, utilize `mvnw.cmd test`. O fluxo de integração contínua em `.github/workflows/maven-build.yml` agora executa `mvn verify` **sem pular os testes**.
+
+Os testes unitários cobrem regras de habilitação de contas ADMIN/USER, aceitação de leituras MQTT, prevenção de mensagens repetidas, alarmes críticos e presença dos arquivos de tema em todas as páginas. Eles foram desenhados para não exigir um servidor MySQL em execução. Isso **não substitui** testes de integração com banco, conferência visual em navegador nem validação de sensores físicos em ambiente controlado.
