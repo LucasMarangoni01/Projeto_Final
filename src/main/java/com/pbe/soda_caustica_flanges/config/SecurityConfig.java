@@ -156,6 +156,9 @@ public class SecurityConfig {
                         // API de autocomplete já limita resultados à unidade do USER.
                         .requestMatchers("/api/flanges/**").hasAnyRole("ADMIN", "USER")
 
+                        // Dados profissionais do próprio ADMIN, sem alteração de role/unidade/status.
+                        .requestMatchers(HttpMethod.POST, "/perfil/dados-profissionais").hasRole("ADMIN")
+
                         // Operações do próprio perfil autenticado.
                         .requestMatchers("/perfil/**").authenticated()
 

@@ -27,6 +27,13 @@
     <div class="perfil-feedback perfil-feedback-success" th:if="${statusSenha == 'alterada'}">
         <strong>Senha alterada.</strong> Sua próxima entrada deverá usar a nova senha.
     </div>
+    <div class="perfil-feedback perfil-feedback-success"
+         th:if="${statusDadosProfissionais == 'atualizados'}">
+        <strong>Dados profissionais atualizados.</strong> Matrícula, cargo e setor foram salvos.
+    </div>
+    <div class="perfil-feedback perfil-feedback-error"
+         th:if="${erroDadosProfissionais != null}"
+         th:text="${erroDadosProfissionais}"></div>
     <div class="perfil-feedback perfil-feedback-error" th:if="${erroPerfil != null}" th:text="${erroPerfil}"></div>
     <div class="perfil-feedback perfil-feedback-error" th:if="${erroSenha != null}" th:text="${erroSenha}"></div>
 
@@ -135,7 +142,7 @@
                                th:value="${usuarioLogado.matricula != null ? usuarioLogado.matricula : 'Não definida'}"
                                disabled
                                readonly>
-                        <small>Identificação interna definida pela administração.</small>
+                        <small th:text="${usuarioLogado.role.name() == 'ADMIN' ? 'Você pode editar sua matrícula na seção administrativa abaixo.' : 'Identificação interna definida pela administração.'}">Identificação interna.</small>
                     </div>
 
                     <div class="perfil-field perfil-field-company">
@@ -145,7 +152,7 @@
                                th:value="${usuarioLogado.cargo != null ? usuarioLogado.cargo : 'Não definido'}"
                                disabled
                                readonly>
-                        <small>Alterações devem ser solicitadas ao administrador.</small>
+                        <small th:text="${usuarioLogado.role.name() == 'ADMIN' ? 'Você pode editar seu cargo na seção administrativa abaixo.' : 'Alterações devem ser solicitadas ao administrador.'}">Dados profissionais.</small>
                     </div>
 
                     <div class="perfil-field perfil-field-company">
@@ -155,7 +162,7 @@
                                th:value="${usuarioLogado.setor != null ? usuarioLogado.setor : 'Não definido'}"
                                disabled
                                readonly>
-                        <small>O setor é controlado pela administração da unidade.</small>
+                        <small th:text="${usuarioLogado.role.name() == 'ADMIN' ? 'Você pode editar seu setor na seção administrativa abaixo.' : 'O setor é controlado pela administração da unidade.'}">Setor.</small>
                     </div>
                 </div>
 
@@ -263,6 +270,47 @@
                 <small>Último login concluído com sucesso.</small>
             </article>
         </div>
+
+        <form id="dados-profissionais"
+              th:action="@{/perfil/dados-profissionais}"
+              th:object="${dadosProfissionaisDTO}"
+              method="post"
+              class="perfil-admin-self-form">
+            <div class="perfil-admin-self-head">
+                <div>
+                    <span class="perfil-panel-kicker">EDIÇÃO DO PRÓPRIO ADMINISTRADOR</span>
+                    <h3>Meus dados profissionais</h3>
+                    <p>Atualize sua matrícula, seu cargo e seu setor. Permissões, unidade e status continuam protegidos.</p>
+                </div>
+            </div>
+            <div class="perfil-admin-self-grid">
+                <div class="perfil-field">
+                    <label for="matriculaAdmin">Matrícula</label>
+                    <input id="matriculaAdmin" type="text" th:field="*{matricula}"
+                           maxlength="30" autocomplete="off" placeholder="Matrícula interna">
+                    <small class="perfil-field-error" th:if="${#fields.hasErrors('matricula')}"
+                           th:errors="*{matricula}"></small>
+                </div>
+                <div class="perfil-field">
+                    <label for="cargoAdmin">Cargo</label>
+                    <input id="cargoAdmin" type="text" th:field="*{cargo}"
+                           maxlength="100" placeholder="Cargo do administrador">
+                    <small class="perfil-field-error" th:if="${#fields.hasErrors('cargo')}"
+                           th:errors="*{cargo}"></small>
+                </div>
+                <div class="perfil-field">
+                    <label for="setorAdmin">Setor</label>
+                    <input id="setorAdmin" type="text" th:field="*{setor}"
+                           maxlength="100" placeholder="Setor ou departamento">
+                    <small class="perfil-field-error" th:if="${#fields.hasErrors('setor')}"
+                           th:errors="*{setor}"></small>
+                </div>
+            </div>
+            <div class="perfil-admin-self-actions">
+                <p>As alterações serão registradas no histórico da conta.</p>
+                <button class="perfil-primary-button" type="submit">Salvar meus dados profissionais</button>
+            </div>
+        </form>
 
         <div class="perfil-admin-notice">
             <svg viewBox="0 0 24 24" aria-hidden="true">

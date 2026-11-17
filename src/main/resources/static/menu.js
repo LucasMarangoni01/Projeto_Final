@@ -94,3 +94,42 @@ document.addEventListener("DOMContentLoaded", function() {
         if (grupo) grupo.classList.add("has-current");
     });
 });
+
+/**
+ * Menus expansíveis são mutuamente exclusivos: impede dois painéis
+ * sobrepostos, fecha ao clicar fora ou pressionar Esc.
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    const menu = document.querySelector(".main-nav");
+    if (!menu) return;
+
+    const menus = Array.from(menu.querySelectorAll("details.nav-dropdown, details.mobile-menu"));
+    menus.forEach(function(item) {
+        item.addEventListener("toggle", function() {
+            if (!item.open) return;
+            menus.forEach(function(other) {
+                if (other !== item) other.open = false;
+            });
+        });
+    });
+
+    document.addEventListener("pointerdown", function(event) {
+        if (!menu.contains(event.target)) {
+            menus.forEach(function(item) { item.open = false; });
+            return;
+        }
+        menus.forEach(function(item) {
+            if (item.open && !item.contains(event.target)) item.open = false;
+        });
+    });
+
+    menu.addEventListener("keydown", function(event) {
+        if (event.key !== "Escape") return;
+        const aberto = menus.find(function(item) { return item.open; });
+        if (!aberto) return;
+        aberto.open = false;
+        const summary = aberto.querySelector("summary");
+        if (summary) summary.focus();
+        event.preventDefault();
+    });
+});

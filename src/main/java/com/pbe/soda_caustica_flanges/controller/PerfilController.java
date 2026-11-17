@@ -1,6 +1,8 @@
 package com.pbe.soda_caustica_flanges.controller;
 
 import com.pbe.soda_caustica_flanges.model.AlterarSenhaDTO;
+import com.pbe.soda_caustica_flanges.model.DadosProfissionaisDTO;
+import com.pbe.soda_caustica_flanges.model.Role;
 import com.pbe.soda_caustica_flanges.model.PerfilDTO;
 import com.pbe.soda_caustica_flanges.model.Usuario;
 import com.pbe.soda_caustica_flanges.service.FotoPerfilService;
@@ -40,12 +42,14 @@ public class PerfilController {
             Authentication authentication,
             Model model,
             @RequestParam(required = false) String perfil,
-            @RequestParam(required = false) String senha) {
+            @RequestParam(required = false) String senha,
+            @RequestParam(required = false) String dados) {
 
         Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
         prepararTela(model, usuario);
         model.addAttribute("statusPerfil", perfil);
         model.addAttribute("statusSenha", senha);
+        model.addAttribute("statusDadosProfissionais", dados);
         return "perfil/perfil";
     }
 
@@ -131,6 +135,43 @@ public class PerfilController {
         }
     }
 
+    /**
+     * Permite que o ADMIN edite os proprios dados profissionais, sem alterar
+     * permissao, unidade, email nem status de acesso. O ID vem da sessao.
+     */
+    @PostMapping("/perfil/dados-profissionais")
+    public String atualizarDadosProfissionais(
+            @Valid @ModelAttribute("dadosProfissionaisDTO") DadosProfissionaisDTO dados,
+            BindingResult result,
+            Authentication authentication,
+            Model model) {
+
+        Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
+        if (usuario.getRole() != Role.ADMIN || !usuario.isAtivo()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+
+        if (result.hasErrors()) {
+            prepararTela(model, usuario);
+            model.addAttribute("dadosProfissionaisDTO", dados);
+            model.addAttribute("erroDadosProfissionais",
+                    "Confira os limites de caracteres de matrícula, cargo e setor.");
+            return "perfil/perfil";
+        }
+
+        try {
+            usuarioService.alterarDadosProfissionais(
+                    usuario.getId(), dados, authentication.getName());
+            return "redirect:/perfil?dados=atualizados#dados-profissionais";
+        } catch (IllegalArgumentException e) {
+            prepararTela(model, usuario);
+            model.addAttribute("dadosProfissionaisDTO", dados);
+            model.addAttribute("erroDadosProfissionais", e.getMessage());
+            return "perfil/perfil";
+        }
+    }
+
     @GetMapping("/perfil/foto/{nomeArquivo:.+}")
     @ResponseBody
     public ResponseEntity<byte[]> fotoPerfil(
@@ -159,6 +200,7 @@ public class PerfilController {
         model.addAttribute("usuarioLogado", usuario);
         model.addAttribute("perfilDTO", new PerfilDTO(usuario));
         model.addAttribute("alterarSenhaDTO", new AlterarSenhaDTO());
+        model.addAttribute("dadosProfissionaisDTO", new DadosProfissionaisDTO(usuario));
         model.addAttribute("historicoUsuario", auditoriaService.buscarPorUsuario(usuario.getId()));
     }
 

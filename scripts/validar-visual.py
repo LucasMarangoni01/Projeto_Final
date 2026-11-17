@@ -94,6 +94,28 @@ def validar():
                       ("guia-nav.css", (STATIC / "guia-nav.css").read_text(encoding="utf-8"))):
         assert css.count("{") == css.count("}"), f"{nome}: blocos CSS desbalanceados"
     assert 'html[data-theme="light"]' in tema and 'html[data-theme="dark"]' in tema
+    # Regressões reais reportadas: barra azul com texto escuro e
+    # formulários azuis com títulos invisíveis quando o tema está claro.
+    assert 'html[data-theme="light"] .main-nav' in tema
+    assert 'background:#ffffff !important' in tema
+    assert 'html[data-theme="light"] body:has(.main-nav) main .card' in tema
+    assert 'html[data-theme="light"] body:has(.main-nav) main .form-group label' in tema
+    assert 'background:#fff8e8' in tema
+    # Menus não podem permanecer simultaneamente expandidos.
+    menu_js = (STATIC / "menu.js").read_text(encoding="utf-8")
+    assert 'other.open = false' in menu_js
+    assert 'event.key !== "Escape"' in menu_js
+    # A área de FAQ empurra as demais perguntas ao expandir.
+    guia_css = (STATIC / "guia-nav.css").read_text(encoding="utf-8")
+    assert 'details.faq-item[open]>p' in guia_css
+    assert 'position:static' in guia_css
+    # Administradores podem atualizar os próprios dados profissionais
+    # sem poder modificar seu papel de acesso nem a unidade.
+    perfil = (TEMPLATES / "perfil/perfil.html").read_text(encoding="utf-8")
+    assert 'th:action="@{/perfil/dados-profissionais}"' in perfil
+    assert 'id="dados-profissionais"' in perfil
+    assert 'th:object="${dadosProfissionaisDTO}"' in perfil
+
     assert '.relatorios-card' in report and '.relatorios-summary' in report
     print("Validação estática de interface: páginas, rotas, estrutura e CSS OK.")
 
