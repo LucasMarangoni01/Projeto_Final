@@ -91,6 +91,7 @@ public class SecurityConfig {
                                 "/sensor.css",
                                 "/sensor.js",
                                 "/analises.css",
+                                "/relatorios.css",
                                 "/analises.js",
                                 "/manutencao.css",
                                 "/js/**",
@@ -128,6 +129,11 @@ public class SecurityConfig {
 
                         // Arquivos antigos na pasta static ficam restritos a ADMIN durante a migração.
                         .requestMatchers("/foto_flange/**").hasRole("ADMIN")
+
+                        // Relatorios da documentacao oficial: administradores veem tudo e
+                        // usuarios somente a sua unidade, filtrada no controller.
+                        .requestMatchers(HttpMethod.GET, "/relatorios", "/relatorios/**")
+                        .hasAnyRole("ADMIN", "USER")
 
                         // A consulta de alarmes é limitada à unidade pelo controller.
                         .requestMatchers(HttpMethod.GET, "/alertas")
