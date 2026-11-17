@@ -106,6 +106,25 @@ def validar():
     assert 'FLANGEGUARD — MODO CLARO CINZA-ACO' in tema
     assert 'background:#cfd8e4' in tema
     assert 'fill:#cedae8' in tema
+    # A navegacao usa o MESMO fragmento em todas as paginas de uso diario.
+    for pagina in paginas:
+        conteudo = (TEMPLATES / pagina).read_text(encoding="utf-8")
+        assert 'fragments/menu :: menu' in conteudo, (
+            f"{pagina}: deve usar o fragmento global em vez de duplicar o nav"
+        )
+        cabecalho = conteudo.split("</head>", 1)[0]
+        assert "menu.css" in cabecalho and "theme.css" in cabecalho, (
+            f"{pagina}: precisa carregar os estilos do menu e do tema"
+        )
+    # O ultimo conjunto de regras vence os estilos anteriores de cinza.
+    # A superficie final do menu no tema claro e AZUL-CLARO em todas as telas.
+    assert 'NAVEGACAO GLOBAL UNIFICADA' in tema
+    assert 'background:linear-gradient(180deg,#d4e4f7 0%,#c7dbf3 100%) !important' in tema
+    assert tema.rfind('background:linear-gradient(180deg,#d4e4f7') > tema.rfind(
+        'background:#dbe3ed !important'
+    )
+    assert '--menu-panel:#e1ebf7' in tema
+
     # O mapa vetorial precisa de classes que respeitem as duas paletas;
     # as cores originais continuam funcionando no modo escuro.
     dashboard = (TEMPLATES / "home/index.html").read_text(encoding="utf-8")
