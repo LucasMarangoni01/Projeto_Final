@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * A execução é habilitada apenas quando TEST_MYSQL_URL está definida no CI.
  */
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         properties = {
                 "spring.jpa.hibernate.ddl-auto=create-drop",
                 "spring.jpa.show-sql=false",
