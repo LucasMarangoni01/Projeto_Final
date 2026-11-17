@@ -152,7 +152,7 @@
                     </div>
 
                     <div class="sensor-field sensor-field-wide" id="temperaturaLimitField"
-                         th:if="${sensorDTO.id != null and sensorDTO.tipo.name() == 'TEMPERATURA_SUPERFICIE'}">
+                         th:if="${sensorDTO.id != null and sensorDTO.tipo != null and sensorDTO.tipo.name() == 'TEMPERATURA_SUPERFICIE'}">
                         <label for="limiteTemperaturaAlerta">Limite térmico para alerta (°C)</label>
                         <input id="limiteTemperaturaAlerta" type="number" step="0.1"
                                min="-100" max="400" th:field="*{limiteTemperaturaAlerta}"
@@ -289,7 +289,7 @@
                     </td>
                     <td class="sensor-actions-cell">
                         <a class="sensor-edit-link" th:href="@{/sensores/editar/{id}(id=${sensor.id})}">Editar</a>
-                        <form th:if="${sensor.status.name() == 'INSTALADO' and sensor.flange.ativo}"
+                        <form th:if="${sensor.tipo.name() != 'DETECCAO_GAS' and sensor.status.name() == 'INSTALADO' and sensor.flange.ativo}"
                               th:action="@{/sensores/token/{id}(id=${sensor.id})}" method="post"
                               onsubmit="return confirm('Gerar um novo token? O token anterior será invalidado imediatamente.');">
                             <button type="submit" class="sensor-token-generate">Gerar token</button>
