@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Monitoramento de Flanges</title>
+  <meta name="description" content="Tela de acesso do sistema de monitoramento de flanges.">
+  <link rel="icon" href="../src/main/resources/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../src/main/resources/static/login.css">
+  <script src="../src/main/resources/static/theme.js"></script>
+  <link rel="stylesheet" href="../src/main/resources/static/theme.css">
+  <style>
+    .login-informativo {
+      margin: 18px 0;
+      padding: 13px 15px;
+      background: rgba(63,130,224,.12);
+      border: 1px solid rgba(113,172,255,.35);
+      color: var(--text-primary);
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .login-form input:disabled {
+      opacity: .62;
+      cursor: not-allowed;
+    }
+    .login-form .login-button:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+    html[data-theme="light"] .login-informativo { background:#eaf2fb; color:#173253; border-color:#b2cbea; }
+  </style>
+</head>
+<body>
+<div class="login-page">
+  <section class="login-info" aria-label="Sobre o sistema">
+    <div class="info-content">
+      <div class="system-badge">
+        <img class="system-badge-logo" src="../src/main/resources/static/img/logo-monitoramento-flanges.svg" alt="">
+        MONITORAMENTO INDUSTRIAL DE FLANGES
+      </div>
+      <h1>Monitoramento e <span>Gerenciamento de Flanges</span></h1>
+      <p class="info-description">Sistema de Monitoramento e Gerenciamento de Flanges em Ambientes Industriais com Soda Cáustica (NaOH).</p>
+      <div class="info-line"></div>
+      <div class="system-data">
+        <div class="data-item"><span class="data-label">PROCESSO</span><span class="data-value">NaOH 32%</span></div>
+        <div class="data-item"><span class="data-label">MONITORAMENTO</span><span class="data-value">Sensores e alertas</span></div>
+        <div class="data-item"><span class="data-label">SISTEMA</span><span class="data-value">Java / Spring Boot</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="login-section" aria-label="Acesso">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo"><span>F</span></div>
+        <h2>Acesso ao Sistema</h2>
+        <p>Entre com suas credenciais</p>
+      </div>
+      <p class="login-informativo" role="status">
+        Esta é a tela de login exibida pelo GitHub Pages.
+        Para autenticar usuários e entrar no sistema é necessário que o servidor Spring Boot esteja hospedado e funcionando.
+        O GitHub Pages não executa Java nem acessa o banco de dados.
+      </p>
+      <form class="login-form">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon" aria-hidden="true">@</span>
+            <input type="email" id="email" name="email" placeholder="seuemail@gmail.com" autocomplete="off" disabled>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon password-icon" aria-hidden="true">●</span>
+            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="off" disabled>
+          </div>
+        </div>
+        <button type="button" class="login-button" disabled>Acesso requer servidor</button>
+      </form>
+      <div class="login-footer">
+        <span>Sistema de Monitoramento de Flanges</span>
+        <span>© 2026</span>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

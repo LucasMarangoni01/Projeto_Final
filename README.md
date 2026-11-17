@@ -180,6 +180,6 @@ Consulte **[docs/VERCEL.md](docs/VERCEL.md)** antes de publicar. O tutorial incl
 
 ## Página inicial no GitHub Pages: acesso ao sistema
 
-O endereço **https://lucasmarangoni01.github.io/Projeto_Final/** redireciona imediatamente para a **página real de login** em **https://flangeguard.vercel.app/login**. A entrada do GitHub Pages fica em `/index.html` na raiz da branch `main`, com a configuração Pages **Deploy from a branch → main → /(root)**.
+O endereço **https://lucasmarangoni01.github.io/Projeto_Final/** abre a tela de login estática em **https://lucasmarangoni01.github.io/Projeto_Final/login/**. A entrada fica no `/index.html` da branch `main` (Pages: `main` → `/(root)`).
 
-**Importante:** GitHub Pages só faz o redirecionamento. O login, os usuários, o banco MySQL e o monitoramento são executados pela aplicação Spring Boot no host externo. Se esse host estiver indisponível, o link de acesso também não funcionará. A Vercel exige configurar `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` e `APP_SETUP_KEY` antes de iniciar o sistema. A página `src/main/resources/templates/login/login.html` é renderizada pelo servidor Java, não pelo GitHub Pages.
+A cópia estática está em `login/index.html` e usa os estilos da aplicação. **Não recebe senhas nem autentica:** o formulário fica desabilitado, porque o GitHub Pages não executa Java, sessões ou MySQL. Para acesso funcional, é necessário hospedar o Spring Boot em servidor próprio e apontar a entrada do Pages para o endereço real `/login` desse servidor. A tela real do Spring Boot segue em `src/main/resources/templates/login/login.html`.

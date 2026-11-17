@@ -1,43 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Entrar no sistema | Monitoramento de Flanges</title>
-  <meta name="description" content="Acesso ao sistema de monitoramento e gerenciamento de flanges.">
-  <meta http-equiv="refresh" content="0; url=https://flangeguard.vercel.app/login">
-  <link rel="canonical" href="https://flangeguard.vercel.app/login">
-  <link rel="icon" type="image/svg+xml" href="./src/main/resources/static/favicon.svg">
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
-      background: #07182d; color: #f5f8ff;
-      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-    }
-    main {
-      width: min(90vw, 430px); padding: 35px; text-align: center;
-      background: #102b4e; border: 1px solid #2c507d; border-radius: 16px;
-    }
-    h1 { font-size: 24px; margin: 0 0 12px; }
-    p { color: #c4d3ea; margin: 0 0 21px; }
-    a {
-      display: inline-block; background: #317dd5; color: white;
-      border-radius: 10px; padding: 11px 19px; font-weight: 700;
-      text-decoration: none;
-    }
-    a:focus-visible { outline: 3px solid #ffd166; outline-offset: 4px; }
-  </style>
-  <script>
-    window.location.replace("https://flangeguard.vercel.app/login");
-  </script>
+  <meta http-equiv="refresh" content="0; url=./login/">
+  <title>Login | Monitoramento de Flanges</title>
+  <script>location.replace(new URL("./login/", location.href));</script>
 </head>
 <body>
-  <main>
-    <h1>Entrar no sistema</h1>
-    <p>Redirecionando para a página de login do Monitoramento de Flanges.</p>
-    <a href="https://flangeguard.vercel.app/login">Abrir login</a>
-  </main>
+  <p><a href="./login/">Abrir a tela de login</a></p>
 </body>
 </html>
