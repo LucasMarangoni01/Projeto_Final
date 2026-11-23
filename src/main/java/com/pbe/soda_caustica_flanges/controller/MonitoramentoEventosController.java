@@ -44,9 +44,11 @@ public class MonitoramentoEventosController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        long totalAtivos;
         List<Incidente> recentes;
         List<Long> flangesEmAlerta;
         if (usuario.getRole() == Role.ADMIN) {
+            totalAtivos = incidentes.countByDataHoraIsNotNullAndNormalizadoEmIsNull();
             recentes = incidentes.findTop6ByDataHoraIsNotNullOrderByDataHoraDesc();
             flangesEmAlerta = incidentes.findIdsFlangesComAlertasAtivos();
         } else {
@@ -54,6 +56,7 @@ public class MonitoramentoEventosController {
             if (unidade == null || !unidade.isAtivo()) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
+            totalAtivos = incidentes.countByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull(unidade.getId());
             recentes = incidentes.findTop6ByFlange_Unidade_IdAndDataHoraIsNotNullOrderByDataHoraDesc(
                     unidade.getId());
             flangesEmAlerta = incidentes.findIdsFlangesComAlertasAtivosPorUnidade(unidade.getId());
@@ -62,10 +65,11 @@ public class MonitoramentoEventosController {
                 .cacheControl(CacheControl.noStore())
                 .body(new Painel(
                         recentes.stream().map(EventoMonitoramentoDTO::de).toList(),
-                        flangesEmAlerta
+                        flangesEmAlerta,
+                        totalAtivos
                 ));
     }
 
-    public record Painel(List<EventoMonitoramentoDTO> eventos, List<Long> idsFlangesEmAlerta) {
+    public record Painel(List<EventoMonitoramentoDTO> eventos, List<Long> idsFlangesEmAlerta, long totalAlertasAtivos) {
     }
 }
