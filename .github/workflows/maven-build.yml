@@ -34,6 +34,7 @@ jobs:
           node --check src/main/resources/static/menu.js
           node --check src/main/resources/static/monitoramento-atualizacao.js
           node --check src/main/resources/static/dashboard-simulacao.js
+          node --test scripts/test-dashboard-alertas.cjs
 
       - name: Compile and verify project
         run: mvn -B -ntp -Pvercel verify
