@@ -8,8 +8,10 @@
 
     const CRITICOS = new Set(['VAZAMENTO', 'SUSPEITA', 'DANIFICADA', 'CRITICO']);
     const PROBLEMAS = new Set(['VAZAMENTO', 'SUSPEITA', 'DANIFICADA', 'CRITICO',
-        'FALHA_SENSOR', 'ATENCAO']);
-    const CODIGOS = new Set([...PROBLEMAS, 'NORMAL', 'MANUTENCAO', 'SEM_LEITURA']);
+        'FALHA_SENSOR', 'LEITURA_DESATUALIZADA', 'ATENCAO']);
+    const CODIGOS = new Set([...PROBLEMAS, 'NORMAL', 'MANUTENCAO',
+        'SEM_SENSOR', 'NAO_INSTALADO', 'AGUARDANDO_DADOS',
+        'LEITURA_DESATUALIZADA']);
 
     // Logica pura usada tambem nos testes automatizados (Node.js).
     function prioridadeOrdenacao(estado) {
