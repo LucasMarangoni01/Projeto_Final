@@ -612,3 +612,28 @@ html[data-theme="light"] .flange-selection-status {color:#345779;}
     .dash .plant-flange:is([data-visual-state="VAZAMENTO"],[data-visual-state="SUSPEITA"],
        [data-visual-state="DANIFICADA"],[data-visual-state="CRITICO"]) .plant-alert-wave {opacity:1;}
 }
+
+
+/* A barra lateral é estreita: chips e legenda não podem se sobrepor. */
+.dash .flange-panel-header {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+}
+.dash .flange-panel-toolbar {
+    width:100%;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:7px;
+    min-width:0;
+}
+.dash .flange-panel-toolbar .btn-legend {flex:0 0 auto;}
+.dash .flange-panel-toolbar .flange-panel-count {
+    color:var(--text-secondary);
+    margin-left:auto;
+}
+.dash .flange-alert-count,
+.dash .flange-sim-count {max-width:100%;}
+html[data-theme="light"] .dash .flange-panel-toolbar .flange-panel-count {color:#3b5c7e;}
