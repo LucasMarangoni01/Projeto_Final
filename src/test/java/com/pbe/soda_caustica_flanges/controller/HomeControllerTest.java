@@ -88,4 +88,39 @@ class HomeControllerTest {
         verify(leituras, never()).findUltimasPorSensores(anyList());
         verify(leituras).findTop10ByFlange_IdInOrderByRecebidaEmDesc(List.of(13L));
     }
+
+    @Test
+    void sensorInstaladoSemPrimeiraLeituraExibeAguardandoDados() {
+        Unidade unidade = new Unidade("Unidade B", "Linha B", true);
+        unidade.setId(25L);
+        Usuario usuario = new Usuario("Operador", "operador@exemplo.com", "hash",
+                Role.USER, true, unidade);
+        when(usuarios.findByEmail(usuario.getEmail())).thenReturn(Optional.of(usuario));
+
+        Flange flange = new Flange();
+        flange.setId(37L);
+        flange.setNomeFlange("FL-037");
+        flange.setUnidade(unidade);
+        when(flanges.findAtivasPorUnidade(25L)).thenReturn(new ArrayList<>(List.of(flange)));
+
+        Sensor sensor = new Sensor();
+        sensor.setId(70L);
+        sensor.setStatus(StatusSensor.INSTALADO);
+        sensor.setFlange(flange);
+        when(sensores.findByFlange_IdIn(List.of(37L))).thenReturn(List.of(sensor));
+        when(leituras.findUltimasPorSensores(List.of(70L))).thenReturn(List.of());
+        when(leituras.findTop10ByFlange_IdInOrderByRecebidaEmDesc(List.of(37L)))
+                .thenReturn(List.of());
+        when(incidentes.findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(25L))
+                .thenReturn(List.of());
+
+        ExtendedModelMap model = new ExtendedModelMap();
+        assertEquals("home/index", controller.home(model, auth));
+        @SuppressWarnings("unchecked")
+        List<DashboardFlangeDTO> resultado = (List<DashboardFlangeDTO>) model.get("flanges");
+        assertEquals(1, resultado.size());
+        assertEquals("AGUARDANDO_DADOS", resultado.getFirst().estadoVisual().codigo());
+        verify(leituras).findUltimasPorSensores(List.of(70L));
+    }
+
 }
