@@ -70,3 +70,14 @@ test('animacao somente em anel, luz e borda; acessivel sem movimento', () => {
     assert.match(css,/html\[data-theme="light"\]/);
     assert.match(script,/recebidos\.forEach/);
 });
+
+test('os estados de leitura aparecem sem alarmes vermelhos indevidos', () => {
+    for (const codigo of ['SEM_SENSOR', 'NAO_INSTALADO',
+            'AGUARDANDO_DADOS', 'LEITURA_DESATUALIZADA']) {
+        assert.match(script, new RegExp(codigo));
+        assert.match(css, new RegExp('data-visual-state="' + codigo + '"'));
+        assert.equal(app.CRITICOS.has(codigo), false);
+    }
+    assert.equal(app.PROBLEMAS.has('AGUARDANDO_DADOS'),false);
+    assert.equal(app.PROBLEMAS.has('LEITURA_DESATUALIZADA'),true);
+});
