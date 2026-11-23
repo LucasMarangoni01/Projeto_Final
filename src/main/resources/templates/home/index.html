@@ -1165,6 +1165,7 @@
                     <div style="display:flex;align-items:center;gap:8px;">
                         <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
                         <span class="flange-alert-count" id="flangeAlertCount" role="status"
+                              th:attr="data-has-alert=${totalFlangesEmAlerta > 0}"
                               th:text="${'Em alerta: ' + totalFlangesEmAlerta}">Em alerta: 0</span>
                         <span class="flange-sim-count" id="flangeSimCount" hidden>1 simulação</span>
                         <span class="flange-panel-count"
@@ -1241,6 +1242,9 @@
                 </div>
                 <div class="monitor-board-actions">
                     <span class="monitor-real-label">DADOS DO SISTEMA</span>
+                    <span class="monitor-connection-status" id="monitorConnectionStatus" role="status">
+                        Consultando atualizações do monitoramento
+                    </span>
                     <button type="button" class="monitor-sim-button" id="abrirSimulacao"
                             th:if="${ehAdmin and !#lists.isEmpty(flanges)}"
                             aria-haspopup="dialog" aria-controls="modalSimulacao">
