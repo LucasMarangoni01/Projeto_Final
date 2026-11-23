@@ -136,6 +136,13 @@
 .dash .dashboard-flange-card[data-alarm-active="true"] {
     animation: monitorCriticalPulse 1.45s ease-in-out infinite;
 }
+/* O SVG foi gerado no servidor: uma ocorrencia nova deve ficar vermelha
+ * mesmo que o atributo fill original tenha sido verde no carregamento. */
+.dash .plant-flange[data-alarm-active="true"] .plant-status-ring {fill:#ef4444!important;}
+.dash .plant-flange[data-alarm-active="false"][data-status="NORMAL"] .plant-status-ring {fill:#22c55e!important;}
+.dash .plant-flange[data-alarm-active="false"][data-status="ATENCAO"] .plant-status-ring {fill:#f59e0b!important;}
+.dash .plant-flange[data-alarm-active="false"][data-status="CRITICO"] .plant-status-ring {fill:#ef4444!important;}
+.dash .plant-flange[data-alarm-active="false"][data-status="MANUTENCAO"] .plant-status-ring {fill:#60a5fa!important;}
 .dash .plant-flange.is-sim-critical .plant-status-ring {fill:#ef4444!important;animation:monitorCriticalPulse 1.15s ease-in-out infinite;}
 .dash .plant-flange.is-sim-warning .plant-status-ring {fill:#f59e0b!important;}
 .dash .dashboard-flange-card.is-sim-critical {
