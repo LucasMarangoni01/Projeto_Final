@@ -1391,3 +1391,29 @@
         font-size: 8px;
     }
 }
+
+
+/* O mesmo indicador de alerta real acompanha o menu em todas as telas. */
+.main-nav .nav-link-alertas {
+    position:relative;
+}
+.main-nav .nav-alert-counter {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:17px;
+    height:17px;
+    padding:1px 4px;
+    border-radius:999px;
+    font:800 9px/1 'JetBrains Mono',Consolas,monospace;
+    color:#fff;
+    background:#ae1b3c;
+    border:1px solid #ff9cb0;
+    box-shadow:0 0 0 2px rgba(244,63,94,.12);
+}
+.main-nav .nav-alert-counter[hidden] {display:none!important;}
+html[data-theme="light"] .main-nav .nav-alert-counter {
+    color:#fff;
+    background:#a81b3c;
+    border-color:#d46a80;
+}
