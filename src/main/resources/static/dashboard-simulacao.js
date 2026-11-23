@@ -31,6 +31,8 @@
     let simulacao = null;
     let consultando = false;
     const original = new Map();
+    const estadoRealPill = new Map();
+    const estadoRealMapa = new Map();
 
     function textoSeguro(valor) {
         return typeof valor === 'string' ? valor : '';
@@ -72,10 +74,43 @@
     }
 
     function atualizarFlangesReais(ids) {
-        const permitidos = new Set((Array.isArray(ids) ? ids : [])
-            .map(String));
-        flangeCards.concat(mapFlanges).forEach(function (elemento) {
-            elemento.dataset.alarmActive = String(permitidos.has(elemento.dataset.flangeId));
+        const permitidos = new Set((Array.isArray(ids) ? ids : []).map(String));
+
+        // Se surgir um alerta real na flange simulada, o real tem prioridade.
+        if (simulacao && permitidos.has(simulacao.id)) restaurarSimulacao();
+
+        flangeCards.forEach(function (card) {
+            const ativo = permitidos.has(card.dataset.flangeId);
+            card.dataset.alarmActive = String(ativo);
+            const pill = card.querySelector('.fc-pill');
+            if (!pill) return;
+            if (ativo && !card.classList.contains('is-sim-critical')
+                      && !card.classList.contains('is-sim-warning')) {
+                if (!estadoRealPill.has(pill)) {
+                    estadoRealPill.set(pill, {texto:pill.textContent, classes:pill.className});
+                }
+                pill.textContent = 'Alerta ativo';
+                pill.classList.add('is-real-active');
+            } else if (!ativo && estadoRealPill.has(pill)) {
+                const anterior = estadoRealPill.get(pill);
+                pill.textContent = anterior.texto;
+                pill.className = anterior.classes;
+                estadoRealPill.delete(pill);
+            }
+        });
+        mapFlanges.forEach(function (flange) {
+            const ativo = permitidos.has(flange.dataset.flangeId);
+            flange.dataset.alarmActive = String(ativo);
+            const label = flange.querySelector('.plant-node-status');
+            if (!label) return;
+            if (ativo && !flange.classList.contains('is-sim-critical')
+                      && !flange.classList.contains('is-sim-warning')) {
+                if (!estadoRealMapa.has(label)) estadoRealMapa.set(label, label.textContent);
+                label.textContent = 'ALERTA ATIVO';
+            } else if (!ativo && estadoRealMapa.has(label)) {
+                label.textContent = estadoRealMapa.get(label);
+                estadoRealMapa.delete(label);
+            }
         });
     }
 
@@ -135,6 +170,15 @@
         const id = flangeSelect.value;
         const card = flangeCards.find(function (item) { return item.dataset.flangeId === id; });
         if (!card) return;
+        if (card.dataset.alarmActive === 'true') {
+            const feedback = document.getElementById('monitorSimFeedback');
+            if (feedback) {
+                feedback.hidden = false;
+                feedback.textContent = 'Esta flange possui um alerta real ativo. '
+                    + 'Escolha outra flange para não encobrir a ocorrência registrada.';
+            }
+            return;
+        }
 
         restaurarSimulacao();
         const nome = card.querySelector('.fc-code')?.textContent?.trim() || 'Flange selecionada';
@@ -208,6 +252,8 @@
 
     if (openButton && modal) {
         openButton.addEventListener('click', function () {
+            const feedback = document.getElementById('monitorSimFeedback');
+            if (feedback) feedback.hidden = true;
             if (typeof modal.showModal === 'function') modal.showModal();
         });
         document.getElementById('fecharSimulacao')?.addEventListener('click', function () { modal.close(); });
