@@ -1148,7 +1148,7 @@
                         <text class="plant-node-status" x="0" y="32" text-anchor="middle" font-size="8.5" fill="#c9d9ef"
                               th:text="${flange.estadoVisual.rotulo}">NORMAL</text>
                         <text class="plant-node-reading" x="0" y="45" text-anchor="middle" font-size="7.5" fill="#8fa8c9"
-                              th:text="${flange.ultimaTemperatura != null ? #numbers.formatDecimal(flange.ultimaTemperatura,1,1) + ' °C' : 'SEM LEITURA'}">SEM LEITURA</text>
+                              th:text="${flange.ultimaTemperatura != null ? #numbers.formatDecimal(flange.ultimaTemperatura,1,1) + ' °C' : 'SEM DADOS'}">SEM DADOS</text>
                     </g>
 
                     <text class="plant-footer" x="430" th:attr="y=${alturaMapa - 12}" text-anchor="middle"
