@@ -133,3 +133,51 @@ document.addEventListener("DOMContentLoaded", function() {
         event.preventDefault();
     });
 });
+
+
+/**
+ * Badge leve de alertas registrados em toda a navegacao autenticada.
+ * Usa resumo da unidade autorizada; simulacoes locais nunca entram na conta.
+ */
+document.addEventListener("DOMContentLoaded", function () {
+    const links = Array.from(document.querySelectorAll(".main-nav .nav-link-alertas"));
+    if (!links.length) return;
+    let consultando = false;
+    async function consultarAlertasDoMenu() {
+        if (document.hidden || consultando) return;
+        consultando = true;
+        try {
+            const resposta = await fetch("/api/monitoramento/resumo", {
+                credentials: "same-origin", cache: "no-store",
+                headers: {Accept: "application/json"}
+            });
+            if (!resposta.ok) throw new Error("Resumo temporariamente indisponível");
+            const dados = await resposta.json();
+            const numero = Math.max(0, Number(dados.alertasAtivos) || 0);
+            links.forEach(function (link) {
+                const contador = link.querySelector(".nav-alert-counter");
+                if (contador) {
+                    contador.hidden = numero === 0;
+                    contador.textContent = numero > 99 ? "99+" : String(numero);
+                }
+                link.setAttribute("aria-label", numero > 0
+                    ? ("Alertas e ocorrências: " + numero + " alertas registrados ativos")
+                    : "Alertas e ocorrências");
+                link.removeAttribute("data-update-failed");
+            });
+        } catch (e) {
+            // Preservar último estado em falhas de rede: nao afirmar zero.
+            links.forEach(function (link) {
+                link.dataset.updateFailed = "true";
+                link.title = "Consulta indisponível: último número registrado, se disponível";
+            });
+        } finally {
+            consultando = false;
+        }
+    }
+    consultarAlertasDoMenu();
+    window.setInterval(consultarAlertasDoMenu, 7000);
+    document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) consultarAlertasDoMenu();
+    });
+});
