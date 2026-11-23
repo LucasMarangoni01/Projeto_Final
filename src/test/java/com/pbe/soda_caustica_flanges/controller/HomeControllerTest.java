@@ -75,7 +75,6 @@ class HomeControllerTest {
         leitura.setFlange(flange);
         leitura.setTemperatura(29.5);
         leitura.setRecebidaEm(LocalDateTime.of(2026, 11, 17, 10, 29));
-        when(leituras.findUltimasPorFlanges(List.of(13L))).thenReturn(List.of(leitura));
         when(leituras.findTop10ByFlange_IdInOrderByRecebidaEmDesc(List.of(13L)))
                 .thenReturn(List.of(leitura));
         when(incidentes.findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(8L))
@@ -86,7 +85,7 @@ class HomeControllerTest {
         assertEquals(1, model.get("totalFlanges"));
         assertEquals(List.of(leitura), model.get("leiturasRecentes"));
         verify(flanges, never()).findAtivas();
-        verify(leituras).findUltimasPorFlanges(List.of(13L));
+        verify(leituras, never()).findUltimasPorSensores(anyList());
         verify(leituras).findTop10ByFlange_IdInOrderByRecebidaEmDesc(List.of(13L));
     }
 }
