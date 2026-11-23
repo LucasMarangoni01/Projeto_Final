@@ -112,6 +112,18 @@ def validar():
     assert css_sim.count("{") == css_sim.count("}")
     assert "prefers-reduced-motion:reduce" in css_sim
     assert "html[data-theme=\"light\"] .monitor-board" in css_sim
+    # Flanges reais e simuladas compartilham a classificação visual.
+    for nome in ('flangeAlertCount', 'flangeSelectionStatus', 'plant-alert-wave',
+                 'fc-alert-icon', 'monitorConnectionStatus'):
+        assert nome in dashboard, f"Recurso visual ausente: {nome}"
+    assert 'data-visual-state=${flange.estadoVisual.codigo}' in dashboard
+    assert "ordenarPorPrioridade" in js_sim
+    assert "selecionar(id, origem)" in js_sim
+    assert "simularEstado" in js_sim
+    for animacao in ('@keyframes pulse-red', '@keyframes critical-glow',
+                     '@keyframes alert-ring', '@keyframes critical-border-glow'):
+        assert animacao in css_sim, f"Animacao ausente: {animacao}"
+
 
     assert 'html[data-theme="light"]' in tema and 'html[data-theme="dark"]' in tema
     # Regressões reais reportadas: barra azul com texto escuro e
