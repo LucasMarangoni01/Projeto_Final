@@ -62,7 +62,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | --- | --- |
 | CRUD de flanges, funcionários e manutenções | Implementado no código |
 | Fotos das flanges com acesso restrito | Implementado no código; testar permissões e persistência após implantação |
-| Dashboard de monitoramento | Implementado; verificação periódica de alertas por unidade e consulta de leituras limitada; validação em navegador pendente |
+| Dashboard de monitoramento | Painel de seis alertas recentes e destaque crítico, simulação local apenas para ADMIN; atualização a cada 7 s por unidade. **Teste visual em navegador pendente.** |
 | Sensores térmicos/Arduino | Proposta original do TAP. Escopo revisado para gás; cadastro de gás implementado, **integração física e telemetria não implementadas** |
 | LED de alerta | **Pendente:** demonstração/testes com circuito de Arduino |
 | Alertas visuais e histórico | Implementado no código |
