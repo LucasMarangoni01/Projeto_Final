@@ -145,6 +145,14 @@
 .dash .plant-flange[data-alarm-active="false"][data-status="MANUTENCAO"] .plant-status-ring {fill:#60a5fa!important;}
 .dash .plant-flange.is-sim-critical .plant-status-ring {fill:#ef4444!important;animation:monitorCriticalPulse 1.15s ease-in-out infinite;}
 .dash .plant-flange.is-sim-warning .plant-status-ring {fill:#f59e0b!important;}
+.dash .dashboard-flange-card[data-alarm-active="true"] {
+    border:2px solid #fb7185!important;
+    background:rgba(110,24,55,.32);
+}
+.dash .dashboard-flange-card .fc-pill.is-real-active {
+    color:#fff!important;background:#9f1239!important;
+    border:1px solid #fb7185!important;
+}
 .dash .dashboard-flange-card.is-sim-critical {
     border:2px solid #fb7185!important;
     box-shadow:0 0 0 3px rgba(244,63,94,.27);
@@ -186,6 +194,16 @@
     border:1px solid #6a95c8;background:#112d58;color:#fff;
     padding:10px 12px;font-size:13px;
 }
+.monitor-sim-feedback {
+    padding:10px 12px;
+    background:#7f1d1d;
+    color:#fff!important;
+    border:1px solid #fca5a5;
+    border-radius:8px;
+    font-size:12px;
+    line-height:1.5;
+    margin:12px 0 0;
+}
 .monitor-dialog-footer {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:21px;}
 .monitor-dialog-cancel {background:#244673;color:#eff5ff;}
 .monitor-dialog-confirm {background:#f4c45f;color:#172a46;border-color:#f4c45f!important;}
@@ -214,6 +232,9 @@ html[data-theme="light"] .monitor-event.is-resolved .monitor-event-status {color
 html[data-theme="light"] .monitor-feed-heading a {color:#80530d;}
 html[data-theme="light"] .monitor-history-button {background:#eaf2fc;color:#1d4e85;border-color:#b6c9df;}
 html[data-theme="light"] .monitor-overview-number {color:#86570c;}
+html[data-theme="light"] .dash .dashboard-flange-card[data-alarm-active="true"] {
+    background:#f7dce2;
+}
 html[data-theme="light"] .monitor-dialog {background:#e1eaf5;color:#1b3b5d;border-color:#9eb8d7;}
 html[data-theme="light"] .monitor-dialog h2,
 html[data-theme="light"] .monitor-dialog-field label {color:#1b3b5d;}
