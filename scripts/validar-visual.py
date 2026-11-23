@@ -87,6 +87,14 @@ def validar():
                  "/manutencao/cadastro", "/usuarios", "/unidades", "/guia"):
         assert rota in menu, f"Navegacao perdeu acesso a {rota}"
     assert "usuarioLogado.role.name() == 'ADMIN'" in menu, "Permissoes do menu ausentes"
+    assert menu.count('class="nav-alert-counter"') == 2, (
+        "Indicador de alertas precisa existir no menu desktop e mobile"
+    )
+    nav_script = (STATIC / "menu.js").read_text(encoding="utf-8")
+    assert '"/api/monitoramento/resumo"' in nav_script
+    assert 'credentials: "same-origin"' in nav_script
+    assert 'link.dataset.updateFailed = "true"' in nav_script
+
 
     tema = (STATIC / "theme.css").read_text(encoding="utf-8")
     report = (STATIC / "relatorios.css").read_text(encoding="utf-8")
