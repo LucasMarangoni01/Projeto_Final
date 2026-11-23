@@ -85,3 +85,22 @@ de leitura. Sinais não verificados nunca aparecem como confirmação automátic
 A simulação tem rótulo explícito e contador separado. Encerrá-la restaura
 os dados reais mais recentes — não declara normalização operacional.
 Regras técnicas e cenários de aceite: [Alertas visuais dinâmicos](ALERTAS-VISUAIS-DINAMICOS.md).
+
+## Status de disponibilidade das leituras
+
+No mapa e na lista lateral, o antigo rótulo genérico **SEM LEITURA** foi
+substituído por estados distinguíveis:
+- **SEM SENSOR:** nenhuma instrumentação cadastrada;
+- **SENSOR NÃO INSTALADO:** existe cadastro, mas sem marcação de instalação;
+- **AGUARDANDO DADOS DO SENSOR:** cadastrado como instalado e ainda sem
+  primeira leitura própria;
+- **SEM DADOS RECENTES:** há histórico de leitura do instrumento instalado,
+  mas a última informação ultrapassou o prazo visual configurado;
+- **NORMAL:** status cadastral normal com leitura registrada recentemente;
+  isso não equivale à confirmação de segurança operacional.
+
+O prazo padrão de referência é 15 minutos, configurável por
+`MONITORAMENTO_PRAZO_LEITURA_MINUTOS`. Ele precisa ser validado com a
+frequência de envio do sensor real. Não há alarme físico automático gerado
+somente por ausência de dados. Falhas registradas de comunicação e
+ocorrências críticas continuam como categorias distintas.

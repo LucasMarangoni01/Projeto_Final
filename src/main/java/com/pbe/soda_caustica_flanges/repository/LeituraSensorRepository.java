@@ -48,4 +48,29 @@ public interface LeituraSensorRepository extends JpaRepository<LeituraSensor, Lo
               )
             """)
     List<LeituraSensor> findUltimasPorFlanges(@Param("flangeIds") List<Long> flangeIds);
+
+    /**
+     * Última leitura por sensor instalado: impede que uma leitura antiga de
+     * outro sensor na mesma flange seja atribuída ao novo equipamento.
+     * Empate de horário resolvido pelo maior identificador.
+     */
+    @EntityGraph(attributePaths = {"sensor", "flange"})
+    @Query("""
+            SELECT l FROM LeituraSensor l
+            WHERE l.sensor.id IN :sensorIds
+              AND l.recebidaEm = (
+                  SELECT MAX(outra.recebidaEm)
+                  FROM LeituraSensor outra
+                  WHERE outra.sensor.id = l.sensor.id
+              )
+              AND l.id = (
+                  SELECT MAX(desempate.id)
+                  FROM LeituraSensor desempate
+                  WHERE desempate.sensor.id = l.sensor.id
+                    AND desempate.recebidaEm = l.recebidaEm
+              )
+            """)
+    List<LeituraSensor> findUltimasPorSensores(@Param("sensorIds") List<Long> sensorIds);
+
+
 }

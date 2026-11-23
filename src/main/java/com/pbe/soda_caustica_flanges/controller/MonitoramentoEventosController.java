@@ -5,6 +5,9 @@ import com.pbe.soda_caustica_flanges.repository.IncidenteRepository;
 import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
 import com.pbe.soda_caustica_flanges.repository.SensorRepository;
 import com.pbe.soda_caustica_flanges.repository.LeituraSensorRepository;
+import org.springframework.beans.factory.annotation.Value;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +37,9 @@ public class MonitoramentoEventosController {
     private final FlangeRepository flanges;
     private final SensorRepository sensores;
     private final LeituraSensorRepository leituras;
+
+    @Value("${app.monitoramento.prazo-leitura-minutos:15}")
+    private long prazoLeituraMinutos = 15;
 
     public MonitoramentoEventosController(
             UsuarioRepository usuarios, IncidenteRepository incidentes,
@@ -87,16 +93,23 @@ public class MonitoramentoEventosController {
         List<Long> ids = permitidas.stream().map(Flange::getId).toList();
         List<Sensor> sensoresPermitidos = ids.isEmpty()
                 ? List.of() : sensores.findByFlange_IdIn(ids);
-        List<LeituraSensor> ultimas = ids.isEmpty()
-                ? List.of() : leituras.findUltimasPorFlanges(ids);
-        Set<Long> comLeitura = ultimas.stream()
-                .filter(l -> l.getFlange() != null)
-                .map(l -> l.getFlange().getId())
-                .collect(Collectors.toSet());
-        Set<Long> comSensorInstalado = sensoresPermitidos.stream()
-                .filter(s -> s.getStatus() == StatusSensor.INSTALADO && s.getFlange() != null)
-                .map(s -> s.getFlange().getId())
-                .collect(Collectors.toSet());
+        List<Long> idsInstalados = sensoresPermitidos.stream()
+                .filter(sensor -> sensor.getStatus() == StatusSensor.INSTALADO)
+                .map(Sensor::getId)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        List<LeituraSensor> ultimas = idsInstalados.isEmpty()
+                ? List.of() : leituras.findUltimasPorSensores(idsInstalados);
+        Map<Long, LeituraSensor> ultimaPorSensor = new HashMap<>();
+        for (LeituraSensor leitura : ultimas) {
+            if (leitura.getSensor() != null && leitura.getSensor().getId() != null) {
+                ultimaPorSensor.put(leitura.getSensor().getId(), leitura);
+            }
+        }
+        Map<Long, List<Sensor>> sensoresPorFlange = sensoresPermitidos.stream()
+                .filter(s -> s.getFlange() != null && s.getFlange().getId() != null)
+                .collect(Collectors.groupingBy(s -> s.getFlange().getId()));
+        LocalDateTime horarioConsulta = LocalDateTime.now();
         Map<Long, List<Incidente>> ativosPorFlange = ativos.stream()
                 .filter(i -> i.getFlange() != null && i.getFlange().getId() != null)
                 .collect(Collectors.groupingBy(i -> i.getFlange().getId()));
@@ -104,8 +117,9 @@ public class MonitoramentoEventosController {
                 .map(flange -> EstadoVisualFlangeDTO.classificar(
                         flange,
                         ativosPorFlange.getOrDefault(flange.getId(), List.of()),
-                        comSensorInstalado.contains(flange.getId()),
-                        comLeitura.contains(flange.getId())))
+                        EstadoComunicacaoSensor.avaliar(
+                                sensoresPorFlange.getOrDefault(flange.getId(), List.of()),
+                                ultimaPorSensor, horarioConsulta, prazoLeituraMinutos)))
                 .toList();
 
         return ResponseEntity.ok()
