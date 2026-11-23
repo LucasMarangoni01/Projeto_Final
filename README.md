@@ -94,10 +94,19 @@ do TAP/TCC, que ainda cita sensores térmicos.
 
 ### Monitoramento
 
-- Painel visual para acompanhamento das flanges;
-- Indicação de status normal ou alerta;
-- Organização dos dados para auxiliar na prevenção de falhas;
-- Possibilidade de integração com sensores físicos, como Arduino e sensor térmico.
+- Painel visual de flanges e de ocorrências com **até seis alertas recentes**,
+  incluindo histórico normalizado.
+- Contagem de alertas ativos, destaque visual vermelho para pontos com alarmes
+  registrados e consulta periódica a cada 7 segundos.
+- **Simulador no Dashboard para ADMIN:** escolher uma flange, reproduzir
+  visualmente um cenário de atenção ou suspeita fictícia de vazamento e encerrar.
+  A simulação não altera dados reais, não grava incidentes e não envia MQTT.
+- Organização dos dados para auxiliar na observação de possíveis falhas.
+- **Integração de gás ainda não homologada:** sensor genérico de gás não
+  confirma vazamento de soda cáustica líquida. O painel não oferece garantia
+  de segurança industrial.
+
+[Funcionamento e testes do painel](docs/PAINEL-MONITORAMENTO-E-SIMULACAO.md).
 
 
 ---
