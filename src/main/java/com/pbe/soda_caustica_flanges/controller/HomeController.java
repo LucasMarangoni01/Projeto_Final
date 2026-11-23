@@ -6,12 +6,14 @@ import com.pbe.soda_caustica_flanges.repository.IncidenteRepository;
 import com.pbe.soda_caustica_flanges.repository.LeituraSensorRepository;
 import com.pbe.soda_caustica_flanges.repository.SensorRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +38,10 @@ public class HomeController {
     private final UsuarioRepository usuarioRepository;
     private final LeituraSensorRepository leituraSensorRepository;
     private final IncidenteRepository incidenteRepository;
+
+    // Referência visual provisória: não significa periodicidade homologada.
+    @Value("${app.monitoramento.prazo-leitura-minutos:15}")
+    private long prazoLeituraMinutos = 15;
 
     public HomeController(
             FlangeRepository flangeRepository,
@@ -84,20 +90,32 @@ public class HomeController {
                 .filter(sensor -> sensor.getFlange() != null)
                 .collect(Collectors.groupingBy(sensor -> sensor.getFlange().getId()));
 
-        // Consultas limitadas: o dashboard não carrega o histórico inteiro.
-        List<LeituraSensor> ultimasLeituras = idsFlanges.isEmpty()
+        // Usar a leitura do próprio sensor instalado, não uma leitura legada
+        // de outro dispositivo que tenha sido vinculado à mesma flange.
+        List<Long> idsInstalados = sensoresDoPainel.stream()
+                .filter(sensor -> sensor.getStatus() == StatusSensor.INSTALADO)
+                .map(Sensor::getId)
+                .filter(Objects::nonNull)
+                .toList();
+        List<LeituraSensor> ultimasLeituras = idsInstalados.isEmpty()
                 ? List.of()
-                : leituraSensorRepository.findUltimasPorFlanges(idsFlanges);
+                : leituraSensorRepository.findUltimasPorSensores(idsInstalados);
+
         List<LeituraSensor> leiturasRecentes = idsFlanges.isEmpty()
                 ? List.of()
                 : leituraSensorRepository.findTop10ByFlange_IdInOrderByRecebidaEmDesc(idsFlanges);
 
+        Map<Long, LeituraSensor> ultimaLeituraPorSensor = new HashMap<>();
         Map<Long, LeituraSensor> ultimaLeituraPorFlange = new HashMap<>();
         for (LeituraSensor leitura : ultimasLeituras) {
-            if (leitura.getFlange() != null) {
-                ultimaLeituraPorFlange.putIfAbsent(leitura.getFlange().getId(), leitura);
+            if (leitura.getSensor() == null || leitura.getSensor().getId() == null) continue;
+            ultimaLeituraPorSensor.put(leitura.getSensor().getId(), leitura);
+            if (leitura.getFlange() != null && leitura.getFlange().getId() != null) {
+                ultimaLeituraPorFlange.merge(leitura.getFlange().getId(), leitura,
+                        (a, b) -> a.getRecebidaEm().isAfter(b.getRecebidaEm()) ? a : b);
             }
         }
+        LocalDateTime horarioConsulta = LocalDateTime.now();
 
         List<Incidente> alarmesAtivos = admin
                 ? incidenteRepository.findByDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc()
@@ -149,11 +167,13 @@ public class HomeController {
 
             LeituraSensor ultimaLeitura = ultimaLeituraPorFlange.get(flange.getId());
 
+            EstadoComunicacaoSensor comunicacao = EstadoComunicacaoSensor.avaliar(
+                    sensoresDaFlange, ultimaLeituraPorSensor,
+                    horarioConsulta, prazoLeituraMinutos);
             EstadoVisualFlangeDTO estadoVisual = EstadoVisualFlangeDTO.classificar(
                     flange,
                     alarmesPorFlange.getOrDefault(flange.getId(), List.of()),
-                    sensoresInstalados > 0,
-                    ultimaLeitura != null);
+                    comunicacao);
 
 
             int coluna = i % COLUNAS_MAPA;
