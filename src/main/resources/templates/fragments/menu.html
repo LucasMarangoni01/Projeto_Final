@@ -23,7 +23,9 @@
                 <ul class="nav-primary">
                     <li><a class="nav-link" th:href="@{/}">Início</a></li>
                     <li><a class="nav-link" th:href="@{/flange/listagem}">Flanges</a></li>
-                    <li><a class="nav-link" th:href="@{/alertas}">Alertas</a></li>
+                    <li><a class="nav-link nav-link-alertas" th:href="@{/alertas}" aria-label="Alertas e ocorrências">
+                        Alertas <span class="nav-alert-counter" hidden aria-hidden="true">0</span>
+                    </a></li>
                     <li><a class="nav-link" th:href="@{/relatorios}">Relatórios</a></li>
                     <li>
                         <details class="nav-dropdown">
@@ -116,7 +118,9 @@
 
                         <a th:href="@{/}" class="mobile-menu-link">Início</a>
                         <a th:href="@{/flange/listagem}" class="mobile-menu-link">Flanges</a>
-                        <a th:href="@{/alertas}" class="mobile-menu-link">Alertas e ocorrências</a>
+                        <a th:href="@{/alertas}" class="mobile-menu-link nav-link-alertas" aria-label="Alertas e ocorrências">
+                            Alertas e ocorrências <span class="nav-alert-counter" hidden aria-hidden="true">0</span>
+                        </a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
                            th:href="@{/sensores}" class="mobile-menu-link">Sensores</a>
                         <a th:if="${usuarioLogado.role.name() == 'ADMIN'}"
