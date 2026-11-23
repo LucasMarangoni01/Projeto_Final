@@ -208,6 +208,9 @@ public class HomeController {
         model.addAttribute("alturaMapa", alturaMapa);
         model.addAttribute("linhasMapa", linhasMapa);
         model.addAttribute("totalFlanges", flanges.size());
+        model.addAttribute("totalFlangesEmAlerta", flanges.stream()
+                .filter(flange -> flange.estadoVisual().prioridade() >= 40)
+                .count());
         model.addAttribute("totalNormais", totalNormais);
         model.addAttribute("totalAtencao", totalAtencao);
         model.addAttribute("totalCriticas", totalCriticas);
