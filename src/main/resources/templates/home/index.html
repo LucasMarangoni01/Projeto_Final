@@ -1130,18 +1130,23 @@
                           fill="#60a5fa" font-family="monospace">LINHA / PONTOS CADASTRADOS</text>
 
                     <g class="plant-flange" th:each="flange : ${flangesMapa}"
-                       th:attr="transform=${'translate(' + flange.mapaX + ',' + flange.mapaY + ')'},data-flange-id=${flange.id},data-alarm-active=${flange.alarmeAtivo},data-status=${flange.status}">
+                       th:attr="transform=${'translate(' + flange.mapaX + ',' + flange.mapaY + ')'},data-flange-id=${flange.id},data-alarm-active=${flange.alarmeAtivo},data-status=${flange.status},data-visual-state=${flange.estadoVisual.codigo},data-priority=${flange.estadoVisual.prioridade},aria-label=${'Localizar ' + flange.nomeFlange + ': ' + flange.estadoVisual.rotulo}"
+                       role="button" tabindex="0" aria-pressed="false">
+                        <circle class="plant-alert-wave" cx="0" cy="0" r="22" aria-hidden="true"/>
+                        <circle class="plant-alert-halo" cx="0" cy="0" r="25" aria-hidden="true"/>
                         <line class="plant-connector" x1="0" y1="-25" x2="0" y2="-7"
                               stroke="rgba(148,163,184,.75)" stroke-width="4"/>
                         <circle class="plant-status-ring" cx="0" cy="0" r="19"
                                 th:attr="fill=${flange.alarmeAtivo ? '#ef4444' : (flange.status == 'CRITICO' ? '#ef4444' : (flange.status == 'ATENCAO' ? '#f59e0b' : (flange.status == 'MANUTENCAO' ? '#60a5fa' : '#22c55e')))}"
                                 stroke="#dbeafe" stroke-width="1.2"/>
+                        <text class="plant-alert-glyph" x="21" y="-16" text-anchor="middle"
+                              font-size="13" font-weight="900" aria-hidden="true">!</text>
                         <circle class="plant-node-core" cx="0" cy="0" r="11" fill="#0b2453" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
                         <path class="plant-node-cross" d="M-7 0 H7 M0 -7 V7" stroke="#dceafe" stroke-width="1.4" stroke-linecap="round"/>
                         <text class="plant-node-name" x="0" y="-31" text-anchor="middle" font-size="10" fill="#f8fbff"
                               font-weight="700" font-family="monospace" th:text="${flange.nomeFlange}">FL-001</text>
                         <text class="plant-node-status" x="0" y="32" text-anchor="middle" font-size="8.5" fill="#c9d9ef"
-                              th:text="${flange.alarmeAtivo ? 'ALERTA ATIVO' : (flange.status == 'CRITICO' ? 'CRÍTICO' : (flange.status == 'ATENCAO' ? 'ATENÇÃO' : (flange.status == 'MANUTENCAO' ? 'MANUTENÇÃO' : 'NORMAL')))}">NORMAL</text>
+                              th:text="${flange.estadoVisual.rotulo}">NORMAL</text>
                         <text class="plant-node-reading" x="0" y="45" text-anchor="middle" font-size="7.5" fill="#8fa8c9"
                               th:text="${flange.ultimaTemperatura != null ? #numbers.formatDecimal(flange.ultimaTemperatura,1,1) + ' °C' : 'SEM LEITURA'}">SEM LEITURA</text>
                     </g>
@@ -1159,6 +1164,9 @@
                     <span class="flange-panel-title">Flanges</span>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <button class="btn-legend" onclick="toggleLegend(true)">Legenda</button>
+                        <span class="flange-alert-count" id="flangeAlertCount" role="status"
+                              th:text="${'Em alerta: ' + totalFlangesEmAlerta}">Em alerta: 0</span>
+                        <span class="flange-sim-count" id="flangeSimCount" hidden>1 simulação</span>
                         <span class="flange-panel-count"
                               th:text="${'Cadastradas: ' + totalFlanges}">0 flanges</span>
                     </div>
@@ -1176,19 +1184,27 @@
                     <kbd>/</kbd>
                 </label>
                 <div class="flange-search-meta" id="flangeSearchMeta" aria-live="polite"></div>
+                <p class="flange-selection-status" id="flangeSelectionStatus" role="status" aria-live="polite"></p>
                 <div class="flange-list" id="dynamic-flange-list">
                     <article class="fc dashboard-flange-card"
                              th:each="flange : ${flanges}"
                              th:id="${flange.posicao > 0 ? 'fc' + flange.posicao : 'fc-extra-' + flange.id}"
-                             th:attr="data-flange-id=${flange.id},data-posicao=${flange.posicao},data-status=${flange.status},data-alarm-active=${flange.alarmeAtivo}">
+                             th:attr="data-flange-id=${flange.id},data-posicao=${flange.posicao},data-status=${flange.status},data-alarm-active=${flange.alarmeAtivo},data-visual-state=${flange.estadoVisual.codigo},data-priority=${flange.estadoVisual.prioridade},aria-label=${'Localizar ' + flange.nomeFlange + ' no mapa: ' + flange.estadoVisual.rotulo}"
+                             role="button" tabindex="0" aria-pressed="false">
                         <div class="fc-dot"
                              th:id="${flange.posicao > 0 ? 'fcdot' + flange.posicao : 'fcdot-extra-' + flange.id}"></div>
                         <div class="fc-info">
-                            <div class="fc-code"
-                                 th:text="${flange.nomeFlange}">Nome da flange</div>
+                            <div class="fc-name-row">
+                                <span class="fc-alert-icon" aria-hidden="true">!</span>
+                                <div class="fc-code"
+                                     th:text="${flange.nomeFlange}">Nome da flange</div>
+                            </div>
                             <div class="fc-loc"
                                  th:text="${flange.localizacao}"
                                  th:title="${flange.localizacao}">Localização</div>
+                            <p class="fc-condition-message" th:text="${flange.estadoVisual.mensagem}">
+                                Condição registrada para verificação.
+                            </p>
                             <div class="fc-details">
                                 <span th:text="${'ID #' + flange.id}">ID</span>
                                 <span th:text="${flange.temperaturaAmbiente != null ? #numbers.formatDecimal(flange.temperaturaAmbiente, 1, 1) + ' °C' : 'Temperatura não informada'}">Temperatura</span>
@@ -1201,7 +1217,7 @@
                         <div class="fc-pill"
                              th:id="${flange.posicao > 0 ? 'fcpill' + flange.posicao : 'fcpill-extra-' + flange.id}"
                              th:classappend="${flange.status == 'CRITICO' ? ' fc-status-critical' : (flange.status == 'ATENCAO' ? ' fc-status-warning' : (flange.status == 'MANUTENCAO' ? ' fc-status-maintenance' : ' fc-status-normal'))}"
-                             th:text="${flange.status == 'CRITICO' ? 'Crítico' : (flange.status == 'ATENCAO' ? 'Atenção' : (flange.status == 'MANUTENCAO' ? 'Manutenção' : 'Normal'))}">Normal</div>
+                             th:text="${flange.estadoVisual.rotulo}">Normal</div>
                     </article>
                     <div class="fc-empty" th:if="${#lists.isEmpty(flanges)}">
                         <strong>Nenhuma flange cadastrada nesta unidade.</strong>
@@ -1325,6 +1341,8 @@
                 <select id="monitorSimTipo">
                     <option value="atencao">Anormalidade em observação (amarelo)</option>
                     <option value="critico">Suspeita de vazamento (vermelho pulsante)</option>
+                    <option value="danificada">Flange danificada (vermelho pulsante)</option>
+                    <option value="falha">Falha de sensor ou comunicação (azul/âmbar)</option>
                 </select>
             </div>
             <p class="monitor-sim-feedback" id="monitorSimFeedback" role="alert" hidden></p>
@@ -1400,7 +1418,7 @@
         </div>
         <div class="legend-item">
             <div class="leg-circle" style="background:#ef4444;box-shadow:0 0 6px #ef4444;"></div>
-            <span><strong style="color:var(--text-primary)">Vermelho:</strong> Status CRÍTICO ou alerta simulado (identificado no cartão).</span>
+            <span><strong style="color:var(--text-primary)">Vermelho:</strong> crítico, dano registrado, suspeita ou simulação identificada. Não confirma vazamento por si só.</span>
         </div>
         <div class="legend-item">
             <div class="leg-circle" style="background:#60a5fa;box-shadow:0 0 6px #60a5fa;"></div>
