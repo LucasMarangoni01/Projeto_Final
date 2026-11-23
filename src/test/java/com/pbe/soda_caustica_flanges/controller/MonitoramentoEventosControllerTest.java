@@ -18,6 +18,9 @@ import static org.mockito.Mockito.*;
 class MonitoramentoEventosControllerTest {
     private UsuarioRepository usuarios;
     private IncidenteRepository incidentes;
+    private FlangeRepository flanges;
+    private SensorRepository sensores;
+    private LeituraSensorRepository leituras;
     private MonitoramentoEventosController controller;
     private Authentication autenticacao;
 
@@ -25,10 +28,14 @@ class MonitoramentoEventosControllerTest {
     void preparar() {
         usuarios = mock(UsuarioRepository.class);
         incidentes = mock(IncidenteRepository.class);
+        flanges = mock(FlangeRepository.class);
+        sensores = mock(SensorRepository.class);
+        leituras = mock(LeituraSensorRepository.class);
         autenticacao = mock(Authentication.class);
         when(autenticacao.isAuthenticated()).thenReturn(true);
         when(autenticacao.getName()).thenReturn("operador@exemplo.com");
-        controller = new MonitoramentoEventosController(usuarios, incidentes);
+        controller = new MonitoramentoEventosController(
+                usuarios, incidentes, flanges, sensores, leituras);
     }
 
     @Test
@@ -55,6 +62,9 @@ class MonitoramentoEventosControllerTest {
                 .thenReturn(List.of(52L));
         when(incidentes.countByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNull(18L))
                 .thenReturn(1L);
+        when(incidentes.findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(18L))
+                .thenReturn(List.of(alerta));
+        when(flanges.findAtivasPorUnidade(18L)).thenReturn(List.of(flange));
 
         MonitoramentoEventosController.Painel painel = controller.listar(autenticacao).getBody();
         assertNotNull(painel);
@@ -63,6 +73,8 @@ class MonitoramentoEventosControllerTest {
         assertTrue(painel.eventos().getFirst().ativo());
         assertEquals(List.of(52L), painel.idsFlangesEmAlerta());
         assertEquals(1L, painel.totalAlertasAtivos());
+        assertEquals(1, painel.estadosFlanges().size());
+        assertEquals("CRITICO", painel.estadosFlanges().getFirst().codigo());
         verify(incidentes, never()).findTop6ByDataHoraIsNotNullOrderByDataHoraDesc();
         verify(incidentes, never()).findIdsFlangesComAlertasAtivos();
     }
@@ -76,6 +88,7 @@ class MonitoramentoEventosControllerTest {
                 .thenReturn(List.of());
         when(incidentes.findIdsFlangesComAlertasAtivos()).thenReturn(List.of(10L));
         when(incidentes.countByDataHoraIsNotNullAndNormalizadoEmIsNull()).thenReturn(2L);
+        when(flanges.findAtivas()).thenReturn(List.of());
 
         MonitoramentoEventosController.Painel painel = controller.listar(autenticacao).getBody();
         assertNotNull(painel);

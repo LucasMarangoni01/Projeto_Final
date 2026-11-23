@@ -87,6 +87,14 @@ def validar():
                  "/manutencao/cadastro", "/usuarios", "/unidades", "/guia"):
         assert rota in menu, f"Navegacao perdeu acesso a {rota}"
     assert "usuarioLogado.role.name() == 'ADMIN'" in menu, "Permissoes do menu ausentes"
+    assert menu.count('class="nav-alert-counter"') == 2, (
+        "Indicador de alertas precisa existir no menu desktop e mobile"
+    )
+    nav_script = (STATIC / "menu.js").read_text(encoding="utf-8")
+    assert '"/api/monitoramento/resumo"' in nav_script
+    assert 'credentials: "same-origin"' in nav_script
+    assert 'link.dataset.updateFailed = "true"' in nav_script
+
 
     tema = (STATIC / "theme.css").read_text(encoding="utf-8")
     report = (STATIC / "relatorios.css").read_text(encoding="utf-8")
@@ -112,6 +120,18 @@ def validar():
     assert css_sim.count("{") == css_sim.count("}")
     assert "prefers-reduced-motion:reduce" in css_sim
     assert "html[data-theme=\"light\"] .monitor-board" in css_sim
+    # Flanges reais e simuladas compartilham a classificação visual.
+    for nome in ('flangeAlertCount', 'flangeSelectionStatus', 'plant-alert-wave',
+                 'fc-alert-icon', 'monitorConnectionStatus'):
+        assert nome in dashboard, f"Recurso visual ausente: {nome}"
+    assert 'data-visual-state=${flange.estadoVisual.codigo}' in dashboard
+    assert "ordenarPorPrioridade" in js_sim
+    assert "selecionar(id, origem)" in js_sim
+    assert "simularEstado" in js_sim
+    for animacao in ('@keyframes pulse-red', '@keyframes critical-glow',
+                     '@keyframes alert-ring', '@keyframes critical-border-glow'):
+        assert animacao in css_sim, f"Animacao ausente: {animacao}"
+
 
     assert 'html[data-theme="light"]' in tema and 'html[data-theme="dark"]' in tema
     # Regressões reais reportadas: barra azul com texto escuro e

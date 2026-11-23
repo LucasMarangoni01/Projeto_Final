@@ -117,6 +117,11 @@ public class HomeController {
                             usuario.getUnidade().getId()
                     );
 
+        Map<Long, List<Incidente>> alarmesPorFlange = alarmesAtivos.stream()
+                .filter(incidente -> incidente.getFlange() != null
+                        && incidente.getFlange().getId() != null)
+                .collect(Collectors.groupingBy(incidente -> incidente.getFlange().getId()));
+
         Set<Long> flangeComAlarme = alarmesAtivos.stream()
                 .filter(incidente -> incidente.getFlange() != null)
                 .map(incidente -> incidente.getFlange().getId())
@@ -143,6 +148,13 @@ public class HomeController {
                     .collect(joining(", "));
 
             LeituraSensor ultimaLeitura = ultimaLeituraPorFlange.get(flange.getId());
+
+            EstadoVisualFlangeDTO estadoVisual = EstadoVisualFlangeDTO.classificar(
+                    flange,
+                    alarmesPorFlange.getOrDefault(flange.getId(), List.of()),
+                    sensoresInstalados > 0,
+                    ultimaLeitura != null);
+
 
             int coluna = i % COLUNAS_MAPA;
             int linha = i / COLUNAS_MAPA;
@@ -175,7 +187,8 @@ public class HomeController {
                     ultimaLeitura == null || ultimaLeitura.getRecebidaEm() == null
                             ? null
                             : ultimaLeitura.getRecebidaEm().format(FORMATO_LEITURA),
-                    flangeComAlarme.contains(flange.getId())
+                    flangeComAlarme.contains(flange.getId()),
+                    estadoVisual
             ));
         }
 
@@ -195,6 +208,9 @@ public class HomeController {
         model.addAttribute("alturaMapa", alturaMapa);
         model.addAttribute("linhasMapa", linhasMapa);
         model.addAttribute("totalFlanges", flanges.size());
+        model.addAttribute("totalFlangesEmAlerta", flanges.stream()
+                .filter(flange -> flange.estadoVisual().prioridade() >= 40)
+                .count());
         model.addAttribute("totalNormais", totalNormais);
         model.addAttribute("totalAtencao", totalAtencao);
         model.addAttribute("totalCriticas", totalCriticas);

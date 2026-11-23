@@ -17,7 +17,8 @@ Nele aparecem:
 - `HomeController` fornece uma renderização inicial do histórico de até seis alertas.
 - `GET /api/monitoramento/eventos` retorna somente os campos de visualização
   (identificador, flange, horário, descrição e situação), IDs das flanges com alarmes
-  ativos e contagem total.
+  ativos, contagem total e estados visuais de cada flange autorizada
+  (rótulo, prioridade, categoria e mensagem).
 - A API exige autenticação. ADMIN acessa todas as unidades; USER só sua unidade
   ativa. O resultado não pode ser armazenado em cache.
 - O alerta real depende de **registros persistidos**; não é a comprovação física
@@ -28,7 +29,8 @@ Nele aparecem:
 
 ADMIN encontra o botão **Simular flange** junto ao título do painel.
 1. Selecionar uma flange cadastrada e visível para o administrador.
-2. Escolher `Anormalidade em observação` ou `Suspeita de vazamento`.
+2. Escolher `Anormalidade em observação`, `Suspeita de vazamento`,
+   `Flange danificada` ou `Falha de sensor/comunicação`.
 3. Iniciar a demonstração.
 4. O cartão e o ponto correspondente no mapa mudam de estilo. Em cenário crítico
    surge faixa **vermelha pulsante** com texto **SIMULAÇÃO**.
@@ -70,3 +72,16 @@ usada para avaliar detecção efetiva de NaOH.
 
 **Situação:** código e testes automatizados disponíveis; não substituem
 ensaio físico ou validação de detecção industrial.
+
+## Alertas e ordenação
+
+O mapa e a lista recebem estados do **mesmo classificador** no carregamento
+inicial e nas consultas periódicas. Flanges em alerta sobem automaticamente
+na lista, com seleção cruzada mapa → cartão e cartão → mapa. O alerta
+crítico pulsa em círculo, borda e ícone; o conteúdo textual permanece estável.
+Há estados distintos para dano explícito, suspeita, falha de sensor e ausência
+de leitura. Sinais não verificados nunca aparecem como confirmação automática.
+
+A simulação tem rótulo explícito e contador separado. Encerrá-la restaura
+os dados reais mais recentes — não declara normalização operacional.
+Regras técnicas e cenários de aceite: [Alertas visuais dinâmicos](ALERTAS-VISUAIS-DINAMICOS.md).

@@ -1,274 +1,366 @@
 /*
- * FlangeGuard: painel de monitoramento e demonstracao visual.
- * NAO envia requisicoes de escrita, NAO simula hardware, NAO persiste incidentes.
+ * FlangeGuard · alertas dinamicos e simulacao visual.
+ * O servidor e a unica fonte de estados reais. Simulacoes sao locais,
+ * jamais criam incidentes, eventos MQTT ou leituras persistidas.
  */
 (function () {
     'use strict';
 
+    const CRITICOS = new Set(['VAZAMENTO', 'SUSPEITA', 'DANIFICADA', 'CRITICO']);
+    const PROBLEMAS = new Set(['VAZAMENTO', 'SUSPEITA', 'DANIFICADA', 'CRITICO',
+        'FALHA_SENSOR', 'ATENCAO']);
+    const CODIGOS = new Set([...PROBLEMAS, 'NORMAL', 'MANUTENCAO', 'SEM_LEITURA']);
+
+    // Logica pura usada tambem nos testes automatizados (Node.js).
+    function prioridadeOrdenacao(estado) {
+        return Number(estado?.prioridade) || 0;
+    }
+    function ordenarPorPrioridade(items) {
+        return [...items].sort(function (a, b) {
+            return prioridadeOrdenacao(b.estado) - prioridadeOrdenacao(a.estado)
+                || a.ordemOriginal - b.ordemOriginal;
+        });
+    }
+    function simularEstado(tipo) {
+        const estados = {
+            atencao: {codigo:'ATENCAO', rotulo:'SIMULAÇÃO · ATENÇÃO',
+                mensagem:'Cenário fictício de anormalidade para treinamento.', prioridade:45},
+            critico: {codigo:'SUSPEITA', rotulo:'SIMULAÇÃO · SUSPEITA',
+                mensagem:'Suspeita fictícia de vazamento, não confirmada.', prioridade:90},
+            danificada: {codigo:'DANIFICADA', rotulo:'SIMULAÇÃO · DANIFICADA',
+                mensagem:'Dano fictício na flange para treinamento.', prioridade:95},
+            falha: {codigo:'FALHA_SENSOR', rotulo:'SIMULAÇÃO · FALHA',
+                mensagem:'Falha fictícia de comunicação ou sensor.', prioridade:75}
+        };
+        return estados[tipo] || estados.atencao;
+    }
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {prioridadeOrdenacao, ordenarPorPrioridade, simularEstado, CRITICOS, PROBLEMAS};
+    }
+    if (typeof document === 'undefined') return;
+
     const board = document.getElementById('painel-monitoramento');
     if (!board) return;
+    const lista = document.getElementById('dynamic-flange-list');
+    const cards = Array.from(document.querySelectorAll('.dashboard-flange-card[data-flange-id]'));
+    const mapa = Array.from(document.querySelectorAll('.plant-flange[data-flange-id]'));
+    const cardsPorId = new Map(cards.map(el => [el.dataset.flangeId, el]));
+    const mapaPorId = new Map(mapa.map(el => [el.dataset.flangeId, el]));
+    const busca = document.getElementById('flangeSearch');
 
     const feed = document.getElementById('monitorEventFeed');
-    const overviewCount = document.getElementById('monitorActiveCount');
-    const overviewTitle = document.getElementById('monitorOverviewTitle');
+    const count = document.getElementById('monitorActiveCount');
+    const countTitle = document.getElementById('monitorOverviewTitle');
+    const badgeAlertas = document.getElementById('flangeAlertCount');
+    const badgeSimulacao = document.getElementById('flangeSimCount');
+    const selectionStatus = document.getElementById('flangeSelectionStatus');
     const banner = document.getElementById('monitorCriticalBanner');
     const bannerTitle = document.getElementById('monitorCriticalTitle');
     const bannerDescription = document.getElementById('monitorCriticalDescription');
     const bannerTag = document.getElementById('monitorCriticalTag');
-    const simSummary = document.getElementById('monitorSimSummary');
-    const simTarget = document.getElementById('monitorSimTarget');
-    const simScenario = document.getElementById('monitorSimScenario');
+    const summary = document.getElementById('monitorSimSummary');
+    const summaryTarget = document.getElementById('monitorSimTarget');
+    const summaryScenario = document.getElementById('monitorSimScenario');
     const demoEvent = document.getElementById('monitorDemoEvent');
     const demoDescription = document.getElementById('monitorDemoDescription');
     const modal = document.getElementById('modalSimulacao');
     const openButton = document.getElementById('abrirSimulacao');
     const flangeSelect = document.getElementById('monitorSimFlange');
     const typeSelect = document.getElementById('monitorSimTipo');
-    const flangeCards = Array.from(document.querySelectorAll('.dashboard-flange-card[data-flange-id]'));
-    const mapFlanges = Array.from(document.querySelectorAll('.plant-flange[data-flange-id]'));
+    const feedback = document.getElementById('monitorSimFeedback');
+    const connectionLabel = document.getElementById('monitorConnectionStatus');
 
-    let totalAtivos = Number(board.dataset.alertasReais || 0);
-    let simulacao = null;
+    const real = new Map();
+    cards.forEach(function (card, index) {
+        real.set(card.dataset.flangeId, {
+            codigo: CODIGOS.has(card.dataset.visualState) ? card.dataset.visualState : 'NORMAL',
+            rotulo: card.querySelector('.fc-pill')?.textContent?.trim() || 'NORMAL',
+            mensagem: card.querySelector('.fc-condition-message')?.textContent?.trim() || '',
+            prioridade: Number(card.dataset.priority) || 0,
+            alertaAtivo: card.dataset.alarmActive === 'true'
+        });
+        card.dataset.originalIndex = String(index);
+    });
+
+    let totalReal = Number(board.dataset.alertasReais || 0);
+    let simulacao = null; // {id, nome, tipo, estado}; nunca enviado ao servidor
+    let selecionada = null;
     let consultando = false;
-    const original = new Map();
-    const estadoRealPill = new Map();
-    const estadoRealMapa = new Map();
 
-    function textoSeguro(valor) {
-        return typeof valor === 'string' ? valor : '';
+    function elemento(tag, classe, valor) {
+        const node = document.createElement(tag);
+        if (classe) node.className = classe;
+        if (valor !== undefined) node.textContent = String(valor);
+        return node;
     }
-
-    function criar(tag, classe, texto) {
-        const elemento = document.createElement(tag);
-        if (classe) elemento.className = classe;
-        if (texto !== undefined) elemento.textContent = String(texto);
-        return elemento;
+    function estadoEfetivo(id) {
+        if (simulacao?.id === id) return {...simulacao.estado, simulado:true};
+        return real.get(id) || {codigo:'NORMAL', rotulo:'NORMAL',
+            mensagem:'Status não disponível', prioridade:0, alertaAtivo:false};
     }
+    function nomeFlange(id) {
+        return cardsPorId.get(id)?.querySelector('.fc-code')?.textContent?.trim() || 'Flange';
+    }
+    function aplicarVisual(id) {
+        const estado = estadoEfetivo(id);
+        const card = cardsPorId.get(id);
+        const group = mapaPorId.get(id);
+        if (!card || !group) return;
+        const codigo = CODIGOS.has(estado.codigo) ? estado.codigo : 'NORMAL';
+        const simulado = Boolean(estado.simulado);
+        for (const node of [card, group]) {
+            node.dataset.visualState = codigo;
+            node.dataset.simulation = String(simulado);
+            node.dataset.priority = String(estado.prioridade || 0);
+            node.classList.toggle('is-sim-critical', simulado && CRITICOS.has(codigo));
+            node.classList.toggle('is-sim-warning', simulado && !CRITICOS.has(codigo));
+            node.classList.toggle('is-selected', selecionada === id);
+            node.setAttribute('aria-pressed', String(selecionada === id));
+            node.setAttribute('aria-label', 'Localizar ' + nomeFlange(id) + ': ' + estado.rotulo
+                + (simulado ? ', SIMULAÇÃO' : ', dado registrado'));
+        }
+        const tituloMapa = group.querySelector('.plant-node-status');
+        if (tituloMapa) tituloMapa.textContent = estado.rotulo;
+        const pill = card.querySelector('.fc-pill');
+        if (pill) pill.textContent = estado.rotulo;
+        const mensagem = card.querySelector('.fc-condition-message');
+        if (mensagem) mensagem.textContent = estado.mensagem;
+        card.dataset.alarmActive = String(Boolean(real.get(id)?.alertaAtivo));
+        group.dataset.alarmActive = card.dataset.alarmActive;
+    }
+    function ordenarLista() {
+        if (!lista) return;
+        const ordenados = ordenarPorPrioridade(cards.map(card => ({
+            card,
+            estado: estadoEfetivo(card.dataset.flangeId),
+            ordemOriginal: Number(card.dataset.originalIndex) || 0
+        }))).map(i => i.card);
+        const existentes = Array.from(lista.querySelectorAll(':scope > .dashboard-flange-card'));
+        if (!ordenados.every((card, idx) => card === existentes[idx])) {
+            const scrollTop = lista.scrollTop;
+            const vazio = document.getElementById('flangeSearchEmpty');
+            ordenados.forEach(card => lista.insertBefore(card, vazio || null));
+            lista.scrollTop = scrollTop;
+        }
+    }
+    function atualizarIndicadores() {
+        const emAlerta = Array.from(real.values()).filter(item => PROBLEMAS.has(item.codigo)).length;
+        if (badgeAlertas) {
+            badgeAlertas.textContent = 'Em alerta: ' + emAlerta;
+            badgeAlertas.dataset.hasAlert = String(emAlerta > 0);
+        }
+        if (badgeSimulacao) badgeSimulacao.hidden = !simulacao;
+        if (count) count.textContent = String(totalReal);
+        if (countTitle) countTitle.textContent = totalReal > 0
+            ? (totalReal === 1 ? 'Alerta real ativo registrado' : 'Alertas reais ativos registrados')
+            : 'Nenhum alerta ativo registrado';
+    }
+    function atualizarBanner() {
+        const estadosReais = Array.from(real.values());
+        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo);
+        const criticoReal = estadosReais.some(item => CRITICOS.has(item.codigo));
+        const somenteFalha = existeReal && !criticoReal;
+        const simCritica = simulacao && CRITICOS.has(simulacao.estado.codigo);
+        if (banner) {
+            banner.hidden = !(existeReal || simCritica);
+            banner.classList.toggle('is-warning', somenteFalha);
+        }
+        board.classList.toggle('has-real-alert', existeReal && criticoReal);
+        board.classList.toggle('is-sim-critical', Boolean(simCritica) && !existeReal);
 
-    function atualizarEventos(eventos) {
+        if (existeReal) {
+            if (bannerTitle) bannerTitle.textContent = criticoReal
+                ? 'ATENÇÃO — ocorrência crítica registrada'
+                : 'ATENÇÃO — registro de falha ou anormalidade';
+            if (bannerDescription) bannerDescription.textContent = criticoReal
+                ? 'Condição registrada que requer avaliação. Sinais automáticos não comprovam vazamento de soda cáustica.'
+                : 'Verifique o sensor, a comunicação e a ocorrência; não há confirmação de vazamento.';
+            if (bannerTag) bannerTag.textContent = 'DADO REGISTRADO';
+        } else if (simCritica) {
+            if (bannerTitle) bannerTitle.textContent = 'SIMULAÇÃO — ' + simulacao.nome;
+            if (bannerDescription) bannerDescription.textContent =
+                simulacao.estado.mensagem + ' Nenhum sensor ou registro real foi alterado.';
+            if (bannerTag) bannerTag.textContent = 'SIMULADO';
+        }
+    }
+    function renderizar() {
+        cards.forEach(card => aplicarVisual(card.dataset.flangeId));
+        ordenarLista();
+        atualizarIndicadores();
+        atualizarBanner();
+        if (busca) busca.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+    function selecionar(id, origem) {
+        const card = cardsPorId.get(id);
+        const group = mapaPorId.get(id);
+        if (!card || !group) return;
+        selecionada = id;
+        if (card.hidden && busca) {
+            busca.value = '';
+            busca.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+        cards.forEach(item => {
+            const selecionado = item.dataset.flangeId === id;
+            item.classList.toggle('is-selected', selecionado);
+            item.setAttribute('aria-pressed', String(selecionado));
+        });
+        mapa.forEach(item => {
+            const selecionado = item.dataset.flangeId === id;
+            item.classList.toggle('is-selected', selecionado);
+            item.setAttribute('aria-pressed', String(selecionado));
+        });
+        if (selectionStatus) selectionStatus.textContent =
+            nomeFlange(id) + ' · ' + estadoEfetivo(id).rotulo + ' · ponto destacado no mapa.';
+        if (origem === 'mapa') {
+            card.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
+            card.focus({preventScroll:true});
+        } else {
+            const container = document.querySelector('.map-viewport');
+            if (container) {
+                const area = container.getBoundingClientRect();
+                const alvo = group.getBoundingClientRect();
+                container.scrollBy({left:(alvo.left + alvo.right - area.left - area.right)/2,
+                    behavior:'smooth'});
+            }
+        }
+    }
+    function ligarSelecao(node, origem) {
+        const id = node.dataset.flangeId;
+        node.addEventListener('click', () => selecionar(id, origem));
+        node.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selecionar(id, origem);
+            }
+        });
+    }
+    cards.forEach(card => ligarSelecao(card, 'lista'));
+    mapa.forEach(node => ligarSelecao(node, 'mapa'));
+
+    function mostrarEventos(eventos) {
         if (!feed || !Array.isArray(eventos)) return;
         const fragmento = document.createDocumentFragment();
-
-        if (eventos.length === 0) {
-            fragmento.append(criar('p', 'monitor-empty',
-                'Ainda não há ocorrências individuais registradas. A ausência de alertas não comprova segurança.'));
+        if (!eventos.length) {
+            fragmento.append(elemento('p','monitor-empty',
+                'Não há ocorrências individuais registradas. Isso não confirma segurança operacional.'));
         } else {
-            eventos.slice(0, 6).forEach(function (evento) {
-                const item = criar('article', 'monitor-event ' + (evento.ativo ? 'is-active' : 'is-resolved'));
-                const indicador = criar('span', 'monitor-event-indicator');
-                indicador.setAttribute('aria-hidden', 'true');
-                const corpo = criar('div', 'monitor-event-body');
-                const topo = criar('div', 'monitor-event-top');
-                const nome = criar('strong', '', textoSeguro(evento.nomeFlange) || 'Flange sem identificação');
-                const horario = criar('time', '', textoSeguro(evento.dataHora) || '—');
-                topo.append(nome, horario);
-                corpo.append(topo,
-                    criar('p', '', textoSeguro(evento.descricao) || 'Ocorrência em verificação'),
-                    criar('span', 'monitor-event-status',
-                        textoSeguro(evento.situacao) || (evento.ativo ? 'Alerta ativo' : 'Normalizado')));
-                item.append(indicador, corpo);
+            eventos.slice(0,6).forEach(function (evento) {
+                const item = elemento('article','monitor-event '
+                    +(evento.ativo ? 'is-active':'is-resolved'));
+                const dot = elemento('span','monitor-event-indicator');
+                dot.setAttribute('aria-hidden','true');
+                const body = elemento('div','monitor-event-body');
+                const top = elemento('div','monitor-event-top');
+                top.append(
+                    elemento('strong','',evento.nomeFlange || 'Flange não vinculada'),
+                    elemento('time','',evento.dataHora || '—'));
+                body.append(top,
+                    elemento('p','',evento.descricao || 'Ocorrência em verificação'),
+                    elemento('span','monitor-event-status',
+                        evento.situacao || (evento.ativo ? 'Alerta ativo':'Normalizado')));
+                item.append(dot,body);
                 fragmento.append(item);
             });
         }
         feed.replaceChildren(fragmento);
     }
 
-    function atualizarFlangesReais(ids) {
-        const permitidos = new Set((Array.isArray(ids) ? ids : []).map(String));
-
-        // Se surgir um alerta real na flange simulada, o real tem prioridade.
-        if (simulacao && permitidos.has(simulacao.id)) restaurarSimulacao();
-
-        flangeCards.forEach(function (card) {
-            const ativo = permitidos.has(card.dataset.flangeId);
-            card.dataset.alarmActive = String(ativo);
-            const pill = card.querySelector('.fc-pill');
-            if (!pill) return;
-            if (ativo && !card.classList.contains('is-sim-critical')
-                      && !card.classList.contains('is-sim-warning')) {
-                if (!estadoRealPill.has(pill)) {
-                    estadoRealPill.set(pill, {texto:pill.textContent, classes:pill.className});
-                }
-                pill.textContent = 'Alerta ativo';
-                pill.classList.add('is-real-active');
-            } else if (!ativo && estadoRealPill.has(pill)) {
-                const anterior = estadoRealPill.get(pill);
-                pill.textContent = anterior.texto;
-                pill.className = anterior.classes;
-                estadoRealPill.delete(pill);
-            }
-        });
-        mapFlanges.forEach(function (flange) {
-            const ativo = permitidos.has(flange.dataset.flangeId);
-            flange.dataset.alarmActive = String(ativo);
-            const label = flange.querySelector('.plant-node-status');
-            if (!label) return;
-            if (ativo && !flange.classList.contains('is-sim-critical')
-                      && !flange.classList.contains('is-sim-warning')) {
-                if (!estadoRealMapa.has(label)) estadoRealMapa.set(label, label.textContent);
-                label.textContent = 'ALERTA ATIVO';
-            } else if (!ativo && estadoRealMapa.has(label)) {
-                label.textContent = estadoRealMapa.get(label);
-                estadoRealMapa.delete(label);
-            }
-        });
-    }
-
-    function atualizarBanner() {
-        const simCritica = simulacao && simulacao.tipo === 'critico';
-        const alertaReal = totalAtivos > 0;
-        board.classList.toggle('has-real-alert', alertaReal);
-        board.classList.toggle('is-sim-critical', Boolean(simCritica));
-        if (banner) banner.hidden = !(simCritica || alertaReal);
-
-        if (simCritica) {
-            bannerTitle.textContent = 'SIMULAÇÃO — suspeita de vazamento';
-            bannerDescription.textContent = simulacao.nome
-                + ': cenário visual de demonstração. Nenhum vazamento foi confirmado e nenhum dado foi alterado.';
-            bannerTag.textContent = 'SIMULADO';
-        } else if (alertaReal) {
-            bannerTitle.textContent = 'ATENÇÃO — ' + totalAtivos
-                + (totalAtivos === 1 ? ' alerta operacional ativo' : ' alertas operacionais ativos');
-            bannerDescription.textContent =
-                'Há anormalidades registradas que exigem verificação. Não representam confirmação de vazamento de NaOH.';
-            bannerTag.textContent = 'REGISTRADO';
-        }
-
-        if (overviewCount) overviewCount.textContent = String(totalAtivos);
-        if (overviewTitle) overviewTitle.textContent = alertaReal
-            ? (totalAtivos === 1 ? 'Alerta ativo registrado' : 'Alertas ativos registrados')
-            : 'Nenhum alerta ativo registrado';
-    }
-
-    function restaurarSimulacao() {
+    function finalizarSimulacao() {
         if (!simulacao) return;
-        flangeCards.filter(function (item) { return item.dataset.flangeId === simulacao.id; })
-            .forEach(function (card) {
-                card.classList.remove('is-sim-critical', 'is-sim-warning');
-                const pill = card.querySelector('.fc-pill');
-                const dadoOriginal = original.get(pill);
-                if (pill && dadoOriginal) {
-                    pill.textContent = dadoOriginal.texto;
-                    pill.className = dadoOriginal.classes;
-                }
-            });
-        mapFlanges.filter(function (item) { return item.dataset.flangeId === simulacao.id; })
-            .forEach(function (item) {
-                item.classList.remove('is-sim-critical', 'is-sim-warning');
-                const label = item.querySelector('.plant-node-status');
-                const anterior = original.get(label);
-                if (label && anterior) label.textContent = anterior.texto;
-            });
         simulacao = null;
-        if (simSummary) simSummary.hidden = true;
+        if (summary) summary.hidden = true;
         if (demoEvent) demoEvent.hidden = true;
-        atualizarBanner();
+        renderizar(); // Retoma exatamente o estado real mais recente.
     }
-
     function iniciarSimulacao() {
-        if (!flangeSelect || !typeSelect) return;
-        const id = flangeSelect.value;
-        const card = flangeCards.find(function (item) { return item.dataset.flangeId === id; });
-        if (!card) return;
-        if (card.dataset.alarmActive === 'true') {
-            const feedback = document.getElementById('monitorSimFeedback');
+        const id = flangeSelect?.value;
+        if (!id || !cardsPorId.has(id)) return;
+        const realAtual = real.get(id);
+        // Ocorrencia real sempre vence; evita mascarar uma flange ja em alerta.
+        if (realAtual?.alertaAtivo || (realAtual?.prioridade || 0) >= 75) {
             if (feedback) {
                 feedback.hidden = false;
-                feedback.textContent = 'Esta flange possui um alerta real ativo. '
-                    + 'Escolha outra flange para não encobrir a ocorrência registrada.';
+                feedback.textContent = 'Existe uma condição real importante nesta flange. '
+                    + 'Escolha outra para não ocultar o alerta registrado.';
             }
             return;
         }
-
-        restaurarSimulacao();
-        const nome = card.querySelector('.fc-code')?.textContent?.trim() || 'Flange selecionada';
-        const tipo = typeSelect.value === 'critico' ? 'critico' : 'atencao';
-        simulacao = {id:id, nome:nome, tipo:tipo};
-        const classe = tipo === 'critico' ? 'is-sim-critical' : 'is-sim-warning';
-        const texto = tipo === 'critico' ? 'SIMULAÇÃO · CRÍTICO' : 'SIMULAÇÃO · ATENÇÃO';
-        const classePill = tipo === 'critico' ? 'is-simulated-critical' : 'is-simulated-warning';
-
-        flangeCards.filter(function (item) { return item.dataset.flangeId === id; })
-            .forEach(function (item) {
-                item.classList.add(classe);
-                const pill = item.querySelector('.fc-pill');
-                if (pill) {
-                    original.set(pill, {texto:pill.textContent, classes:pill.className});
-                    pill.classList.add(classePill);
-                    pill.textContent = texto;
-                }
-            });
-
-        mapFlanges.filter(function (item) { return item.dataset.flangeId === id; })
-            .forEach(function (item) {
-                item.classList.add(classe);
-                const label = item.querySelector('.plant-node-status');
-                if (label) {
-                    original.set(label, {texto:label.textContent});
-                    label.textContent = tipo === 'critico' ? 'SIMULAÇÃO CRÍTICA' : 'SIMULAÇÃO ATENÇÃO';
-                }
-            });
-
-        if (simSummary) simSummary.hidden = false;
-        if (simTarget) simTarget.textContent = nome;
-        if (simScenario) simScenario.textContent = tipo === 'critico'
-            ? 'Suspeita fictícia de vazamento: destaque vermelho pulsante'
-            : 'Anormalidade fictícia em observação: destaque amarelo';
+        const tipo = typeSelect?.value || 'atencao';
+        const estado = simularEstado(tipo);
+        simulacao = {id, tipo, estado, nome:nomeFlange(id)};
+        if (summary) summary.hidden = false;
+        if (summaryTarget) summaryTarget.textContent = simulacao.nome;
+        if (summaryScenario) summaryScenario.textContent = estado.mensagem;
         if (demoEvent) demoEvent.hidden = false;
-        if (demoDescription) demoDescription.textContent = nome + ' · '
-            + (tipo === 'critico' ? 'Suspeita de vazamento' : 'Anormalidade em observação')
-            + ' · Treinamento visual. Não é um alerta real.';
-        atualizarBanner();
-        if (modal && typeof modal.close === 'function') modal.close();
-        if (simSummary && !simSummary.hidden) {
-            document.getElementById('encerrarSimulacao')?.focus();
-        }
+        if (demoDescription) demoDescription.textContent = simulacao.nome + ' · '
+            + estado.rotulo + ' · evento local não registrado no banco.';
+        if (modal?.open) modal.close();
+        renderizar();
+        selecionar(id, 'lista');
+        document.getElementById('encerrarSimulacao')?.focus({preventScroll:true});
+    }
+    if (openButton && modal) {
+        openButton.addEventListener('click', function () {
+            if (feedback) feedback.hidden = true;
+            if (typeof modal.showModal === 'function') modal.showModal();
+        });
+        document.getElementById('fecharSimulacao')?.addEventListener('click',() => modal.close());
+        document.getElementById('cancelarSimulacao')?.addEventListener('click',() => modal.close());
+        document.getElementById('iniciarSimulacao')?.addEventListener('click',iniciarSimulacao);
+        modal.addEventListener('click', e => {if (e.target === modal) modal.close();});
+        document.getElementById('encerrarSimulacao')?.addEventListener('click',finalizarSimulacao);
     }
 
-    async function consultarAlertas() {
+    async function consultarEstados() {
         if (consultando || document.hidden) return;
         consultando = true;
         try {
             const resposta = await fetch('/api/monitoramento/eventos', {
-                credentials: 'same-origin',
-                cache: 'no-store',
-                headers: {'Accept':'application/json'}
+                credentials: 'same-origin', cache: 'no-store',
+                headers:{Accept:'application/json'}
             });
-            if (!resposta.ok) throw new Error('Monitoramento indisponível');
+            if (!resposta.ok) throw new Error('Consulta indisponível');
             const dados = await resposta.json();
-            totalAtivos = Number(dados.totalAlertasAtivos) || 0;
-            atualizarEventos(dados.eventos);
-            atualizarFlangesReais(dados.idsFlangesEmAlerta);
-            board.dataset.alertasReais = String(totalAtivos);
-            atualizarBanner();
+            if (!Array.isArray(dados.estadosFlanges)) {
+                throw new Error('Sem dados de estados das flanges');
+            }
+            totalReal = Number(dados.totalAlertasAtivos) || 0;
+            const recebidos = new Map();
+            dados.estadosFlanges.forEach(function (estado) {
+                const id = String(estado.flangeId);
+                if (!cardsPorId.has(id) || !CODIGOS.has(estado.codigo)) return;
+                recebidos.set(id, {
+                    codigo:estado.codigo,
+                    rotulo:typeof estado.rotulo === 'string' ? estado.rotulo:'VERIFICAR',
+                    mensagem:typeof estado.mensagem === 'string' ? estado.mensagem:'',
+                    prioridade:Number(estado.prioridade) || 0,
+                    alertaAtivo:Boolean(estado.alertaAtivo)
+                });
+            });
+            if (simulacao && recebidos.has(simulacao.id)) {
+                const novo = recebidos.get(simulacao.id);
+                if (novo.alertaAtivo || novo.prioridade >= 75) finalizarSimulacao();
+            }
+            // Somente estados das flanges visiveis sao usados; nao inventar
+            // flanges novas se o cadastro mudar ate o proximo reload.
+            recebidos.forEach((value,id) => real.set(id,value));
+            mostrarEventos(dados.eventos);
+            board.dataset.alertasReais = String(totalReal);
             board.dataset.conexao = 'ok';
-        } catch (erro) {
+            if (connectionLabel) connectionLabel.textContent = 'Dados atualizados automaticamente.';
+            renderizar();
+        } catch (error) {
             board.dataset.conexao = 'falha';
-            // Dados originais permanecem visíveis e não são falsamente zerados.
+            if (connectionLabel) connectionLabel.textContent =
+                'Conexão indisponível. Exibindo a última informação recebida; não presuma estado normal.';
         } finally {
             consultando = false;
         }
     }
-
-    if (openButton && modal) {
-        openButton.addEventListener('click', function () {
-            const feedback = document.getElementById('monitorSimFeedback');
-            if (feedback) feedback.hidden = true;
-            if (typeof modal.showModal === 'function') modal.showModal();
-        });
-        document.getElementById('fecharSimulacao')?.addEventListener('click', function () { modal.close(); });
-        document.getElementById('cancelarSimulacao')?.addEventListener('click', function () { modal.close(); });
-        document.getElementById('iniciarSimulacao')?.addEventListener('click', iniciarSimulacao);
-        modal.addEventListener('click', function (event) {
-            if (event.target === modal) modal.close();
-        });
-        document.getElementById('encerrarSimulacao')?.addEventListener('click', restaurarSimulacao);
-    }
-
-    atualizarBanner();
-    consultarAlertas();
-    window.setInterval(consultarAlertas, 7000);
-    document.addEventListener('visibilitychange', function () {
-        if (!document.hidden) consultarAlertas();
+    renderizar();
+    consultarEstados();
+    window.setInterval(consultarEstados,7000);
+    document.addEventListener('visibilitychange',function () {
+        if (!document.hidden) consultarEstados();
     });
 })();

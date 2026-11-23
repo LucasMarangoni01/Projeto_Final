@@ -20,7 +20,8 @@ public record DashboardFlangeDTO(
         double mapaY,
         Double ultimaTemperatura,
         String ultimaLeituraEm,
-        boolean alarmeAtivo) {
+        boolean alarmeAtivo,
+        EstadoVisualFlangeDTO estadoVisual) {
 
     public int getPosicao() { return posicao; }
     public Long getId() { return id; }
@@ -38,4 +39,5 @@ public record DashboardFlangeDTO(
     public Double getUltimaTemperatura() { return ultimaTemperatura; }
     public String getUltimaLeituraEm() { return ultimaLeituraEm; }
     public boolean isAlarmeAtivo() { return alarmeAtivo; }
+    public EstadoVisualFlangeDTO getEstadoVisual() { return estadoVisual; }
 }
