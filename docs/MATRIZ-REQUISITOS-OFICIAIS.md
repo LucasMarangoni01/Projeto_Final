@@ -65,7 +65,7 @@ Situações: **implementado no código**, **parcial**, **pendente de validação
 | Dashboard de monitoramento | Painel de seis alertas recentes e destaque crítico, simulação local apenas para ADMIN; atualização a cada 7 s por unidade. **Teste visual em navegador pendente.** |
 | Sensores térmicos/Arduino | Proposta original do TAP. Escopo revisado para gás; cadastro de gás implementado, **integração física e telemetria não implementadas** |
 | LED de alerta | **Pendente:** demonstração/testes com circuito de Arduino |
-| Alertas visuais e histórico | Implementado no código |
+| Alertas visuais e histórico | Estados categorizados, animações, ordenação por criticidade e seleção bidirecional no Dashboard; testes de lógica automatizados; **navegador e hardware ainda pendentes** |
 | **Relatórios detalhados** | Integrado à branch main: exportações CSV por escopo; validação de uso real pendente |
 | Testes unitários e integração | Maven e testes automatizados com MySQL descartável no CI; hardware, navegador e aceite continuam pendentes |
 | Segurança de acesso | Spring Security com ADMIN/USER; ampliar testes de isolamento entre unidades |
