@@ -125,6 +125,15 @@ def validar():
                  'fc-alert-icon', 'monitorConnectionStatus'):
         assert nome in dashboard, f"Recurso visual ausente: {nome}"
     assert 'data-visual-state=${flange.estadoVisual.codigo}' in dashboard
+    # Informacoes de sensor: cadastro, primeira leitura e historico atrasado.
+    estado_sensor = (ROOT / "src/main/java/com/pbe/soda_caustica_flanges/model/EstadoComunicacaoSensor.java").read_text(encoding="utf-8")
+    for codigo in ("SEM_SENSOR", "NAO_INSTALADO", "AGUARDANDO_DADOS", "LEITURA_DESATUALIZADA"):
+        assert codigo in estado_sensor, f"Codigo de sensor nao encontrado: {codigo}"
+        assert codigo in js_sim, f"Dashboard nao reconhece o status: {codigo}"
+        assert codigo in css_sim, f"Falta aparencia para estado do sensor: {codigo}"
+    assert 'SEM DADOS' in dashboard
+    assert 'SEM LEITURA' not in dashboard
+
     assert "ordenarPorPrioridade" in js_sim
     assert "selecionar(id, origem)" in js_sim
     assert "simularEstado" in js_sim
