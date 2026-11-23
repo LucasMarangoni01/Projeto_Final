@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     ? ("Alertas e ocorrências: " + numero + " alertas registrados ativos")
                     : "Alertas e ocorrências");
                 link.removeAttribute("data-update-failed");
+                link.removeAttribute("title");
             });
         } catch (e) {
             // Preservar último estado em falhas de rede: nao afirmar zero.
