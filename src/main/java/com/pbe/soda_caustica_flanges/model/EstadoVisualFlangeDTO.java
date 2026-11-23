@@ -67,6 +67,14 @@ public record EstadoVisualFlangeDTO(
                 0, false);
     }
 
+    // JavaBeans: acesso consistente aos registros no Thymeleaf e no JSON.
+    public Long getFlangeId() { return flangeId; }
+    public String getCodigo() { return codigo; }
+    public String getRotulo() { return rotulo; }
+    public String getMensagem() { return mensagem; }
+    public int getPrioridade() { return prioridade; }
+    public boolean isAlertaAtivo() { return alertaAtivo; }
+
     private static EstadoVisualFlangeDTO estado(
             Flange flange, String codigo, String rotulo, String mensagem,
             int prioridade, boolean ativo) {
