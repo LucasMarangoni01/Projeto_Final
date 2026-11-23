@@ -156,16 +156,25 @@
             : 'Nenhum alerta ativo registrado';
     }
     function atualizarBanner() {
-        const existeReal = totalReal > 0 || Array.from(real.values()).some(item => item.alertaAtivo);
+        const estadosReais = Array.from(real.values());
+        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo);
+        const criticoReal = estadosReais.some(item => CRITICOS.has(item.codigo));
+        const somenteFalha = existeReal && !criticoReal;
         const simCritica = simulacao && CRITICOS.has(simulacao.estado.codigo);
-        if (banner) banner.hidden = !(existeReal || simCritica);
-        board.classList.toggle('has-real-alert', existeReal);
+        if (banner) {
+            banner.hidden = !(existeReal || simCritica);
+            banner.classList.toggle('is-warning', somenteFalha);
+        }
+        board.classList.toggle('has-real-alert', existeReal && criticoReal);
         board.classList.toggle('is-sim-critical', Boolean(simCritica) && !existeReal);
 
         if (existeReal) {
-            if (bannerTitle) bannerTitle.textContent = 'ATENÇÃO — ocorrência operacional ativa';
-            if (bannerDescription) bannerDescription.textContent =
-                'Condição registrada que requer avaliação. Sinais automáticos não comprovam vazamento de soda cáustica.';
+            if (bannerTitle) bannerTitle.textContent = criticoReal
+                ? 'ATENÇÃO — ocorrência crítica registrada'
+                : 'ATENÇÃO — registro de falha ou anormalidade';
+            if (bannerDescription) bannerDescription.textContent = criticoReal
+                ? 'Condição registrada que requer avaliação. Sinais automáticos não comprovam vazamento de soda cáustica.'
+                : 'Verifique o sensor, a comunicação e a ocorrência; não há confirmação de vazamento.';
             if (bannerTag) bannerTag.textContent = 'DADO REGISTRADO';
         } else if (simCritica) {
             if (bannerTitle) bannerTitle.textContent = 'SIMULAÇÃO — ' + simulacao.nome;
