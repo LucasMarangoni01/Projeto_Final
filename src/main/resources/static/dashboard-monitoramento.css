@@ -391,7 +391,7 @@ html[data-theme="light"] .dash .plant-flange[data-visual-state="NORMAL"] .plant-
 .dash .dashboard-flange-card::before {
     content:"";
     position:absolute;
-    z-index:-1;
+    z-index:1;
     inset:-2px;
     border:2px solid transparent;
     border-radius:inherit;
