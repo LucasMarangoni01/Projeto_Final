@@ -68,7 +68,7 @@ public record EstadoComunicacaoSensor(String codigo, String rotulo,
 
         if (semPrimeiraLeitura > 0) {
             return new EstadoComunicacaoSensor(
-                    "AGUARDANDO_DADOS", "AGUARDANDO DADOS",
+                    "AGUARDANDO_DADOS", "AGUARDANDO DADOS DO SENSOR",
                     semPrimeiraLeitura + " sensor(es) marcado(s) como instalado(s) "
                             + "ainda não enviaram a primeira leitura. A integração do "
                             + "hardware pode estar pendente; comunicação não confirmada.",
