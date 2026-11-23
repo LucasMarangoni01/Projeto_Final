@@ -98,15 +98,20 @@ do TAP/TCC, que ainda cita sensores térmicos.
   incluindo histórico normalizado.
 - Contagem de alertas ativos, destaque visual vermelho para pontos com alarmes
   registrados e consulta periódica a cada 7 segundos.
-- **Simulador no Dashboard para ADMIN:** escolher uma flange, reproduzir
-  visualmente um cenário de atenção ou suspeita fictícia de vazamento e encerrar.
-  A simulação não altera dados reais, não grava incidentes e não envia MQTT.
+- **Alertas dinâmicos:** mapa e cartões sincronizados, anéis vermelhos
+  pulsantes para situações críticas, estados próprios para falha de sensor,
+  aviso de ausência de leitura, ordenação por prioridade e seleção
+  bidirecional entre mapa e lista.
+- **Simulador no Dashboard para ADMIN:** cenários fictícios de atenção,
+  suspeita, dano e falha, sempre identificados como simulação.
+  A demonstração não altera dados reais, não grava incidentes e não envia MQTT.
 - Organização dos dados para auxiliar na observação de possíveis falhas.
 - **Integração de gás ainda não homologada:** sensor genérico de gás não
   confirma vazamento de soda cáustica líquida. O painel não oferece garantia
   de segurança industrial.
 
 [Funcionamento e testes do painel](docs/PAINEL-MONITORAMENTO-E-SIMULACAO.md).
+[Estados visuais, animações e prioridades](docs/ALERTAS-VISUAIS-DINAMICOS.md).
 
 
 ---
