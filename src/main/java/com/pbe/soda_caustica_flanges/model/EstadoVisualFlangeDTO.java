@@ -14,7 +14,7 @@ public record EstadoVisualFlangeDTO(
 
     public static EstadoVisualFlangeDTO classificar(
             Flange flange, List<Incidente> incidentesAtivos,
-            boolean sensorInstalado, boolean possuiLeitura) {
+            EstadoComunicacaoSensor disponibilidade) {
         EstadoVisualFlangeDTO melhor = null;
         for (Incidente evento : incidentesAtivos) {
             if (evento.getFlange() == null
@@ -56,14 +56,13 @@ public record EstadoVisualFlangeDTO(
             return estado(flange, "MANUTENCAO", "MANUTENÇÃO",
                     "Flange marcada em manutenção.", 20, false);
         }
-        if (sensorInstalado && !possuiLeitura) {
-            return estado(flange, "SEM_LEITURA", "SEM LEITURA",
-                    "Sensor cadastrado como instalado, mas sem leitura recebida. Comunicação não confirmada.", 30, false);
+        if (!"LEITURA_RECENTE".equals(disponibilidade.codigo())) {
+            return estado(flange, disponibilidade.codigo(), disponibilidade.rotulo(),
+                    disponibilidade.mensagem(), disponibilidade.prioridade(), false);
         }
         return estado(flange, "NORMAL", "NORMAL",
-                sensorInstalado
-                    ? "Status normal cadastrado; confirme a condição em inspeção."
-                    : "Status normal cadastrado; nenhum sensor instalado comprova a condição.",
+                "Status normal cadastrado e leitura recente recebida. "
+                        + "A leitura não comprova segurança operacional nem ausência de vazamento.",
                 0, false);
     }
 
