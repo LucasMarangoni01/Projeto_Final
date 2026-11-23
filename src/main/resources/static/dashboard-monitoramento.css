@@ -272,3 +272,343 @@ html[data-theme="light"] .monitor-sim-stop {background:#704c1d;color:#fff;}
         animation:none!important;filter:none!important;
     }
 }
+
+
+/* ==============================================================
+   ESTADOS VISUAIS SINCRONIZADOS · FLANGEGUARD
+   Mesmo data-visual-state no SVG e nos cards; não piscar textos.
+   =============================================================== */
+.dash .plant-flange {
+    cursor:pointer;
+    outline:none;
+}
+.dash .plant-flange .plant-alert-wave,
+.dash .plant-flange .plant-alert-halo {
+    fill:none;
+    stroke:#ff596b;
+    stroke-width:2;
+    pointer-events:none;
+    opacity:0;
+}
+.dash .plant-flange .plant-alert-glyph {
+    pointer-events:none;
+    fill:#fff;
+    opacity:0;
+    paint-order:stroke;
+    stroke:rgba(140,15,40,.9);
+    stroke-width:2px;
+}
+.dash .plant-flange .plant-node-name,
+.dash .plant-flange .plant-node-status {
+    transition:fill .25s ease;
+}
+.dash .plant-flange :is(.plant-node-name,.plant-node-status) {pointer-events:none;}
+/* A cor normal e o texto preservam a identidade do dashboard original. */
+.dash .plant-flange[data-visual-state="NORMAL"] .plant-status-ring {fill:#22c55e!important;}
+.dash .plant-flange[data-visual-state="NORMAL"] .plant-node-name {fill:#f8fbff!important;}
+html[data-theme="light"] .dash .plant-flange[data-visual-state="NORMAL"] .plant-node-name {fill:#193b65!important;}
+
+/* Estados críticos: um anel vermelho, nome vermelho e ondas visíveis. */
+.dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .plant-status-ring {
+    fill:#ef334c!important;
+    stroke:#ffd0d7!important;
+    animation:pulse-red 1.25s ease-in-out infinite !important;
+}
+.dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) :is(.plant-node-name,.plant-node-status) {
+    fill:#ff687b!important;
+    font-weight:900!important;
+    animation:critical-glow 1.25s ease-in-out infinite;
+}
+.dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .plant-alert-wave {
+    opacity:1;
+    animation:alert-ring 1.25s ease-out infinite;
+}
+.dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .plant-alert-halo {
+    opacity:1;
+    stroke:#ff6b7a;
+    animation:pulse-red 1.25s ease-in-out infinite;
+}
+.dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .plant-alert-glyph {opacity:1;animation:pulse-red 1.25s ease-in-out infinite;}
+
+/* Falha de sensor e ausência de leitura são diferentes de vazamento. */
+.dash .plant-flange[data-visual-state="FALHA_SENSOR"] .plant-status-ring {
+    fill:#d99b28!important;stroke:#c9f0ff!important;
+}
+.dash .plant-flange[data-visual-state="FALHA_SENSOR"] :is(.plant-node-name,.plant-node-status) {
+    fill:#ffc76c!important;font-weight:800!important;
+}
+.dash .plant-flange[data-visual-state="FALHA_SENSOR"] .plant-alert-glyph {
+    opacity:1;fill:#ffe8ba;stroke:#705020;
+}
+.dash .plant-flange[data-visual-state="SEM_LEITURA"] .plant-status-ring {fill:#589ed2!important;}
+.dash .plant-flange[data-visual-state="SEM_LEITURA"] .plant-node-status {fill:#8ecff8!important;}
+.dash .plant-flange[data-visual-state="ATENCAO"] .plant-status-ring {fill:#f59e0b!important;}
+.dash .plant-flange[data-visual-state="ATENCAO"] .plant-node-status {fill:#ffce7e!important;}
+.dash .plant-flange[data-visual-state="MANUTENCAO"] .plant-status-ring {fill:#60a5fa!important;}
+
+/* Seleção sincronizada, inclusive pelo teclado. */
+.dash .plant-flange.is-selected .plant-alert-halo,
+.dash .plant-flange:focus-visible .plant-alert-halo {
+    opacity:1;
+    stroke:#f4c45f!important;
+    stroke-width:3;
+    animation:none!important;
+}
+.dash .plant-flange:focus-visible .plant-node-name {text-decoration:underline;}
+
+/* Cartões: brilho na borda e na bolinha, NÃO na informação interna. */
+.dash .dashboard-flange-card {
+    position:relative;
+    isolation:isolate;
+    outline:none;
+    transition:background-color .25s,border-color .25s,box-shadow .25s;
+}
+.dash .dashboard-flange-card::before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    inset:-2px;
+    border:2px solid transparent;
+    border-radius:inherit;
+    pointer-events:none;
+}
+.dash .dashboard-flange-card .fc-name-row {
+    display:flex;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+}
+.dash .dashboard-flange-card .fc-alert-icon {
+    display:none;
+    place-items:center;
+    flex:0 0 18px;
+    width:18px;height:18px;
+    border:1px solid #ff8c9c;
+    border-radius:50%;
+    background:#9f1d36;
+    color:#fff;
+    font-size:12px;
+    font-weight:900;
+    line-height:1;
+}
+.dash .dashboard-flange-card .fc-code {
+    min-width:0;
+    overflow-wrap:anywhere;
+}
+.dash .dashboard-flange-card .fc-condition-message {
+    margin:6px 0 0;
+    color:#d0ddf1;
+    font-size:11px;
+    line-height:1.5;
+}
+.dash .dashboard-flange-card[data-visual-state="NORMAL"] .fc-condition-message {display:none;}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) {
+    animation:none!important;
+    background:linear-gradient(145deg,#402037,#25273f)!important;
+    border:2px solid #fb526a!important;
+    box-shadow:0 0 12px rgba(239,68,90,.16);
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+)::before {
+    border-color:#f54b63;
+    animation:critical-border-glow 1.25s ease-in-out infinite;
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .fc-dot {
+    background:#ff425e!important;
+    box-shadow:0 0 0 3px rgba(255,66,94,.25),0 0 12px #f43f5e!important;
+    animation:pulse-red 1.25s ease-in-out infinite!important;
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .fc-code {
+    color:#ff788b!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .fc-alert-icon {
+    display:grid;
+    animation:pulse-red 1.25s ease-in-out infinite;
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .fc-pill {
+    background:#a91636!important;
+    border-color:#fb8c9c!important;
+    color:#fff!important;
+    animation:none!important;
+    max-width:118px;
+    white-space:normal;
+    text-align:center;
+    font-size:9px;
+}
+.dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] {
+    background:rgba(88,110,145,.28)!important;
+    border:2px solid #c9a457!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] .fc-dot {
+    background:#fbbf24!important;box-shadow:0 0 0 3px rgba(251,191,36,.19)!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] .fc-alert-icon {
+    display:grid;background:#a56e18;border-color:#efca71;animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] .fc-pill {
+    color:#ffe9ae!important;background:#705425!important;border-color:#c3a45d!important;
+}
+.dash .dashboard-flange-card[data-visual-state="SEM_LEITURA"] .fc-dot {
+    background:#60a5fa!important;box-shadow:0 0 0 3px rgba(96,165,250,.18)!important;
+}
+.dash .dashboard-flange-card[data-visual-state="SEM_LEITURA"] .fc-pill {
+    color:#b0d7ff!important;background:#1c497b!important;border-color:#719dcd!important;
+}
+.dash .dashboard-flange-card[data-visual-state="ATENCAO"] .fc-dot {background:#f59e0b!important;}
+.dash .dashboard-flange-card[data-visual-state="ATENCAO"] .fc-pill {
+    color:#ffe3a3!important;background:#704e1e!important;border-color:#c69d51!important;
+}
+.dash .dashboard-flange-card.is-selected,
+.dash .dashboard-flange-card:focus-visible {
+    outline:3px solid #f4c45f!important;
+    outline-offset:2px;
+    box-shadow:0 0 0 5px rgba(244,196,95,.14)!important;
+}
+.flange-alert-count,
+.flange-sim-count {
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:20px;
+    font:800 10px/1.35 'JetBrains Mono',Consolas,monospace;
+    color:#b9d4f4;
+    border:1px solid rgba(147,197,253,.3);
+    background:rgba(96,165,250,.10);
+    white-space:nowrap;
+}
+.flange-alert-count[data-has-alert="true"] {
+    color:#fff;border-color:#ff667a;background:#a4223a;
+}
+.flange-sim-count {
+    color:#ffd98f;border-color:#b89947;background:#67471b;
+}
+.flange-sim-count[hidden] {display:none!important;}
+.flange-selection-status {color:#b4cbea;font-size:10px;min-height:0;}
+.flange-selection-status:empty {display:none;}
+.monitor-connection-status {font-size:11px;color:var(--mon-muted);margin:7px 0 0;}
+.monitor-board[data-conexao="falha"] .monitor-connection-status {
+    color:#fbbf84;font-weight:750;
+}
+/* Pulsos sincronizados, baratos de renderizar. */
+@keyframes pulse-red {
+    0%,100% {filter:brightness(1);}
+    50% {filter:brightness(1.5);}
+}
+@keyframes critical-glow {
+    0%,100% {filter:drop-shadow(0 0 1px rgba(255,105,120,.25));}
+    50% {filter:drop-shadow(0 0 5px rgba(255,105,120,.95));}
+}
+@keyframes alert-ring {
+    0% {opacity:.9;transform:scale(1);}
+    100% {opacity:0;transform:scale(1.6);}
+}
+@keyframes critical-border-glow {
+    0%,100% {box-shadow:0 0 4px rgba(244,63,94,.24);}
+    50% {box-shadow:0 0 16px rgba(244,63,94,.85);}
+}
+.dash .plant-alert-wave {
+    transform-box:fill-box;
+    transform-origin:center;
+}
+/* Modo claro: fundo cinza-azulado e vermelho de boa leitura. */
+html[data-theme="light"] .dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) {background:#f3dfe4!important;border-color:#b72c49!important;}
+html[data-theme="light"] .dash .dashboard-flange-card:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) .fc-code {color:#9d1534!important;}
+html[data-theme="light"] .dash .dashboard-flange-card .fc-condition-message {color:#405d7b;}
+html[data-theme="light"] .dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] {
+    background:#eee8d7!important;border-color:#aa7e30!important;
+}
+html[data-theme="light"] .dash .dashboard-flange-card[data-visual-state="FALHA_SENSOR"] .fc-pill {
+    color:#573d0b!important;background:#f8e4b1!important;
+}
+html[data-theme="light"] .dash .plant-flange:is(
+    [data-visual-state="VAZAMENTO"],
+    [data-visual-state="SUSPEITA"],
+    [data-visual-state="DANIFICADA"],
+    [data-visual-state="CRITICO"]
+) :is(.plant-node-name,.plant-node-status) {fill:#a31b3b!important;}
+html[data-theme="light"] .dash .plant-flange[data-visual-state="FALHA_SENSOR"] :is(
+    .plant-node-name,.plant-node-status) {fill:#7d5212!important;}
+html[data-theme="light"] .flange-selection-status {color:#345779;}
+@media(max-width:640px) {
+    .flange-alert-count,.flange-sim-count {font-size:9px;padding:4px 7px;}
+    .dash .dashboard-flange-card .fc-condition-message {font-size:11px;}
+    .dash .dashboard-flange-card .fc-pill {max-width:108px;white-space:normal;text-align:center;}
+}
+@media(prefers-reduced-motion:reduce) {
+    .dash .plant-flange :is(.plant-status-ring,.plant-alert-halo,.plant-alert-wave,
+        .plant-alert-glyph,.plant-node-name,.plant-node-status),
+    .dash .dashboard-flange-card,
+    .dash .dashboard-flange-card::before,
+    .dash .dashboard-flange-card :is(.fc-dot,.fc-alert-icon,.fc-code,.fc-pill) {
+        animation:none!important;transition:none!important;filter:none!important;
+    }
+    .dash .plant-flange:is([data-visual-state="VAZAMENTO"],[data-visual-state="SUSPEITA"],
+       [data-visual-state="DANIFICADA"],[data-visual-state="CRITICO"]) .plant-alert-wave {opacity:1;}
+}
