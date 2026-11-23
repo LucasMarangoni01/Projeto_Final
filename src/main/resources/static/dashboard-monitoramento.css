@@ -637,3 +637,29 @@ html[data-theme="light"] .flange-selection-status {color:#345779;}
 .dash .flange-alert-count,
 .dash .flange-sim-count {max-width:100%;}
 html[data-theme="light"] .dash .flange-panel-toolbar .flange-panel-count {color:#3b5c7e;}
+
+
+/* Falhas de instrumentação não recebem o mesmo vermelho de vazamento/dano. */
+.monitor-critical-banner.is-warning {
+    background:#624813;
+    border-color:#f4c45f;
+    box-shadow:0 0 0 3px rgba(244,196,95,.10);
+    color:#fff5dd;
+}
+.monitor-critical-banner.is-warning .monitor-critical-symbol {
+    background:#fff0c7;
+    color:#684818;
+}
+.monitor-critical-banner.is-warning .monitor-critical-tag {
+    background:#fff0c7;
+    color:#634010;
+}
+html[data-theme="light"] .monitor-critical-banner.is-warning {
+    background:#f0dbab;border-color:#ad8332;color:#4d3612;
+}
+html[data-theme="light"] .monitor-critical-banner.is-warning :is(strong,p) {
+    color:#513b1b;
+}
+html[data-theme="light"] .monitor-critical-banner.is-warning .monitor-critical-symbol {
+    color:#734b0e;background:#fff7df;
+}
