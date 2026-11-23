@@ -33,6 +33,7 @@ jobs:
           python3 scripts/validar-visual.py
           node --check src/main/resources/static/menu.js
           node --check src/main/resources/static/monitoramento-atualizacao.js
+          node --check src/main/resources/static/dashboard-simulacao.js
 
       - name: Compile and verify project
         run: mvn -B -ntp -Pvercel verify

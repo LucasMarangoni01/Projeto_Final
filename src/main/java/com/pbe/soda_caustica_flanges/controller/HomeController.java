@@ -107,6 +107,16 @@ public class HomeController {
                             usuario.getUnidade().getId()
                     );
 
+        // Historico compacto para o painel: inclui alertas ativos e normalizados,
+        // sem carregar toda a tabela nem expor dados de outras unidades.
+        List<Incidente> historicoRecente = admin
+                ? incidenteRepository.findTop6ByDataHoraIsNotNullOrderByDataHoraDesc()
+                : usuario.getUnidade() == null || !usuario.getUnidade().isAtivo()
+                    ? List.of()
+                    : incidenteRepository.findTop6ByFlange_Unidade_IdAndDataHoraIsNotNullOrderByDataHoraDesc(
+                            usuario.getUnidade().getId()
+                    );
+
         Set<Long> flangeComAlarme = alarmesAtivos.stream()
                 .filter(incidente -> incidente.getFlange() != null)
                 .map(incidente -> incidente.getFlange().getId())
@@ -194,6 +204,9 @@ public class HomeController {
         model.addAttribute("flangesSemSensor", flangesSemSensor);
         model.addAttribute("totalAlertasAtivos", alarmesAtivos.size());
         model.addAttribute("leiturasRecentes", leiturasRecentes);
+        model.addAttribute("eventosRecentes", historicoRecente.stream()
+                .map(EventoMonitoramentoDTO::de)
+                .toList());
         model.addAttribute("ehAdmin", admin);
         model.addAttribute("nomeUnidade", usuario.getUnidade() == null
                 ? "Todas as unidades"

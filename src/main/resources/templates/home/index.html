@@ -1066,6 +1066,7 @@
     <script src="/theme.js"></script>
     <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" th:href="@{/monitoramento-atualizacao.css}">
+    <link rel="stylesheet" th:href="@{/dashboard-monitoramento.css}">
 </head>
 <body>
 
@@ -1128,11 +1129,11 @@
                     <text class="plant-line-label" x="430" y="44" text-anchor="middle" font-size="8"
                           fill="#60a5fa" font-family="monospace">LINHA / PONTOS CADASTRADOS</text>
 
-                    <g th:each="flange : ${flangesMapa}"
-                       th:attr="transform=${'translate(' + flange.mapaX + ',' + flange.mapaY + ')'}">
+                    <g class="plant-flange" th:each="flange : ${flangesMapa}"
+                       th:attr="transform=${'translate(' + flange.mapaX + ',' + flange.mapaY + ')'},data-flange-id=${flange.id},data-alarm-active=${flange.alarmeAtivo},data-status=${flange.status}">
                         <line class="plant-connector" x1="0" y1="-25" x2="0" y2="-7"
                               stroke="rgba(148,163,184,.75)" stroke-width="4"/>
-                        <circle cx="0" cy="0" r="19"
+                        <circle class="plant-status-ring" cx="0" cy="0" r="19"
                                 th:attr="fill=${flange.alarmeAtivo ? '#ef4444' : (flange.status == 'CRITICO' ? '#ef4444' : (flange.status == 'ATENCAO' ? '#f59e0b' : (flange.status == 'MANUTENCAO' ? '#60a5fa' : '#22c55e')))}"
                                 stroke="#dbeafe" stroke-width="1.2"/>
                         <circle class="plant-node-core" cx="0" cy="0" r="11" fill="#0b2453" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
@@ -1179,7 +1180,7 @@
                     <article class="fc dashboard-flange-card"
                              th:each="flange : ${flanges}"
                              th:id="${flange.posicao > 0 ? 'fc' + flange.posicao : 'fc-extra-' + flange.id}"
-                             th:attr="data-flange-id=${flange.id},data-posicao=${flange.posicao},data-status=${flange.status}">
+                             th:attr="data-flange-id=${flange.id},data-posicao=${flange.posicao},data-status=${flange.status},data-alarm-active=${flange.alarmeAtivo}">
                         <div class="fc-dot"
                              th:id="${flange.posicao > 0 ? 'fcdot' + flange.posicao : 'fcdot-extra-' + flange.id}"></div>
                         <div class="fc-info">
@@ -1213,6 +1214,125 @@
                 </div>
             </div>
         </div>
+
+        <section class="monitor-board" id="painel-monitoramento" aria-labelledby="monitorBoardTitle"
+                 th:attr="data-alertas-reais=${totalAlertasAtivos}">
+            <header class="monitor-board-header">
+                <div>
+                    <span class="topbar-eyebrow">ACOMPANHAMENTO OPERACIONAL</span>
+                    <h2 id="monitorBoardTitle">Painel de monitoramento</h2>
+                    <p>Últimas ocorrências do sistema, com histórico e visualização das flanges.</p>
+                </div>
+                <div class="monitor-board-actions">
+                    <span class="monitor-real-label">DADOS DO SISTEMA</span>
+                    <button type="button" class="monitor-sim-button" id="abrirSimulacao"
+                            th:if="${ehAdmin and !#lists.isEmpty(flanges)}"
+                            aria-haspopup="dialog" aria-controls="modalSimulacao">
+                        <span aria-hidden="true">▶</span> Simular flange
+                    </button>
+                    <a class="monitor-history-button" th:href="@{/alertas}">Ver todos os alertas</a>
+                </div>
+            </header>
+
+            <div class="monitor-critical-banner" id="monitorCriticalBanner" role="status" hidden>
+                <span class="monitor-critical-symbol" aria-hidden="true">!</span>
+                <div>
+                    <strong id="monitorCriticalTitle">Atenção: anormalidade registrada</strong>
+                    <p id="monitorCriticalDescription">Verifique os dados e siga os procedimentos aplicáveis.</p>
+                </div>
+                <span class="monitor-critical-tag" id="monitorCriticalTag">ALERTA</span>
+            </div>
+
+            <div class="monitor-board-grid">
+                <div class="monitor-overview" id="monitorOverview">
+                    <span class="monitor-overview-eyebrow">SITUAÇÃO DAS OCORRÊNCIAS</span>
+                    <div class="monitor-overview-number" id="monitorActiveCount"
+                         th:text="${totalAlertasAtivos}">0</div>
+                    <h3 id="monitorOverviewTitle"
+                        th:text="${totalAlertasAtivos > 0 ? 'Alerta(s) ativo(s) registrado(s)' : 'Nenhum alerta ativo registrado'}">
+                        Nenhum alerta ativo registrado
+                    </h3>
+                    <p>Sem registro de alerta não significa que as flanges estejam seguras.
+                        A comunicação dos sensores precisa ser validada.</p>
+
+                    <div class="monitor-sim-summary" id="monitorSimSummary" hidden>
+                        <span class="monitor-sim-stamp">MODO DEMONSTRAÇÃO</span>
+                        <strong id="monitorSimTarget">Flange de demonstração</strong>
+                        <span id="monitorSimScenario">Cenário ilustrativo</span>
+                        <button type="button" class="monitor-sim-stop" id="encerrarSimulacao">
+                            Encerrar simulação
+                        </button>
+                    </div>
+                </div>
+                <div class="monitor-feed-panel">
+                    <div class="monitor-feed-heading">
+                        <div>
+                            <strong>Últimos alertas registrados</strong>
+                            <small>Até 6 registros reais · não inclui simulações</small>
+                        </div>
+                        <a th:href="@{/alertas}">Histórico completo</a>
+                    </div>
+                    <div class="monitor-event-feed" id="monitorEventFeed" aria-label="Histórico recente de alertas">
+                        <article class="monitor-event"
+                                 th:each="evento : ${eventosRecentes}"
+                                 th:classappend="${evento.ativo ? ' is-active' : ' is-resolved'}">
+                            <span class="monitor-event-indicator" aria-hidden="true"></span>
+                            <div class="monitor-event-body">
+                                <div class="monitor-event-top">
+                                    <strong th:text="${evento.nomeFlange}">FL-001</strong>
+                                    <time th:text="${evento.dataHora}">00/00/0000 00:00:00</time>
+                                </div>
+                                <p th:text="${evento.descricao}">Anormalidade registrada para verificação</p>
+                                <span class="monitor-event-status"
+                                      th:text="${evento.situacao}">Alerta ativo</span>
+                            </div>
+                        </article>
+                        <p class="monitor-empty" th:if="${#lists.isEmpty(eventosRecentes)}">
+                            Ainda não há ocorrências individuais registradas.
+                            Isso não confirma que o processo esteja seguro.
+                        </p>
+                    </div>
+                    <div class="monitor-demo-event" id="monitorDemoEvent" hidden>
+                        <span class="monitor-sim-stamp">SIMULAÇÃO LOCAL · NÃO REGISTRADA</span>
+                        <p id="monitorDemoDescription">Cenário de treinamento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <dialog class="monitor-dialog" id="modalSimulacao"
+                th:if="${ehAdmin and !#lists.isEmpty(flanges)}"
+                aria-labelledby="monitorDialogTitle" aria-describedby="monitorDialogHelp">
+            <div class="monitor-dialog-top">
+                <span class="monitor-sim-stamp">TREINAMENTO · APENAS VISUAL</span>
+                <button type="button" class="monitor-dialog-close" id="fecharSimulacao"
+                        aria-label="Fechar painel de simulação">×</button>
+            </div>
+            <h2 id="monitorDialogTitle">Simulação de flanges</h2>
+            <p id="monitorDialogHelp">Escolha uma flange e um cenário fictício. Apenas a tela mudará:
+                nenhum incidente será criado, nenhuma leitura será gravada e nenhum sensor será acionado.</p>
+            <div class="monitor-dialog-field">
+                <label for="monitorSimFlange">Flange da simulação</label>
+                <select id="monitorSimFlange" required>
+                    <option th:each="flange : ${flanges}" th:value="${flange.id}"
+                            th:text="${flange.nomeFlange + ' · ' + flange.localizacao}">
+                        FL-001
+                    </option>
+                </select>
+            </div>
+            <div class="monitor-dialog-field">
+                <label for="monitorSimTipo">Cenário ilustrativo</label>
+                <select id="monitorSimTipo">
+                    <option value="atencao">Anormalidade em observação (amarelo)</option>
+                    <option value="critico">Suspeita de vazamento (vermelho pulsante)</option>
+                </select>
+            </div>
+            <p class="monitor-sim-feedback" id="monitorSimFeedback" role="alert" hidden></p>
+            <div class="monitor-dialog-footer">
+                <button type="button" class="monitor-dialog-cancel" id="cancelarSimulacao">Cancelar</button>
+                <button type="button" class="monitor-dialog-confirm" id="iniciarSimulacao">Iniciar demonstração</button>
+            </div>
+        </dialog>
 
         <section class="dashboard-status-section">
             <div class="dashboard-section-heading">
@@ -1259,7 +1379,7 @@
         </p>
 
         <p class="dashboard-readonly-note" th:unless="${ehAdmin}">
-            Modo de consulta: os status acima são os valores salvos no banco. Os controles demonstrativos ficam disponíveis somente para ADMIN.
+            Modo de consulta: os status acima são os valores salvos no banco. A simulação visual está disponível somente para ADMIN.
         </p>
 
     </div>
@@ -1364,6 +1484,7 @@
 </script>
 
 <script src="/monitoramento-atualizacao.js"></script>
+<script src="/dashboard-simulacao.js"></script>
 <script src="/menu.js"></script>
 </body>
 </html>

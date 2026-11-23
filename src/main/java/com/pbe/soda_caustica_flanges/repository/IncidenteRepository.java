@@ -2,6 +2,7 @@ package com.pbe.soda_caustica_flanges.repository;
 
 import com.pbe.soda_caustica_flanges.model.Incidente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -37,6 +38,28 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     List<Incidente> findByFlange_Unidade_IdAndDataHoraIsNotNullAndNormalizadoEmIsNullOrderByDataHoraDesc(
             Long unidadeId
     );
+
+    // Os eventos exibidos no painel devem ser limitados e incluir flange carregada.
+    @EntityGraph(attributePaths = {"flange"})
+    List<Incidente> findTop6ByDataHoraIsNotNullOrderByDataHoraDesc();
+
+    @EntityGraph(attributePaths = {"flange"})
+    List<Incidente> findTop6ByFlange_Unidade_IdAndDataHoraIsNotNullOrderByDataHoraDesc(Long unidadeId);
+
+    // Busca somente IDs, para destacar todos os alarmes ativos sem trazer entidades inteiras.
+    @Query("""
+            SELECT DISTINCT i.flange.id FROM Incidente i
+            WHERE i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL
+              AND i.flange IS NOT NULL
+            """)
+    List<Long> findIdsFlangesComAlertasAtivos();
+
+    @Query("""
+            SELECT DISTINCT i.flange.id FROM Incidente i
+            WHERE i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL
+              AND i.flange.unidade.id = :unidadeId
+            """)
+    List<Long> findIdsFlangesComAlertasAtivosPorUnidade(@Param("unidadeId") Long unidadeId);
 
     long countByDataHoraIsNotNullAndNormalizadoEmIsNull();
 

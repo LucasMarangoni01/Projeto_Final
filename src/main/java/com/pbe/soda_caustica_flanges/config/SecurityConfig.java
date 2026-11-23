@@ -94,6 +94,8 @@ public class SecurityConfig {
                                 "/relatorios.css",
                                 "/monitoramento-atualizacao.css",
                                 "/monitoramento-atualizacao.js",
+                                "/dashboard-monitoramento.css",
+                                "/dashboard-simulacao.js",
                                 "/analises.js",
                                 "/manutencao.css",
                                 "/js/**",
@@ -150,6 +152,9 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
                         // Resumo periódico disponível somente para perfis autenticados.
+                        .requestMatchers(HttpMethod.GET, "/api/monitoramento/eventos")
+                        .hasAnyRole("ADMIN", "USER")
+
                         .requestMatchers(HttpMethod.GET, "/api/monitoramento/resumo")
                         .hasAnyRole("ADMIN", "USER")
 
