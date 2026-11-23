@@ -16,8 +16,11 @@ detecção em tempo real ou de latência máxima.
 | SUSPEITA | POSSÍVEL VAZAMENTO | Vermelho pulsante | Sinal de telemetria ainda não verificado |
 | DANIFICADA | FLANGE DANIFICADA | Vermelho pulsante | Ocorrência explícita `FLANGE_DANIFICADA` ou `DANO_FLANGE` |
 | CRITICO | ALERTA/ESTADO CRÍTICO | Vermelho pulsante | Estado crítico ou ocorrência ativa sem diagnóstico específico |
-| FALHA_SENSOR | FALHA DE SENSOR | Âmbar distinto | Ocorrência explícita `FALHA_SENSOR` ou `FALHA_COMUNICACAO` |
-| SEM_LEITURA | SEM LEITURA | Azul diagnóstico, sem pulsação vermelha | Sensor marcado como instalado mas sem leituras persistidas; não equivale a falha diagnosticada |
+| SEM_SENSOR | SEM SENSOR | Cinza, sem animação | Não há instrumento cadastrado nesta flange |
+| NAO_INSTALADO | SENSOR NÃO INSTALADO | Cinza, sem animação | Existe cadastro, mas nenhum sensor consta como instalado |
+| AGUARDANDO_DADOS | AGUARDANDO DADOS DO SENSOR | Azul, sem animação | Há sensor marcado como instalado que nunca enviou uma primeira leitura própria |
+| LEITURA_DESATUALIZADA | SEM DADOS RECENTES | Âmbar, sem vermelho pulsante | Sensor previamente enviou leituras, mas ultrapassou o prazo visual de atualização |
+| FALHA_SENSOR | FALHA DE SENSOR | Âmbar de falha registrada | Ocorrência explícita de falha ou de comunicação, independente do prazo de dados |
 | ATENCAO | ATENÇÃO | Amarelo | Status cadastral de atenção |
 | MANUTENCAO | MANUTENÇÃO | Azul | Status cadastral de manutenção |
 
@@ -79,3 +82,24 @@ legibilidade em modo claro/escuro, selecionar e localizar flanges,
 abrir/fechar simulação, condições simultâneas, responsividade
 (360/768/1366 px), teclado e redução de movimento. Teste físico de
 sensor/segurança industrial é uma etapa separada.
+
+## Ciclo de leitura do instrumento
+
+O estado visual não depende apenas da presença de algum registro na flange:
+o sistema consulta a **última leitura de cada sensor marcado como instalado**,
+evitando confundir registros de instrumentos antigos/desativados com os do
+sensor atual. O mesmo classificador alimenta o Dashboard inicial e a API de
+atualização sem recarregar a página.
+
+O prazo para indicar **SEM DADOS RECENTES** é provisoriamente de
+**15 minutos** e pode ser configurado por
+`MONITORAMENTO_PRAZO_LEITURA_MINUTOS`
+(`app.monitoramento.prazo-leitura-minutos`). Este intervalo é somente uma
+referência visual de protótipo; precisa ser revisto quando a periodicidade
+do hardware for definida e validada pelo orientador.
+
+Um atraso não confirma que a comunicação foi interrompida ou que o sensor
+está defeituoso. Da mesma forma, leitura recente não comprova ausência de
+vazamento e não transforma um sensor de gás não homologado em detector de NaOH.
+Ocorrências explícitas e status críticos continuam tendo prioridade visual
+sobre os diagnósticos de leitura.
