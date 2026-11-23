@@ -307,7 +307,7 @@
         consultando = true;
         try {
             const resposta = await fetch('/api/monitoramento/eventos', {
-                credentials:'same-origin',cache:'no-store',
+                credentials: 'same-origin', cache: 'no-store',
                 headers:{Accept:'application/json'}
             });
             if (!resposta.ok) throw new Error('Consulta indisponível');
