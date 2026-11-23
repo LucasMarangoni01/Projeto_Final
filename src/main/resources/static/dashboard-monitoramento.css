@@ -1,0 +1,246 @@
+/* FlangeGuard · Painel de monitoramento e simulacao visual segura.
+ * Nenhum estado de simulacao e persistido; estilos independentes de MQTT.
+ */
+.monitor-board {
+    --mon-panel: #0b2b64;
+    --mon-raised: #123673;
+    --mon-border: rgba(147,197,253,.23);
+    --mon-text: #eff6ff;
+    --mon-muted: #b7cde9;
+    margin-top: 4px;
+    border: 1px solid var(--mon-border);
+    border-radius: 15px;
+    padding: clamp(18px,2.3vw,28px);
+    color: var(--mon-text);
+    background: linear-gradient(145deg,#0c3478,#082554);
+    box-shadow: 0 14px 35px rgba(0,12,40,.19);
+}
+.monitor-board-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    padding:0 0 20px;
+    margin:0 0 20px;
+    border-bottom:1px solid var(--mon-border);
+    text-align:left;
+    width:auto;
+}
+.monitor-board-header h2 {color:var(--mon-text);font-size:clamp(21px,2.2vw,29px);margin:5px 0 6px;letter-spacing:-.028em;}
+.monitor-board-header p {color:var(--mon-muted);font-size:13px;line-height:1.55;max-width:600px;}
+.monitor-board-actions {display:flex;align-items:center;flex-wrap:wrap;gap:10px;}
+.monitor-real-label,.monitor-sim-stamp {
+    display:inline-flex;align-items:center;gap:6px;
+    font:800 10px/1.4 'JetBrains Mono',Consolas,monospace;
+    letter-spacing:.055em;
+}
+.monitor-real-label {color:#95c1f8;}
+.monitor-real-label::before {content:"";width:7px;height:7px;border-radius:50%;background:#60a5fa;}
+.monitor-sim-stamp {color:#f5bf62;}
+.monitor-board-actions :is(button,a),
+.monitor-sim-stop,.monitor-dialog button {
+    border:1px solid var(--mon-border);
+    border-radius:9px;
+    padding:10px 14px;
+    min-height:43px;
+    font:750 12px/1.35 'IBM Plex Sans','Segoe UI',Arial,sans-serif;
+    text-decoration:none;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    cursor:pointer;
+}
+.monitor-sim-button {background:#f4c45f;color:#152b49;border-color:#ffdc93 !important;}
+.monitor-sim-button:hover {background:#ffda8d;}
+.monitor-history-button {background:rgba(96,165,250,.12);color:#e7f2ff;}
+.monitor-history-button:hover {background:rgba(96,165,250,.24);}
+.monitor-board-grid {display:grid;grid-template-columns:minmax(260px,.78fr) minmax(0,1.55fr);gap:15px;}
+.monitor-overview,.monitor-feed-panel {
+    min-width:0;
+    border:1px solid var(--mon-border);
+    border-radius:12px;
+    background:rgba(3,24,60,.48);
+    padding:20px;
+}
+.monitor-overview-eyebrow {color:#a5c6eb;font:800 10px 'JetBrains Mono',Consolas,monospace;letter-spacing:.09em;}
+.monitor-overview-number {font:800 clamp(38px,4vw,58px)/1.2 'JetBrains Mono',Consolas,monospace;color:#f5c75d;margin:10px 0 0;}
+.monitor-overview h3 {font-size:17px;color:var(--mon-text);line-height:1.3;margin:4px 0 10px;}
+.monitor-overview>p {color:var(--mon-muted);font-size:12.5px;line-height:1.65;}
+.monitor-feed-heading {display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:15px;}
+.monitor-feed-heading>div {display:flex;flex-direction:column;gap:4px;}
+.monitor-feed-heading strong {color:var(--mon-text);font-size:15px;}
+.monitor-feed-heading small {color:var(--mon-muted);font-size:11px;}
+.monitor-feed-heading a {color:#f5cc80;font-size:12px;font-weight:750;text-decoration:underline;text-underline-offset:3px;}
+.monitor-event-feed {display:flex;flex-direction:column;gap:9px;max-height:355px;overflow-y:auto;padding-right:4px;}
+.monitor-event {display:flex;align-items:flex-start;gap:11px;padding:12px 13px;border:1px solid var(--mon-border);border-radius:9px;background:rgba(20,55,116,.48);}
+.monitor-event.is-active {border-left:3px solid #fb7185;}
+.monitor-event.is-resolved {border-left:3px solid #60d7a4;}
+.monitor-event-indicator {width:9px;height:9px;border-radius:50%;flex:0 0 9px;margin-top:6px;background:#60d7a4;}
+.monitor-event.is-active .monitor-event-indicator {background:#fb7185;}
+.monitor-event-body {flex:1;min-width:0;}
+.monitor-event-top {display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;}
+.monitor-event-top strong {color:var(--mon-text);font-size:13px;}
+.monitor-event-top time {color:var(--mon-muted);font:600 10px/1.6 'JetBrains Mono',Consolas,monospace;}
+.monitor-event-body p {font-size:12px;line-height:1.45;color:var(--mon-muted);margin:5px 0;}
+.monitor-event-status {font-size:10px;font-weight:800;color:#f8a8b4;}
+.monitor-event.is-resolved .monitor-event-status {color:#8de4bd;}
+.monitor-empty {padding:17px;border:1px dashed var(--mon-border);border-radius:9px;color:var(--mon-muted);font-size:13px;line-height:1.55;}
+.monitor-critical-banner {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#8b1730;
+    border:2px solid #ffa2b2;
+    border-radius:12px;
+    color:#fff;
+    padding:15px 17px;
+    margin-bottom:18px;
+    box-shadow:0 0 0 4px rgba(244,63,94,.16);
+}
+.monitor-critical-banner[hidden],.monitor-sim-summary[hidden],.monitor-demo-event[hidden] {display:none!important;}
+.monitor-critical-symbol {
+    flex:0 0 37px;width:37px;height:37px;
+    display:grid;place-items:center;border-radius:50%;
+    background:#fff;color:#9f1239;font-size:25px;font-weight:900;
+}
+.monitor-critical-banner>div {min-width:0;flex:1;}
+.monitor-critical-banner strong {font-size:15px;line-height:1.4;color:#fff;}
+.monitor-critical-banner p {font-size:12px;color:#fff1f2;margin-top:4px;line-height:1.45;}
+.monitor-critical-tag {
+    background:#fff0f1;color:#991b3f;border-radius:7px;
+    padding:6px 9px;font:800 10px 'JetBrains Mono',Consolas,monospace;
+    white-space:nowrap;
+}
+.monitor-board.has-real-alert .monitor-critical-banner:not([hidden]),
+.monitor-board.is-sim-critical .monitor-critical-banner:not([hidden]) {
+    animation: monitorCriticalPulse 1.45s ease-in-out infinite;
+}
+.monitor-sim-summary {
+    display:flex;flex-direction:column;gap:9px;
+    margin-top:16px;padding:14px;
+    border:1px dashed #f4c45f;border-radius:10px;
+    background:rgba(244,196,95,.10);
+}
+.monitor-sim-summary strong {color:var(--mon-text);font-size:15px;}
+.monitor-sim-summary>span:last-of-type {font-size:12px;color:var(--mon-muted);}
+.monitor-sim-stop {color:#fff1c5;background:#80521d;border-color:#d4a14c;}
+.monitor-sim-stop:hover {background:#966120;}
+.monitor-demo-event {
+    margin-top:12px;padding:13px;
+    border:1px dashed #f4c45f;border-radius:9px;
+    background:rgba(244,196,95,.10);
+}
+.monitor-demo-event p {font-size:12px;color:var(--mon-text);margin:7px 0 0;line-height:1.5;}
+/* Marca visual no mapa e nos cards: real e demonstrativo sao estados distintos. */
+.dash .plant-flange[data-alarm-active="true"] .plant-status-ring,
+.dash .plant-flange[data-status="CRITICO"] .plant-status-ring,
+.dash .dashboard-flange-card[data-alarm-active="true"] {
+    animation: monitorCriticalPulse 1.45s ease-in-out infinite;
+}
+.dash .plant-flange.is-sim-critical .plant-status-ring {fill:#ef4444!important;animation:monitorCriticalPulse 1.15s ease-in-out infinite;}
+.dash .plant-flange.is-sim-warning .plant-status-ring {fill:#f59e0b!important;}
+.dash .dashboard-flange-card.is-sim-critical {
+    border:2px solid #fb7185!important;
+    box-shadow:0 0 0 3px rgba(244,63,94,.27);
+    animation:monitorCriticalPulse 1.15s ease-in-out infinite;
+}
+.dash .dashboard-flange-card.is-sim-warning {
+    border:2px solid #fbbf24!important;
+}
+.dash .dashboard-flange-card .fc-pill.is-simulated-critical {
+    color:#fff!important;background:#be123c!important;border-color:#fb7185!important;
+}
+.dash .dashboard-flange-card .fc-pill.is-simulated-warning {
+    color:#20170a!important;background:#fbbf24!important;border-color:#d19b1c!important;
+}
+@keyframes monitorCriticalPulse {
+    0%,100% {filter:brightness(1);box-shadow:0 0 0 2px rgba(244,63,94,.14);}
+    50% {filter:brightness(1.32);box-shadow:0 0 0 7px rgba(244,63,94,.29);}
+}
+.monitor-dialog {
+    width:min(460px,calc(100% - 28px));
+    max-width:460px;
+    margin:auto;
+    padding:24px;
+    border-radius:15px;
+    background:#0a2d65;
+    color:#edf5ff;
+    border:1px solid #669ad4;
+    box-shadow:0 20px 70px rgba(0,8,25,.5);
+}
+.monitor-dialog::backdrop {background:rgba(2,12,28,.70);backdrop-filter:blur(3px);}
+.monitor-dialog-top {display:flex;justify-content:space-between;align-items:center;gap:15px;}
+.monitor-dialog .monitor-dialog-close {font-size:23px;min-height:35px;width:35px;padding:0;background:rgba(147,197,253,.11);color:#fff;}
+.monitor-dialog h2 {color:#fff;font-size:24px;margin:13px 0 9px;}
+.monitor-dialog>p {color:#bbd0ee;font-size:12.5px;line-height:1.6;margin:0 0 19px;}
+.monitor-dialog-field {display:flex;flex-direction:column;gap:7px;margin:13px 0;}
+.monitor-dialog-field label {font-size:12px;font-weight:800;color:#e5f0ff;}
+.monitor-dialog-field select {
+    display:block;width:100%;min-height:45px;border-radius:8px;
+    border:1px solid #6a95c8;background:#112d58;color:#fff;
+    padding:10px 12px;font-size:13px;
+}
+.monitor-dialog-footer {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:21px;}
+.monitor-dialog-cancel {background:#244673;color:#eff5ff;}
+.monitor-dialog-confirm {background:#f4c45f;color:#172a46;border-color:#f4c45f!important;}
+.monitor-dialog button:focus-visible,.monitor-board button:focus-visible,.monitor-board a:focus-visible,.monitor-dialog select:focus-visible {
+    outline:3px solid #f4c45f;outline-offset:3px;
+}
+html[data-theme="light"] .monitor-board {
+    --mon-panel:#e1e9f2;
+    --mon-raised:#d4e0ed;
+    --mon-border:#aebfd4;
+    --mon-text:#1b3b5d;
+    --mon-muted:#456583;
+    background:#e1e9f2;
+    border-color:#b5c7da;
+    box-shadow:0 10px 25px rgba(31,58,90,.09);
+}
+html[data-theme="light"] .monitor-overview,
+html[data-theme="light"] .monitor-feed-panel {background:#d6e2ee;border-color:#b5c8da;}
+html[data-theme="light"] .monitor-overview-eyebrow,
+html[data-theme="light"] .monitor-real-label {color:#2b5d8b;}
+html[data-theme="light"] .monitor-event {background:#e8edf4;border-color:#bdcada;}
+html[data-theme="light"] .monitor-event.is-active {border-left-color:#cc3652;}
+html[data-theme="light"] .monitor-event.is-resolved {border-left-color:#17845b;}
+html[data-theme="light"] .monitor-event.is-active .monitor-event-status {color:#9e2540;}
+html[data-theme="light"] .monitor-event.is-resolved .monitor-event-status {color:#176e50;}
+html[data-theme="light"] .monitor-feed-heading a {color:#80530d;}
+html[data-theme="light"] .monitor-history-button {background:#eaf2fc;color:#1d4e85;border-color:#b6c9df;}
+html[data-theme="light"] .monitor-overview-number {color:#86570c;}
+html[data-theme="light"] .monitor-dialog {background:#e1eaf5;color:#1b3b5d;border-color:#9eb8d7;}
+html[data-theme="light"] .monitor-dialog h2,
+html[data-theme="light"] .monitor-dialog-field label {color:#1b3b5d;}
+html[data-theme="light"] .monitor-dialog>p {color:#456583;}
+html[data-theme="light"] .monitor-dialog-field select {background:#fff;color:#1b3b5d;border-color:#a9bfd7;}
+html[data-theme="light"] .monitor-dialog .monitor-dialog-close {color:#1b3b5d;background:#cfdfef;}
+html[data-theme="light"] .monitor-dialog-cancel {background:#cbd9e8;color:#173b62;}
+html[data-theme="light"] .monitor-sim-summary {background:#f5e7c9;}
+html[data-theme="light"] .monitor-sim-summary .monitor-sim-stamp {color:#7d510b;}
+html[data-theme="light"] .monitor-demo-event {background:#f4e5c8;}
+html[data-theme="light"] .monitor-demo-event .monitor-sim-stamp {color:#7d510b;}
+html[data-theme="light"] .monitor-sim-stop {background:#704c1d;color:#fff;}
+@media(max-width:900px) {
+    .monitor-board-grid {grid-template-columns:1fr;}
+}
+@media(max-width:600px) {
+    .monitor-board {padding:15px;}
+    .monitor-board-header {align-items:flex-start;}
+    .monitor-board-actions {width:100%;}
+    .monitor-board-actions .monitor-real-label {width:100%;}
+    .monitor-overview,.monitor-feed-panel {padding:15px;}
+    .monitor-board-actions :is(.monitor-sim-button,.monitor-history-button) {flex:1 1 140px;}
+    .monitor-event-top {flex-direction:column;}
+    .monitor-critical-banner {align-items:flex-start;flex-wrap:wrap;}
+    .monitor-critical-tag {margin-left:51px;}
+    .monitor-dialog {padding:17px;}
+    .monitor-dialog-footer>button {flex:1 1 155px;}
+}
+@media(prefers-reduced-motion:reduce) {
+    .monitor-board.has-real-alert .monitor-critical-banner,
+    .monitor-board.is-sim-critical .monitor-critical-banner,
+    .dash .plant-flange .plant-status-ring,
+    .dash .dashboard-flange-card[data-alarm-active="true"],
+    .dash .dashboard-flange-card.is-sim-critical {
+        animation:none!important;filter:none!important;
+    }
+}
