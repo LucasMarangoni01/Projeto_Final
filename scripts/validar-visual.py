@@ -93,6 +93,26 @@ def validar():
     for nome, css in (("theme.css", tema), ("relatorios.css", report),
                       ("guia-nav.css", (STATIC / "guia-nav.css").read_text(encoding="utf-8"))):
         assert css.count("{") == css.count("}"), f"{nome}: blocos CSS desbalanceados"
+    # Painel de alertas e demonstracao sao visuais e nao persistem incidentes.
+    dashboard = (TEMPLATES / "home/index.html").read_text(encoding="utf-8")
+    for elemento in ('id="painel-monitoramento"', 'id="monitorEventFeed"',
+                     'id="monitorCriticalBanner"', 'id="abrirSimulacao"',
+                     'id="modalSimulacao"', 'id="encerrarSimulacao"'):
+        assert elemento in dashboard, f"Controle do painel ausente: {elemento}"
+    assert 'dashboard-monitoramento.css' in dashboard
+    assert 'dashboard-simulacao.js' in dashboard
+    assert 'th:if="${ehAdmin and !#lists.isEmpty(flanges)}"' in dashboard
+    js_sim = (STATIC / "dashboard-simulacao.js").read_text(encoding="utf-8")
+    assert "fetch('/api/monitoramento/eventos'" in js_sim
+    assert "credentials: 'same-origin'" in js_sim
+    assert "document.createElement" in js_sim
+    assert "replaceChildren" in js_sim
+    assert 'fetch(' in js_sim and "'POST'" not in js_sim
+    css_sim = (STATIC / "dashboard-monitoramento.css").read_text(encoding="utf-8")
+    assert css_sim.count("{") == css_sim.count("}")
+    assert "prefers-reduced-motion:reduce" in css_sim
+    assert "html[data-theme=\"light\"] .monitor-board" in css_sim
+
     assert 'html[data-theme="light"]' in tema and 'html[data-theme="dark"]' in tema
     # Regressões reais reportadas: barra azul com texto escuro e
     # formulários azuis com títulos invisíveis quando o tema está claro.
