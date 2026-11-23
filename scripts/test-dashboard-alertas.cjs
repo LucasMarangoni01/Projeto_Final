@@ -52,7 +52,7 @@ test('simulacao e sinalizada e nao possui transporte de escrita', () => {
 });
 test('mapa e cards tem pontos identificaveis e estado renderizado', () => {
     assert.match(html,/class="plant-flange"/);
-    assert.match(html,/class="dashboard-flange-card"/);
+    assert.match(html,/class="fc dashboard-flange-card"/);
     assert.match(html,/data-visual-state=\$\{flange.estadoVisual.codigo\}/);
     assert.match(html,/class="plant-alert-wave"/);
     assert.match(html,/class="fc-alert-icon"/);
