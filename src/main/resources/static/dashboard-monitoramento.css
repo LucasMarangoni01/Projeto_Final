@@ -663,3 +663,108 @@ html[data-theme="light"] .monitor-critical-banner.is-warning :is(strong,p) {
 html[data-theme="light"] .monitor-critical-banner.is-warning .monitor-critical-symbol {
     color:#734b0e;background:#fff7df;
 }
+
+
+/* Diagnostico dos sensores: sem dados nao significa defeito ou vazamento.
+   O backend fornece os codigos; o mapa e os cards exibem o mesmo estado. */
+.dash .plant-flange[data-visual-state="SEM_SENSOR"] .plant-status-ring,
+.dash .plant-flange[data-visual-state="NAO_INSTALADO"] .plant-status-ring {
+    fill:#8495ad!important;
+    stroke:#c6d4e6!important;
+}
+.dash .plant-flange[data-visual-state="SEM_SENSOR"] .plant-node-status,
+.dash .plant-flange[data-visual-state="NAO_INSTALADO"] .plant-node-status {
+    fill:#c0cfe2!important;
+}
+.dash .plant-flange[data-visual-state="AGUARDANDO_DADOS"] .plant-status-ring {
+    fill:#58a9e2!important;
+    stroke:#b7e2fa!important;
+}
+.dash .plant-flange[data-visual-state="AGUARDANDO_DADOS"] .plant-node-status {
+    fill:#b1dfff!important;
+}
+.dash .plant-flange[data-visual-state="LEITURA_DESATUALIZADA"] .plant-status-ring {
+    fill:#e5a03b!important;
+    stroke:#ffe7a8!important;
+}
+.dash .plant-flange[data-visual-state="LEITURA_DESATUALIZADA"] .plant-node-status {
+    fill:#ffd58c!important;
+}
+.dash .dashboard-flange-card:is([data-visual-state="SEM_SENSOR"],
+    [data-visual-state="NAO_INSTALADO"]) .fc-dot {
+    background:#94a3b8!important;
+    box-shadow:0 0 0 3px rgba(148,163,184,.18)!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card:is([data-visual-state="SEM_SENSOR"],
+    [data-visual-state="NAO_INSTALADO"]) .fc-pill {
+    background:#344660!important;
+    border:1px solid #8293ab!important;
+    color:#e0e7f1!important;
+}
+.dash .dashboard-flange-card[data-visual-state="AGUARDANDO_DADOS"] .fc-dot {
+    background:#55a5e2!important;
+    box-shadow:0 0 0 3px rgba(85,165,226,.22)!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="AGUARDANDO_DADOS"] .fc-pill {
+    background:#1b4d80!important;
+    border:1px solid #7aaee0!important;
+    color:#d1e9ff!important;
+}
+.dash .dashboard-flange-card[data-visual-state="LEITURA_DESATUALIZADA"] {
+    border:2px solid #d29b44!important;
+    background:rgba(105,78,39,.18)!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="LEITURA_DESATUALIZADA"] .fc-dot {
+    background:#e9a844!important;
+    box-shadow:0 0 0 3px rgba(233,168,68,.18)!important;
+    animation:none!important;
+}
+.dash .dashboard-flange-card[data-visual-state="LEITURA_DESATUALIZADA"] .fc-pill {
+    background:#71511d!important;
+    border:1px solid #c8a266!important;
+    color:#ffe8b7!important;
+}
+.dash .dashboard-flange-card:is(
+    [data-visual-state="SEM_SENSOR"],
+    [data-visual-state="NAO_INSTALADO"],
+    [data-visual-state="AGUARDANDO_DADOS"],
+    [data-visual-state="LEITURA_DESATUALIZADA"]
+) .fc-pill {
+    max-width:125px;
+    white-space:normal;
+    overflow-wrap:normal;
+    font-size:9px;
+    line-height:1.35;
+    text-align:center;
+}
+html[data-theme="light"] .dash .dashboard-flange-card:is(
+    [data-visual-state="SEM_SENSOR"],
+    [data-visual-state="NAO_INSTALADO"]
+) .fc-pill {
+    background:#e1e7ef!important;
+    color:#405673!important;
+}
+html[data-theme="light"] .dash .dashboard-flange-card[data-visual-state="AGUARDANDO_DADOS"] .fc-pill {
+    background:#d6eafd!important;
+    color:#245986!important;
+}
+html[data-theme="light"] .dash .dashboard-flange-card[data-visual-state="LEITURA_DESATUALIZADA"] {
+    background:#f1e7d3!important;
+    border-color:#b78835!important;
+}
+html[data-theme="light"] .dash .dashboard-flange-card[data-visual-state="LEITURA_DESATUALIZADA"] .fc-pill {
+    background:#f5dfb0!important;
+    color:#74501a!important;
+}
+html[data-theme="light"] .dash .plant-flange[data-visual-state="AGUARDANDO_DADOS"] .plant-node-status {
+    fill:#285d8b!important;
+}
+html[data-theme="light"] .dash .plant-flange[data-visual-state="LEITURA_DESATUALIZADA"] .plant-node-status {
+    fill:#845912!important;
+}
+html[data-theme="light"] .dash .plant-flange:is(
+    [data-visual-state="SEM_SENSOR"],[data-visual-state="NAO_INSTALADO"]
+) .plant-node-status {fill:#536a83!important;}
