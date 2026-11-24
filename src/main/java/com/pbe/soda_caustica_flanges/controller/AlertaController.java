@@ -98,8 +98,7 @@ public class AlertaController {
             return "redirect:/alertas?erro=encerrado";
         }
 
-        if (incidente.getStatusAlarme() == StatusAlarme.RECONHECIDO
-                || incidente.getStatusAlarme() == StatusAlarme.EM_MANUTENCAO) {
+        if (!CicloAlarme.aguardaReconhecimento(incidente.getStatusAlarme())) {
             return "redirect:/alertas?erro=ja_reconhecido";
         }
 
@@ -126,7 +125,7 @@ public class AlertaController {
             RedirectAttributes redirectAttributes) {
 
         Usuario usuario = buscarUsuario(authentication);
-        if (usuario.getRole() != Role.ADMIN) {
+        if (!usuario.isAtivo() || usuario.getRole() != Role.ADMIN) {
             return "redirect:/alertas?erro=permissao";
         }
 
@@ -135,8 +134,7 @@ public class AlertaController {
             return "redirect:/alertas?erro=encerrado";
         }
 
-        if (incidente.getStatusAlarme() != StatusAlarme.RECONHECIDO
-                && incidente.getStatusAlarme() != StatusAlarme.EM_MANUTENCAO) {
+        if (!CicloAlarme.podeResolver(incidente.getStatusAlarme())) {
             return "redirect:/alertas?erro=reconhecimento_obrigatorio";
         }
 
@@ -182,7 +180,7 @@ public class AlertaController {
     }
 
     private boolean podeConsultar(Incidente incidente, Usuario usuario) {
-        if (incidente == null || incidente.getFlange() == null
+        if (!usuario.isAtivo() || incidente == null || incidente.getFlange() == null
                 || incidente.getFlange().getUnidade() == null) {
             return false;
         }
