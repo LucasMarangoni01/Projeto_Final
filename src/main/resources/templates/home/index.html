@@ -1067,6 +1067,9 @@
     <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" th:href="@{/monitoramento-atualizacao.css}">
     <link rel="stylesheet" th:href="@{/dashboard-monitoramento.css}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="stylesheet" th:href="@{/css/central-alarmes.css}">
 </head>
 <body>
 
@@ -1262,6 +1265,58 @@
                 </div>
                 <span class="monitor-critical-tag" id="monitorCriticalTag">ALERTA</span>
             </div>
+
+            <section class="central-alarmes" id="centralAlarmes" aria-label="Central de alarmes">
+                <div class="ca-header">
+                    <div><span class="topbar-eyebrow">CENTRAL DE NOTIFICAÇÕES</span><h3>Alarmes e emergências</h3></div>
+                    <span id="caConexao" role="status">Consultando registros…</span>
+                </div>
+                <div class="ca-metrics">
+                    <div><small>Ocorrências reais ativas</small><strong id="caReais">—</strong></div>
+                    <div><small>Aguardando reconhecimento</small><strong id="caPendentes">—</strong></div>
+                    <div><small>Testes ativos</small><strong id="caTestes">—</strong></div>
+                    <div><small>Sistema sonoro</small><strong id="caSom" aria-live="polite">Desativado</strong></div>
+                </div>
+                <div class="ca-controls">
+                    <button type="button" id="caAtivarSom">Ativar som</button>
+                    <button type="button" id="caSilenciar" disabled>Silenciar alarmes atuais</button>
+                    <button type="button" id="caRetomar" disabled>Retomar som</button>
+                </div>
+                <p class="ca-help">Som local do navegador. Silenciar não reconhece nem resolve uma ocorrência; um novo alarme poderá tocar novamente. Não substitui alarmes industriais independentes.</p>
+                <div class="ca-live" id="caNotificacao" role="status" aria-live="polite"></div>
+                <h4>Ocorrências reais ativas</h4><div class="ca-list" id="caAtivos"></div>
+                <h4>Últimos registros reais</h4><div class="ca-list" id="caHistorico"></div>
+                <div th:if="${ehAdmin}" class="ca-admin">
+                    <div class="ca-header"><div><span class="topbar-eyebrow">ADMIN · AMBIENTE DE TREINAMENTO</span><h4>Teste de emergência</h4></div>
+                    <button type="button" id="caAbrirTeste">Novo teste</button></div>
+                    <p>Eventos de exercício persistidos separadamente. Nenhum comando de hardware, leitura fictícia ou incidente real será gerado.</p>
+                    <h4>Testes em andamento</h4><div id="caTestesAtivos" class="ca-list"></div>
+                    <h4>Histórico de testes</h4><div id="caTestesHistorico" class="ca-list"></div>
+                </div>
+            </section>
+            <dialog class="monitor-dialog" id="caDetalhes" aria-labelledby="caDetalheTitulo">
+                <h2 id="caDetalheTitulo">Detalhes da ocorrência</h2>
+                <div id="caDetalheConteudo"></div>
+                <p id="caDetalheErro" role="status"></p>
+                <div class="ca-controls" id="caDetalheAcoes"></div>
+                <button type="button" id="caFecharDetalhes">Fechar</button>
+            </dialog>
+            <dialog class="monitor-dialog" th:if="${ehAdmin}" id="caModalTeste" aria-labelledby="caTesteTitulo">
+                <h2 id="caTesteTitulo">Teste de emergência · ADMIN</h2>
+                <p>Exercício de software. A ocorrência ficará identificada como TESTE em toda a central.</p>
+                <form id="caFormTeste">
+                    <div class="monitor-dialog-field"><label for="caFlange">Flange ativa</label>
+                    <select id="caFlange" required><option value="">Selecione</option>
+                    <option th:each="flange : ${flanges}" th:value="${flange.id}" th:text="${flange.nomeFlange + ' · ' + flange.localizacao}"></option></select></div>
+                    <div class="monitor-dialog-field"><label for="caTipo">Ocorrência</label>
+                    <select id="caTipo"><option value="VAZAMENTO">Vazamento fictício</option><option value="CRITICO">Condição crítica fictícia</option><option value="FALHA_COMUNICACAO">Falha de comunicação fictícia</option></select></div>
+                    <div class="monitor-dialog-field"><label for="caGravidade">Gravidade</label>
+                    <select id="caGravidade"><option value="MODERADA">Moderada</option><option value="ALTA">Alta</option><option value="CRITICA" selected>Crítica</option></select></div>
+                    <label class="ca-confirm"><input id="caConfirmar" type="checkbox" required> Confirmo que iniciarei um exercício, não uma ocorrência real.</label>
+                    <p id="caTesteErro" role="alert"></p>
+                    <div class="ca-controls"><button type="submit" id="caIniciar">Iniciar teste</button><button type="button" id="caCancelar">Cancelar</button></div>
+                </form>
+            </dialog>
 
             <div class="monitor-board-grid">
                 <div class="monitor-overview" id="monitorOverview">
@@ -1507,6 +1562,7 @@
 
 <script src="/monitoramento-atualizacao.js"></script>
 <script src="/dashboard-simulacao.js"></script>
+<script src="/js/central-alarmes.js"></script>
 <script src="/menu.js"></script>
 </body>
 </html>
