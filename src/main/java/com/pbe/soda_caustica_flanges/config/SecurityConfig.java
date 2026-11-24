@@ -155,7 +155,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/monitoramento/testes", "/api/monitoramento/testes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/monitoramento/alarmes").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/monitoramento/alarmes/*/atender").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/monitoramento/alarmes/*/atender", "/api/monitoramento/alarmes/*/reconhecer").hasAnyRole("ADMIN", "USER")
 
                         // Resumo periódico disponível somente para perfis autenticados.
                         .requestMatchers(HttpMethod.GET, "/api/monitoramento/eventos")
