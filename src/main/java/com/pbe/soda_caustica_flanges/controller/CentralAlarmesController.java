@@ -31,6 +31,14 @@ public class CentralAlarmesController {
         return ResponseEntity.ok(service.transicao(auth, id, acao));
     }
 
+    public record Reconhecimento(String justificativa) {}
+
+    @PostMapping("/alarmes/{id}/reconhecer")
+    public ResponseEntity<Void> reconhecer(Authentication auth, @PathVariable Long id, @RequestBody Reconhecimento pedido) {
+        service.reconhecerReal(auth, id, pedido.justificativa());
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/alarmes/{id}/atender")
     public ResponseEntity<Void> atender(Authentication auth, @PathVariable Long id) {
         service.atenderReal(auth, id);
