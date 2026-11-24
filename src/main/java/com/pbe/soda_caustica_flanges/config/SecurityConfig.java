@@ -96,6 +96,8 @@ public class SecurityConfig {
                                 "/monitoramento-atualizacao.js",
                                 "/dashboard-monitoramento.css",
                                 "/dashboard-simulacao.js",
+                                "/js/central-alarmes.js",
+                                "/css/central-alarmes.css",
                                 "/analises.js",
                                 "/manutencao.css",
                                 "/js/**",
@@ -150,6 +152,10 @@ public class SecurityConfig {
                         // Apenas ADMIN pode normalizar e restaurar o estado operacional da flange.
                         .requestMatchers(HttpMethod.POST, "/alertas/*/normalizar")
                         .hasRole("ADMIN")
+
+                        .requestMatchers("/api/monitoramento/testes", "/api/monitoramento/testes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/monitoramento/alarmes").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/monitoramento/alarmes/*/atender").hasAnyRole("ADMIN", "USER")
 
                         // Resumo periódico disponível somente para perfis autenticados.
                         .requestMatchers(HttpMethod.GET, "/api/monitoramento/eventos")
