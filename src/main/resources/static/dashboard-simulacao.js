@@ -89,6 +89,7 @@
     // Exercícios persistidos e ocorrências reais permanecem em coleções distintas.
     const testesAtivos = new Map();
     let idsReaisCentral = new Set();
+    const estadosReaisCentral = new Map();
     let selecionada = null;
     let consultando = false;
 
@@ -101,9 +102,10 @@
     function estadoEfetivo(id) {
         const atual = real.get(id);
         // Um exercício nunca substitui uma ocorrência real ativa nem um estado crítico real.
-        if (idsReaisCentral.has(id) || atual?.alertaAtivo || (atual?.prioridade || 0) >= 75) {
-            return atual || {codigo:'CRITICO', rotulo:'ALERTA REAL',
-                mensagem:'Ocorrência registrada. Consulte a central.', prioridade:85, alertaAtivo:true};
+        const central = estadosReaisCentral.get(id);
+        if (central || atual?.alertaAtivo || (atual?.prioridade || 0) >= 75) {
+            if (!central) return atual;
+            return atual && atual.prioridade >= central.prioridade && (atual.alertaAtivo || atual.prioridade >= 75) ? atual : central;
         }
         const teste = testesAtivos.get(id);
         if (teste) return teste;
@@ -113,7 +115,17 @@
     }
     document.addEventListener('flangeguard:testes-atualizados', function (event) {
         testesAtivos.clear();
-        idsReaisCentral = new Set((event.detail.reais || []).filter(id=>id != null).map(String));
+        estadosReaisCentral.clear();
+        for (const a of event.detail.reais || []) {
+            if (a.teste || !a.ativo || a.flangeId == null) continue;
+            const id = String(a.flangeId);
+            const codigo = {VAZAMENTO_CONFIRMADO:'VAZAMENTO',SUSPEITA_VAZAMENTO:'SUSPEITA',FALHA_COMUNICACAO:'FALHA_SENSOR'}[a.tipo] || 'CRITICO';
+            const prioridade = {VAZAMENTO:100,SUSPEITA:90,CRITICO:85,FALHA_SENSOR:75}[codigo];
+            const rotulo = {VAZAMENTO:'VAZAMENTO CONFIRMADO',SUSPEITA:'POSSÍVEL VAZAMENTO',CRITICO:'ALERTA CRÍTICO',FALHA_SENSOR:'FALHA DE SENSOR'}[codigo];
+            const estado = {codigo,prioridade,rotulo,mensagem:'Ocorrência real registrada · '+a.rotuloEstado+'. Consulte a central.',alertaAtivo:true};
+            if (!estadosReaisCentral.has(id) || estadosReaisCentral.get(id).prioridade < prioridade) estadosReaisCentral.set(id,estado);
+        }
+        idsReaisCentral = new Set(estadosReaisCentral.keys());
         for (const t of event.detail.testes || []) {
             if (!t.teste || !t.ativo) continue;
             const id = String(t.flangeId);
@@ -155,7 +167,7 @@
         if (pill) pill.textContent = estado.rotulo;
         const mensagem = card.querySelector('.fc-condition-message');
         if (mensagem) mensagem.textContent = estado.mensagem;
-        card.dataset.alarmActive = String(Boolean(real.get(id)?.alertaAtivo));
+        card.dataset.alarmActive = String(Boolean(real.get(id)?.alertaAtivo || idsReaisCentral.has(id)));
         group.dataset.alarmActive = card.dataset.alarmActive;
     }
     function ordenarLista() {
@@ -187,8 +199,8 @@
     }
     function atualizarBanner() {
         const estadosReais = Array.from(real.values());
-        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo);
-        const criticoReal = estadosReais.some(item => CRITICOS.has(item.codigo));
+        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo) || estadosReaisCentral.size > 0;
+        const criticoReal = [...estadosReais,...estadosReaisCentral.values()].some(item => CRITICOS.has(item.codigo));
         const somenteFalha = existeReal && !criticoReal;
         const simCritica = simulacao && CRITICOS.has(simulacao.estado.codigo);
         const testeCritico = Array.from(testesAtivos.values()).some(t => CRITICOS.has(t.codigo));
