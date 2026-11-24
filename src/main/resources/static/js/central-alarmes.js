@@ -172,7 +172,18 @@
                 if (window.confirm('Encerrar apenas este exercício? Ocorrências reais não serão modificadas.')) agir(a,'encerrar');
             }));
         } else if (a.ativo) {
-            const link = criar('a','Reconhecer ou normalizar em Alertas');
+            if (a.sonoro) {
+                const label = criar('label','Justificativa do reconhecimento');
+                label.htmlFor = 'caJustificativa';
+                const campo = criar('textarea');
+                campo.id = 'caJustificativa'; campo.maxLength = 500; campo.rows = 3;
+                host.append(label,campo);
+                acoes.append(acaoBotao('Reconhecer ocorrência',()=>{
+                    if (!campo.value.trim()) { $('caDetalheErro').textContent='Informe a justificativa.'; return; }
+                    agir(a,'reconhecer',{justificativa:campo.value});
+                }));
+            }
+            const link = criar('a','Consultar ou normalizar em Alertas');
             link.href='/alertas'; acoes.append(link);
             if (a.estado === 'RECONHECIDO') acoes.append(acaoBotao('Registrar atendimento',()=>agir(a,'atender')));
         }
@@ -183,18 +194,18 @@
         const header = document.querySelector('meta[name="_csrf_header"]')?.content;
         const token = document.querySelector('meta[name="_csrf"]')?.content;
         if (!header || !token) throw new Error('Sessão sem proteção CSRF disponível. Recarregue a página.');
-        const resposta = await fetch(url,{method:'POST', credentials:'same-origin',
+        const resposta = await fetch(url,{method:'POST', credentials:'same-origin', redirect:'error',
             headers:{'Content-Type':'application/json',Accept:'application/json',[header]:token},
             body:JSON.stringify(body || {})});
         if (!resposta.ok) throw new Error('Ação não concluída (HTTP '+resposta.status+'). Confira a sessão e o estado atual.');
     }
-    async function agir(a, acao) {
+    async function agir(a, acao, body) {
         if (enviando) return;
         enviando=true;
         $('caDetalheErro').textContent='Enviando…';
         try {
             const raiz = a.teste ? '/api/monitoramento/testes/' : '/api/monitoramento/alarmes/';
-            await post(raiz+encodeURIComponent(a.id)+'/'+acao);
+            await post(raiz+encodeURIComponent(a.id)+'/'+acao,body);
             $('caDetalheErro').textContent='Ação registrada.';
             await consultar();
         } catch(e) {$('caDetalheErro').textContent=e.message;}
@@ -223,7 +234,7 @@
         listar('caHistorico',painel.recentes,'Nenhum registro recente.');
         listar('caTestesAtivos',painel.testesAtivos,'Nenhum teste em andamento.');
         listar('caTestesHistorico',painel.testesHistorico,'Nenhum teste encerrado.');
-        if(detalhe && $('caDetalhes').open) renderDetalhe();
+        if(detalhe && $('caDetalhes').open && document.activeElement?.id !== 'caJustificativa') renderDetalhe();
         atualizarSom();
     }
     async function consultar() {
@@ -242,14 +253,21 @@
                 const selecionado=real[0] || chegadas[0];
                 $('caNotificacao').textContent=(selecionado.teste?'TESTE · ':'NOVA OCORRÊNCIA REAL · ')+selecionado.flange+' · '+descricao(selecionado);
                 $('caNotificacao').dataset.teste=String(selecionado.teste);
+                $('caNotificacao').dataset.chave=selecionado.chave;
             } else if(!chaves.size) $('caNotificacao').textContent='';
+            else if (!chaves.has($('caNotificacao').dataset.chave)) {
+                const a=novos.find(x=>!x.teste)||novos[0];
+                $('caNotificacao').textContent=(a.teste?'TESTE · ':'OCORRÊNCIA REAL PENDENTE · ')+a.flange+' · '+descricao(a);
+                $('caNotificacao').dataset.teste=String(a.teste);
+                $('caNotificacao').dataset.chave=a.chave;
+            }
             const mudou=!carregado || JSON.stringify(novo)!==JSON.stringify(painel);
             painel=novo; anterior=chaves; carregado=true; erroRede=false;
             $('caConexao').textContent='Consulta atualizada · '+new Date().toLocaleTimeString('pt-BR');
             if(mudou) {
                 render();
                 document.dispatchEvent(new CustomEvent('flangeguard:testes-atualizados',
-                    {detail:{testes:painel.testesAtivos, reais:painel.ativos.map(a=>a.flangeId)}}));
+                    {detail:{testes:painel.testesAtivos, reais:painel.ativos}}));
             } else atualizarSom();
             tocar();
         } catch(_) {
