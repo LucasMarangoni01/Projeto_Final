@@ -22,7 +22,7 @@
     const $ = id => document.getElementById(id);
     if (!$('centralAlarmes')) return;
     let painel = {ativos:[], recentes:[], testesAtivos:[], testesHistorico:[]};
-    let carregado = false, consultando = false, erroRede = false, detalhe = null, enviando = false;
+    let carregado = false, consultando = false, detalhe = null, enviando = false;
     let contexto = null, somAtivo = false, ultimaChave = null;
     let silenciados = new Set(), anterior = new Set(), nosAudio = [];
     const tipoTexto = {
@@ -262,7 +262,7 @@
                 $('caNotificacao').dataset.chave=a.chave;
             }
             const mudou=!carregado || JSON.stringify(novo)!==JSON.stringify(painel);
-            painel=novo; anterior=chaves; carregado=true; erroRede=false;
+            painel=novo; anterior=chaves; carregado=true;
             $('caConexao').textContent='Consulta atualizada · '+new Date().toLocaleTimeString('pt-BR');
             if(mudou) {
                 render();
@@ -271,7 +271,6 @@
             } else atualizarSom();
             tocar();
         } catch(_) {
-            erroRede=true;
             $('caConexao').textContent=carregado?'Consulta indisponível · exibindo último registro':'Consulta indisponível · estado desconhecido';
         } finally {consultando=false;}
     }
