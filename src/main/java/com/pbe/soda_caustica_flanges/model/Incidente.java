@@ -82,6 +82,12 @@ public class Incidente {
     @Column(name = "justificativa_reconhecimento", length = 500)
     private String justificativaReconhecimento;
 
+    @Column(name = "atendimento_em")
+    private LocalDateTime atendimentoEm;
+
+    @Column(name = "atendimento_por_email", length = 120)
+    private String atendimentoPorEmail;
+
     @Column(name = "normalizado_em")
     private LocalDateTime normalizadoEm;
 
@@ -152,6 +158,9 @@ public class Incidente {
 
     public String getJustificativaReconhecimento() { return justificativaReconhecimento; }
     public void setJustificativaReconhecimento(String justificativaReconhecimento) { this.justificativaReconhecimento = justificativaReconhecimento; }
+
+    public LocalDateTime getAtendimentoEm() { return atendimentoEm; }
+    public String getAtendimentoPorEmail() { return atendimentoPorEmail; }
 
     public LocalDateTime getNormalizadoEm() { return normalizadoEm; }
     public void setNormalizadoEm(LocalDateTime normalizadoEm) { this.normalizadoEm = normalizadoEm; }
