@@ -78,7 +78,7 @@
                     </div>
                     <span class="alert-state"
                           th:classappend="${alerta.statusAlarme != null ? ' alert-state-' + #strings.toLowerCase(alerta.statusAlarme.name()) : ' alert-state-disparado'}"
-                          th:text="${alerta.statusAlarme != null ? alerta.statusAlarme.descricao : 'Disparado'}">Disparado</span>
+                          th:text="${alerta.statusAlarme != null ? alerta.statusAlarme.descricao : 'Disparado'}">Aguardando reconhecimento</span>
                 </div>
 
                 <div class="alert-reading-grid">
