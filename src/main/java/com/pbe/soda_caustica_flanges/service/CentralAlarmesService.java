@@ -88,17 +88,38 @@ public class CentralAlarmesService {
     @Transactional
     public void atenderReal(Authentication auth, Long id) {
         Usuario u = usuario(auth);
+        Incidente i = incidentePermitido(u, id);
+        if (!i.isAlarmeAtivo() || !CicloAlarme.podeAtender(i.getStatusAlarme()) ||
+                incidentes.marcarEmAtendimento(id, StatusAlarme.RECONHECIDO, StatusAlarme.EM_MANUTENCAO, LocalDateTime.now(), u.getEmail()) != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Reconheça a ocorrência ativa antes de iniciar atendimento.");
+        }
+        auditoria.registrar(u, u.getEmail(), "ALARME_EM_ATENDIMENTO", "Ocorrência real #" + id);
+    }
+
+    @Transactional
+    public void reconhecerReal(Authentication auth, Long id, String justificativa) {
+        Usuario u = usuario(auth);
+        Incidente i = incidentePermitido(u, id);
+        String motivo = justificativa == null ? "" : justificativa.trim();
+        if (motivo.isBlank() || motivo.length() > 500) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe uma justificativa de até 500 caracteres.");
+        }
+        if (!i.isAlarmeAtivo() || !CicloAlarme.aguardaReconhecimento(i.getStatusAlarme()) ||
+                incidentes.reconhecerAtivo(id, StatusAlarme.DISPARADO, StatusAlarme.RECONHECIDO,
+                        LocalDateTime.now(), u.getEmail(), motivo) != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A ocorrência já foi reconhecida ou encerrada.");
+        }
+        auditoria.registrar(u, u.getEmail(), "ALARME_RECONHECIDO", "Ocorrência real #" + id);
+    }
+
+    private Incidente incidentePermitido(Usuario u, Long id) {
         Incidente i = incidentes.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (i.getFlange() == null || (u.getRole() != Role.ADMIN &&
                 (i.getFlange().getUnidade() == null || !i.getFlange().getUnidade().isAtivo()
                   || !u.getUnidade().getId().equals(i.getFlange().getUnidade().getId())))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        if (!i.isAlarmeAtivo() || !CicloAlarme.podeAtender(i.getStatusAlarme()) ||
-                incidentes.marcarEmAtendimento(id, StatusAlarme.RECONHECIDO, StatusAlarme.EM_MANUTENCAO) != 1) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Reconheça a ocorrência ativa antes de iniciar atendimento.");
-        }
-        auditoria.registrar(u, u.getEmail(), "ALARME_EM_ATENDIMENTO", "Ocorrência real #" + id);
+        return i;
     }
 
     private void auditar(Usuario u, TesteEmergencia t, String acao) {
