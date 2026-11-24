@@ -16,8 +16,15 @@ import java.util.Optional;
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
 
     @Modifying
-    @Query("UPDATE Incidente i SET i.statusAlarme = :novo WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND i.statusAlarme = :anterior")
-    int marcarEmAtendimento(@Param("id") Long id, @Param("anterior") StatusAlarme anterior, @Param("novo") StatusAlarme novo);
+    @Query("UPDATE Incidente i SET i.statusAlarme = :novo, i.atendimentoEm = :agora, i.atendimentoPorEmail = :ator WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND i.statusAlarme = :anterior")
+    int marcarEmAtendimento(@Param("id") Long id, @Param("anterior") StatusAlarme anterior,
+            @Param("novo") StatusAlarme novo, @Param("agora") java.time.LocalDateTime agora, @Param("ator") String ator);
+
+    @Modifying
+    @Query("UPDATE Incidente i SET i.statusAlarme = :novo, i.reconhecidoEm = :agora, i.reconhecidoPorEmail = :ator, i.justificativaReconhecimento = :motivo WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND (i.statusAlarme IS NULL OR i.statusAlarme = :anterior)")
+    int reconhecerAtivo(@Param("id") Long id, @Param("anterior") StatusAlarme anterior,
+            @Param("novo") StatusAlarme novo, @Param("agora") java.time.LocalDateTime agora,
+            @Param("ator") String ator, @Param("motivo") String motivo);
 
     // Busca todos os incidentes de um ano específico ordenado por mês
     List<Incidente> findByAnoOrderByMesAsc(Integer ano);
