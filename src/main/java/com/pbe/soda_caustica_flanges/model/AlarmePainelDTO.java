@@ -26,7 +26,7 @@ public record AlarmePainelDTO(String chave, Long id, boolean teste, Long flangeI
                 estado.name(), CicloAlarme.rotulo(estado), i.isAlarmeAtivo(),
                 i.isAlarmeAtivo() && CicloAlarme.aguardaReconhecimento(estado),
                 data(i.getDataHora()), null, i.getReconhecidoPorEmail(), data(i.getReconhecidoEm()),
-                null, null, i.getNormalizadoPorEmail(), data(i.getNormalizadoEm()));
+                i.getAtendimentoPorEmail(), data(i.getAtendimentoEm()), i.getNormalizadoPorEmail(), data(i.getNormalizadoEm()));
     }
 
     public static AlarmePainelDTO teste(TesteEmergencia t) {
