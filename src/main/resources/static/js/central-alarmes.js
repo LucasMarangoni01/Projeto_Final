@@ -226,7 +226,27 @@
             finally {enviando=false; $('caIniciar').disabled=false;}
         });
     }
+    function grafico(id, eventos) {
+        const host = $(id); if (!host) return;
+        const grupos = [
+            ['Vazamento / suspeita', eventos.filter(a=>['VAZAMENTO','SUSPEITA_VAZAMENTO','VAZAMENTO_CONFIRMADO'].includes(a.tipo)).length],
+            ['Condição crítica', eventos.filter(a=>a.tipo==='CRITICO').length],
+            ['Comunicação', eventos.filter(a=>a.tipo==='FALHA_COMUNICACAO').length]
+        ];
+        const fragmento = document.createDocumentFragment();
+        for (const [rotulo, qtd] of grupos) {
+            const row = criar('div',undefined,'ca-chart-row');
+            const label = criar('span',rotulo);
+            const meter = criar('meter'); meter.min=0; meter.max=Math.max(1,eventos.length); meter.value=qtd;
+            meter.setAttribute('aria-label',rotulo+': '+qtd);
+            row.append(label,meter,criar('strong',String(qtd)));
+            fragmento.append(row);
+        }
+        host.replaceChildren(fragmento);
+    }
     function render() {
+        grafico('caGraficoReais',painel.ativos);
+        grafico('caGraficoTestes',painel.testesAtivos);
         $('caReais').textContent=String(painel.ativos.length);
         $('caPendentes').textContent=String(painel.ativos.filter(a=>a.sonoro).length);
         $('caTestes').textContent=String(painel.testesAtivos.length);
