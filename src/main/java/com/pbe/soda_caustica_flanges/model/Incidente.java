@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 
 @Entity
+@org.hibernate.annotations.DynamicUpdate
 @Table(name = "incidentes",
         indexes = {
                 @Index(name = "idx_incidente_flange_data", columnList = "flange_id, data_hora"),
