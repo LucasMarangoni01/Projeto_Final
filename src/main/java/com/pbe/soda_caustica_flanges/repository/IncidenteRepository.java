@@ -4,6 +4,8 @@ import com.pbe.soda_caustica_flanges.model.Incidente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import com.pbe.soda_caustica_flanges.model.StatusAlarme;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,17 @@ import java.util.Optional;
 
 @Repository
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
+
+    @Modifying
+    @Query("UPDATE Incidente i SET i.statusAlarme = :novo, i.atendimentoEm = :agora, i.atendimentoPorEmail = :ator WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND i.statusAlarme = :anterior")
+    int marcarEmAtendimento(@Param("id") Long id, @Param("anterior") StatusAlarme anterior,
+            @Param("novo") StatusAlarme novo, @Param("agora") java.time.LocalDateTime agora, @Param("ator") String ator);
+
+    @Modifying
+    @Query("UPDATE Incidente i SET i.statusAlarme = :novo, i.reconhecidoEm = :agora, i.reconhecidoPorEmail = :ator, i.justificativaReconhecimento = :motivo WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND (i.statusAlarme IS NULL OR i.statusAlarme = :anterior)")
+    int reconhecerAtivo(@Param("id") Long id, @Param("anterior") StatusAlarme anterior,
+            @Param("novo") StatusAlarme novo, @Param("agora") java.time.LocalDateTime agora,
+            @Param("ator") String ator, @Param("motivo") String motivo);
 
     // Busca todos os incidentes de um ano específico ordenado por mês
     List<Incidente> findByAnoOrderByMesAsc(Integer ano);

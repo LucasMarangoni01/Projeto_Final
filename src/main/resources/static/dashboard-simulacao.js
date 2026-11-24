@@ -86,6 +86,10 @@
 
     let totalReal = Number(board.dataset.alertasReais || 0);
     let simulacao = null; // {id, nome, tipo, estado}; nunca enviado ao servidor
+    // Exercícios persistidos e ocorrências reais permanecem em coleções distintas.
+    const testesAtivos = new Map();
+    let idsReaisCentral = new Set();
+    const estadosReaisCentral = new Map();
     let selecionada = null;
     let consultando = false;
 
@@ -96,10 +100,45 @@
         return node;
     }
     function estadoEfetivo(id) {
+        const atual = real.get(id);
+        // Um exercício nunca substitui uma ocorrência real ativa nem um estado crítico real.
+        const central = estadosReaisCentral.get(id);
+        if (central || atual?.alertaAtivo || (atual?.prioridade || 0) >= 75) {
+            if (!central) return atual;
+            return atual && atual.prioridade >= central.prioridade && (atual.alertaAtivo || atual.prioridade >= 75) ? atual : central;
+        }
+        const teste = testesAtivos.get(id);
+        if (teste) return teste;
         if (simulacao?.id === id) return {...simulacao.estado, simulado:true};
-        return real.get(id) || {codigo:'NORMAL', rotulo:'NORMAL',
+        return atual || {codigo:'NORMAL', rotulo:'NORMAL',
             mensagem:'Status não disponível', prioridade:0, alertaAtivo:false};
     }
+    document.addEventListener('flangeguard:testes-atualizados', function (event) {
+        testesAtivos.clear();
+        estadosReaisCentral.clear();
+        for (const a of event.detail.reais || []) {
+            if (a.teste || !a.ativo || a.flangeId == null) continue;
+            const id = String(a.flangeId);
+            const codigo = {VAZAMENTO_CONFIRMADO:'VAZAMENTO',SUSPEITA_VAZAMENTO:'SUSPEITA',FALHA_COMUNICACAO:'FALHA_SENSOR'}[a.tipo] || 'CRITICO';
+            const prioridade = {VAZAMENTO:100,SUSPEITA:90,CRITICO:85,FALHA_SENSOR:75}[codigo];
+            const rotulo = {VAZAMENTO:'VAZAMENTO CONFIRMADO',SUSPEITA:'POSSÍVEL VAZAMENTO',CRITICO:'ALERTA CRÍTICO',FALHA_SENSOR:'FALHA DE SENSOR'}[codigo];
+            const estado = {codigo,prioridade,rotulo,mensagem:'Ocorrência real registrada · '+a.rotuloEstado+'. Consulte a central.',alertaAtivo:true};
+            if (!estadosReaisCentral.has(id) || estadosReaisCentral.get(id).prioridade < prioridade) estadosReaisCentral.set(id,estado);
+        }
+        idsReaisCentral = new Set(estadosReaisCentral.keys());
+        for (const t of event.detail.testes || []) {
+            if (!t.teste || !t.ativo) continue;
+            const id = String(t.flangeId);
+            const falha = t.tipo === 'FALHA_COMUNICACAO';
+            const estado = {codigo:falha?'FALHA_SENSOR':t.tipo==='VAZAMENTO'?'SUSPEITA':'CRITICO',
+                rotulo:falha?'TESTE · FALHA':t.tipo==='VAZAMENTO'?'TESTE · VAZAMENTO':'TESTE · CRÍTICO',
+                mensagem:'Exercício administrativo · '+t.gravidade+' · '+t.rotuloEstado+'. Não é uma ocorrência real.',
+                prioridade:(falha?65:80)+({MODERADA:1,ALTA:2,CRITICA:3}[t.gravidade]||0),
+                testeEmergencia:true};
+            if (!testesAtivos.has(id) || testesAtivos.get(id).prioridade < estado.prioridade) testesAtivos.set(id,estado);
+        }
+        renderizar();
+    });
     function nomeFlange(id) {
         return cardsPorId.get(id)?.querySelector('.fc-code')?.textContent?.trim() || 'Flange';
     }
@@ -113,13 +152,14 @@
         for (const node of [card, group]) {
             node.dataset.visualState = codigo;
             node.dataset.simulation = String(simulado);
+            node.dataset.testeEmergencia = String(Boolean(estado.testeEmergencia));
             node.dataset.priority = String(estado.prioridade || 0);
             node.classList.toggle('is-sim-critical', simulado && CRITICOS.has(codigo));
             node.classList.toggle('is-sim-warning', simulado && !CRITICOS.has(codigo));
             node.classList.toggle('is-selected', selecionada === id);
             node.setAttribute('aria-pressed', String(selecionada === id));
             node.setAttribute('aria-label', 'Localizar ' + nomeFlange(id) + ': ' + estado.rotulo
-                + (simulado ? ', SIMULAÇÃO' : ', dado registrado'));
+                + (estado.testeEmergencia ? ', TESTE DE EMERGÊNCIA' : simulado ? ', SIMULAÇÃO' : ', dado registrado'));
         }
         const tituloMapa = group.querySelector('.plant-node-status');
         if (tituloMapa) tituloMapa.textContent = estado.rotulo;
@@ -127,7 +167,7 @@
         if (pill) pill.textContent = estado.rotulo;
         const mensagem = card.querySelector('.fc-condition-message');
         if (mensagem) mensagem.textContent = estado.mensagem;
-        card.dataset.alarmActive = String(Boolean(real.get(id)?.alertaAtivo));
+        card.dataset.alarmActive = String(Boolean(real.get(id)?.alertaAtivo || idsReaisCentral.has(id)));
         group.dataset.alarmActive = card.dataset.alarmActive;
     }
     function ordenarLista() {
@@ -159,16 +199,18 @@
     }
     function atualizarBanner() {
         const estadosReais = Array.from(real.values());
-        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo);
-        const criticoReal = estadosReais.some(item => CRITICOS.has(item.codigo));
+        const existeReal = totalReal > 0 || estadosReais.some(item => item.alertaAtivo) || estadosReaisCentral.size > 0;
+        const criticoReal = [...estadosReais,...estadosReaisCentral.values()].some(item => CRITICOS.has(item.codigo));
         const somenteFalha = existeReal && !criticoReal;
         const simCritica = simulacao && CRITICOS.has(simulacao.estado.codigo);
+        const testeCritico = Array.from(testesAtivos.values()).some(t => CRITICOS.has(t.codigo));
+        const temTeste = testesAtivos.size > 0;
         if (banner) {
-            banner.hidden = !(existeReal || simCritica);
-            banner.classList.toggle('is-warning', somenteFalha);
+            banner.hidden = !(existeReal || simCritica || temTeste);
+            banner.classList.toggle('is-warning', somenteFalha || (!existeReal && temTeste && !testeCritico && !simCritica));
         }
         board.classList.toggle('has-real-alert', existeReal && criticoReal);
-        board.classList.toggle('is-sim-critical', Boolean(simCritica) && !existeReal);
+        board.classList.toggle('is-sim-critical', Boolean(simCritica || testeCritico) && !existeReal);
 
         if (existeReal) {
             if (bannerTitle) bannerTitle.textContent = criticoReal
@@ -178,6 +220,10 @@
                 ? 'Condição registrada que requer avaliação. Sinais automáticos não comprovam vazamento de soda cáustica.'
                 : 'Verifique o sensor, a comunicação e a ocorrência; não há confirmação de vazamento.';
             if (bannerTag) bannerTag.textContent = 'DADO REGISTRADO';
+        } else if (temTeste) {
+            if (bannerTitle) bannerTitle.textContent = 'TESTE DE EMERGÊNCIA — '+testesAtivos.size+' flange(s)';
+            if (bannerDescription) bannerDescription.textContent = 'Exercício de software registrado separadamente. Nenhum equipamento foi acionado.';
+            if (bannerTag) bannerTag.textContent = 'TESTE';
         } else if (simCritica) {
             if (bannerTitle) bannerTitle.textContent = 'SIMULAÇÃO — ' + simulacao.nome;
             if (bannerDescription) bannerDescription.textContent =
@@ -279,7 +325,7 @@
         if (!id || !cardsPorId.has(id)) return;
         const realAtual = real.get(id);
         // Ocorrencia real sempre vence; evita mascarar uma flange ja em alerta.
-        if (realAtual?.alertaAtivo || (realAtual?.prioridade || 0) >= 75) {
+        if (testesAtivos.has(id) || idsReaisCentral.has(id) || realAtual?.alertaAtivo || (realAtual?.prioridade || 0) >= 75) {
             if (feedback) {
                 feedback.hidden = false;
                 feedback.textContent = 'Existe uma condição real importante nesta flange. '

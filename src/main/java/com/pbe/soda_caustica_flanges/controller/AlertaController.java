@@ -5,6 +5,8 @@ import com.pbe.soda_caustica_flanges.repository.FlangeRepository;
 import com.pbe.soda_caustica_flanges.repository.IncidenteRepository;
 import com.pbe.soda_caustica_flanges.repository.UsuarioRepository;
 import org.springframework.security.core.Authentication;
+import com.pbe.soda_caustica_flanges.service.CentralAlarmesService;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +23,16 @@ public class AlertaController {
     private final IncidenteRepository incidenteRepository;
     private final UsuarioRepository usuarioRepository;
     private final FlangeRepository flangeRepository;
+    private final CentralAlarmesService centralAlarmes;
 
     public AlertaController(
             IncidenteRepository incidenteRepository,
             UsuarioRepository usuarioRepository,
-            FlangeRepository flangeRepository) {
+            FlangeRepository flangeRepository, CentralAlarmesService centralAlarmes) {
         this.incidenteRepository = incidenteRepository;
         this.usuarioRepository = usuarioRepository;
         this.flangeRepository = flangeRepository;
+        this.centralAlarmes = centralAlarmes;
     }
 
     @GetMapping
@@ -98,8 +102,7 @@ public class AlertaController {
             return "redirect:/alertas?erro=encerrado";
         }
 
-        if (incidente.getStatusAlarme() == StatusAlarme.RECONHECIDO
-                || incidente.getStatusAlarme() == StatusAlarme.EM_MANUTENCAO) {
+        if (!CicloAlarme.aguardaReconhecimento(incidente.getStatusAlarme())) {
             return "redirect:/alertas?erro=ja_reconhecido";
         }
 
@@ -108,11 +111,11 @@ public class AlertaController {
             return "redirect:/alertas?erro=justificativa";
         }
 
-        incidente.setStatusAlarme(StatusAlarme.RECONHECIDO);
-        incidente.setReconhecidoEm(LocalDateTime.now());
-        incidente.setReconhecidoPorEmail(usuario.getEmail());
-        incidente.setJustificativaReconhecimento(motivo);
-        incidenteRepository.save(incidente);
+        try {
+            centralAlarmes.reconhecerReal(authentication, id, motivo);
+        } catch (ResponseStatusException ex) {
+            return "redirect:/alertas?erro=ja_reconhecido";
+        }
 
         redirectAttributes.addAttribute("sucesso", "reconhecido");
         return "redirect:/alertas";
@@ -126,7 +129,7 @@ public class AlertaController {
             RedirectAttributes redirectAttributes) {
 
         Usuario usuario = buscarUsuario(authentication);
-        if (usuario.getRole() != Role.ADMIN) {
+        if (!usuario.isAtivo() || usuario.getRole() != Role.ADMIN) {
             return "redirect:/alertas?erro=permissao";
         }
 
@@ -135,8 +138,7 @@ public class AlertaController {
             return "redirect:/alertas?erro=encerrado";
         }
 
-        if (incidente.getStatusAlarme() != StatusAlarme.RECONHECIDO
-                && incidente.getStatusAlarme() != StatusAlarme.EM_MANUTENCAO) {
+        if (!CicloAlarme.podeResolver(incidente.getStatusAlarme())) {
             return "redirect:/alertas?erro=reconhecimento_obrigatorio";
         }
 
@@ -182,7 +184,7 @@ public class AlertaController {
     }
 
     private boolean podeConsultar(Incidente incidente, Usuario usuario) {
-        if (incidente == null || incidente.getFlange() == null
+        if (!usuario.isAtivo() || incidente == null || incidente.getFlange() == null
                 || incidente.getFlange().getUnidade() == null) {
             return false;
         }

@@ -1,0 +1,53 @@
+/* Central de alarmes — usa as variáveis e a identidade do painel existente. */
+.central-alarmes {margin:0 0 20px;padding:18px;border:1px solid var(--mon-border);border-radius:12px;background:rgba(4,25,59,.32);color:var(--mon-text);}
+.ca-header,.ca-controls {display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.ca-header h3,.ca-header h4 {margin:5px 0;color:var(--mon-text);}
+.ca-header>span,.ca-help,.ca-admin>p {font-size:12px;color:var(--mon-muted);line-height:1.5;}
+.ca-metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0;}
+.ca-metrics>div {border:1px solid var(--mon-border);border-radius:8px;padding:12px;background:rgba(96,165,250,.07);display:flex;flex-direction:column;gap:6px;}
+.ca-metrics small {font-size:11px;color:var(--mon-muted);}
+.ca-metrics strong {font-size:20px;overflow-wrap:anywhere;color:var(--mon-text);}
+#caSom {font-size:13px;}
+#caSom[data-silenciado="true"] {color:#f4c45f;}
+.ca-controls {justify-content:flex-start;margin:10px 0;}
+.central-alarmes button,.ca-controls button,.ca-controls a,#caFecharDetalhes {
+    border:1px solid #6583b1;border-radius:7px;padding:9px 13px;font:700 12px/1.4 'IBM Plex Sans','Segoe UI',sans-serif;
+    color:var(--mon-text,#eff6ff);background:#234773;cursor:pointer;text-decoration:none;
+}
+.central-alarmes button:disabled,.ca-controls button:disabled {opacity:.5;cursor:not-allowed;}
+.central-alarmes h4 {font-size:13px;margin:18px 0 8px;color:var(--mon-text);}
+.ca-list {display:grid;gap:7px;max-height:290px;overflow:auto;padding:2px;}
+.central-alarmes .ca-event {width:100%;display:flex;justify-content:space-between;gap:12px;text-align:left;background:rgba(96,165,250,.08);border:1px solid var(--mon-border);}
+.central-alarmes .ca-event[data-ativo="true"] {border-left:4px solid #fb7185;}
+.central-alarmes .ca-event[data-tipo="FALHA_COMUNICACAO"] {border-left-color:#dba74c;}
+.central-alarmes .ca-event[data-teste="true"] {border:1px dashed #e6b65a;border-left:4px solid #e6b65a;}
+.ca-event-main,.ca-event-state {display:flex;flex-direction:column;gap:4px;min-width:0;}
+.ca-event-main strong,.ca-event-main span {overflow-wrap:anywhere;}
+.ca-event-main small,.ca-event-state small,.ca-empty {font-size:11px;color:var(--mon-muted);}
+.ca-event-state {text-align:right;max-width:42%;}
+.ca-event-state>span {font-size:10px;letter-spacing:.05em;}
+.ca-live:not(:empty) {padding:12px;border-radius:8px;background:#7c263a;color:#fff;border:1px solid #fa8b9f;font-weight:750;font-size:13px;}
+.ca-live[data-teste="true"]:not(:empty) {background:#72541c;border-color:#e9bb64;}
+.ca-admin {margin-top:20px;padding-top:16px;border-top:1px solid var(--mon-border);}
+.ca-confirm {display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.5;}
+.ca-confirm input {width:auto;flex:none;margin-top:3px;}
+.ca-details {display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,1.5fr);gap:8px 12px;font-size:13px;}
+.ca-details dt {font-weight:750;}
+.ca-details dd {margin:0;overflow-wrap:anywhere;}
+#caDetalheErro,#caTesteErro {font-size:12px;min-height:1em;}
+.dash .dashboard-flange-card[data-teste-emergencia="true"] {outline:2px dashed #e6b65a;outline-offset:-5px;}
+.dash .plant-flange[data-teste-emergencia="true"] .plant-node-status {font-weight:900!important;}
+html[data-theme="light"] .central-alarmes {background:#d6e2ee;}
+html[data-theme="light"] .central-alarmes button,html[data-theme="light"] .ca-controls button,html[data-theme="light"] .ca-controls a,html[data-theme="light"] #caFecharDetalhes {background:#d6e3f2;color:#203f65;border-color:#9bb4d0;}
+html[data-theme="light"] .central-alarmes .ca-event {background:#e9eef5;color:#193b5d;}
+html[data-theme="light"] #caSom[data-silenciado="true"] {color:#78530e;}
+@media(max-width:900px) {.ca-metrics {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:480px) {.central-alarmes {padding:12px;}.ca-metrics>div{padding:9px;}.ca-event {flex-wrap:wrap;}.ca-event-state{text-align:left;max-width:100%;}.ca-controls>*{flex:1 1 auto;}}
+
+.ca-distribuicao {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px;margin:10px 0 16px;}
+.ca-distribuicao>div {padding:12px;border:1px solid var(--mon-border);border-radius:8px;}
+.ca-distribuicao h4 {margin:0 0 12px;font-size:12px;}
+.ca-chart-row {display:grid;grid-template-columns:1.35fr 1fr 24px;align-items:center;gap:8px;margin:8px 0;font-size:11px;}
+.ca-chart-row meter {width:100%;height:12px;accent-color:#d89a42;}
+.ca-chart-row strong {text-align:right;}
+#caDetalheConteudo textarea {display:block;width:100%;margin-top:6px;min-height:70px;resize:vertical;}

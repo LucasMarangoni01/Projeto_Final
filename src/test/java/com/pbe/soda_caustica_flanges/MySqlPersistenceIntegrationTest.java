@@ -35,6 +35,8 @@ class MySqlPersistenceIntegrationTest {
     @Autowired private SensorRepository sensores;
     @Autowired private LeituraSensorRepository leituras;
     @Autowired private IncidenteRepository incidentes;
+    @Autowired private TesteEmergenciaRepository testes;
+    @Autowired private jakarta.persistence.EntityManager em;
 
     @Test
     void consultasDoDashboardRetornamSomenteLeiturasAtuais() {
@@ -80,6 +82,47 @@ class MySqlPersistenceIntegrationTest {
                 unidadeA.getId()));
         assertEquals(1, incidentes.findByFlange_Unidade_IdAndDataHoraIsNotNullOrderByDataHoraDesc(
                 unidadeB.getId()).size());
+    }
+
+    @Test
+    void exercicioPersistidoNaoEntraNasEstatisticasNemEncerraAlarmeReal() {
+        Unidade unidade = unidades.save(new Unidade("Teste Exercício", "Setor A", true));
+        Flange flange = criarFlange(unidade, "F-201");
+        Incidente incidente = incidentes.saveAndFlush(criarIncidente(flange));
+        Long idReal = incidente.getId();
+        TesteEmergencia teste = testes.saveAndFlush(new TesteEmergencia(flange,
+                TesteEmergencia.Tipo.VAZAMENTO, TesteEmergencia.Gravidade.CRITICA,
+                "admin@example.com", LocalDateTime.now()));
+        Long idTeste = teste.getId();
+        assertEquals(1, incidentes.countByDataHoraIsNotNullAndNormalizadoEmIsNull());
+        assertEquals(1, testes.findByEstadoNotOrderByDetectadoEmDesc(StatusAlarme.NORMALIZADO).size());
+        teste.reconhecer("admin@example.com", LocalDateTime.now());
+        teste.atender("admin@example.com", LocalDateTime.now());
+        teste.encerrar("admin@example.com", LocalDateTime.now());
+        testes.saveAndFlush(teste);
+        em.clear();
+        assertTrue(incidentes.findById(idReal).orElseThrow().isAlarmeAtivo());
+        assertEquals(StatusFlange.NORMAL, flanges.findById(flange.getId()).orElseThrow().getStatus());
+        assertEquals(StatusAlarme.NORMALIZADO, testes.findById(idTeste).orElseThrow().getEstado());
+        assertEquals(1, testes.findTop20ByEstadoOrderByDetectadoEmDesc(StatusAlarme.NORMALIZADO).size());
+        assertEquals(1, incidentes.countByDataHoraIsNotNullAndNormalizadoEmIsNull());
+    }
+
+    @Test
+    void reconhecimentoEAtendimentoAtomicosNaoNormalizamOcorrencia() {
+        Unidade unidade = unidades.save(new Unidade("Teste Atendimento", "Setor B", true));
+        Flange flange = criarFlange(unidade, "F-202");
+        Long id = incidentes.saveAndFlush(criarIncidente(flange)).getId();
+        LocalDateTime agora = LocalDateTime.now();
+        assertEquals(1, incidentes.reconhecerAtivo(id, StatusAlarme.DISPARADO, StatusAlarme.RECONHECIDO, agora, "operador@example.com", "Verificação"));
+        assertEquals(0, incidentes.reconhecerAtivo(id, StatusAlarme.DISPARADO, StatusAlarme.RECONHECIDO, agora, "operador@example.com", "Repetido"));
+        assertEquals(1, incidentes.marcarEmAtendimento(id, StatusAlarme.RECONHECIDO, StatusAlarme.EM_MANUTENCAO, agora, "operador@example.com"));
+        em.clear();
+        Incidente atualizado = incidentes.findById(id).orElseThrow();
+        assertTrue(atualizado.isAlarmeAtivo());
+        assertEquals(StatusAlarme.EM_MANUTENCAO, atualizado.getStatusAlarme());
+        assertEquals("operador@example.com", atualizado.getAtendimentoPorEmail());
+        assertEquals("Verificação", atualizado.getJustificativaReconhecimento());
     }
 
     private Flange criarFlange(Unidade unidade, String nome) {
