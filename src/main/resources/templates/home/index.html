@@ -1277,6 +1277,10 @@
                     <div><small>Testes ativos</small><strong id="caTestes">—</strong></div>
                     <div><small>Sistema sonoro</small><strong id="caSom" aria-live="polite">Desativado</strong></div>
                 </div>
+                <div class="ca-distribuicao">
+                    <div><h4>Ocorrências reais ativas por categoria</h4><div id="caGraficoReais"></div></div>
+                    <div th:if="${ehAdmin}"><h4>Exercícios ativos por categoria</h4><div id="caGraficoTestes"></div></div>
+                </div>
                 <div class="ca-controls">
                     <button type="button" id="caAtivarSom">Ativar som</button>
                     <button type="button" id="caSilenciar" disabled>Silenciar alarmes atuais</button>
