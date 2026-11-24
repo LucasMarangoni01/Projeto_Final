@@ -4,6 +4,8 @@ import com.pbe.soda_caustica_flanges.model.Incidente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import com.pbe.soda_caustica_flanges.model.StatusAlarme;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,10 @@ import java.util.Optional;
 
 @Repository
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
+
+    @Modifying
+    @Query("UPDATE Incidente i SET i.statusAlarme = :novo WHERE i.id = :id AND i.dataHora IS NOT NULL AND i.normalizadoEm IS NULL AND i.statusAlarme = :anterior")
+    int marcarEmAtendimento(@Param("id") Long id, @Param("anterior") StatusAlarme anterior, @Param("novo") StatusAlarme novo);
 
     // Busca todos os incidentes de um ano específico ordenado por mês
     List<Incidente> findByAnoOrderByMesAsc(Integer ano);
